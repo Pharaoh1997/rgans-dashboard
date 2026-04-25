@@ -41,6 +41,46 @@
 
     <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"></div>
 
+    <div id="start-modal" class="fixed inset-0 z-[10002] hidden items-center justify-center p-4 modal-blur">
+        <div class="bg-rgans-card w-full max-w-xs rounded-[30px] border-2 border-rgans-cyan shadow-[0_0_60px_rgba(34,211,238,0.4)] overflow-hidden animate-pop flex flex-col text-center">
+            <div class="bg-rgans-cyan py-4 px-6 shadow-lg">
+                <p class="font-black text-xl text-rgans-bg uppercase tracking-tighter">Mulai Sesi</p>
+            </div>
+            <div class="p-6 flex flex-col gap-4">
+                <p class="text-white text-xs font-bold uppercase" id="start-unit-name">UNIT --</p>
+                <div class="flex flex-col gap-3">
+                    <button id="btn-start-tamu" class="w-full bg-rgans-card2 border border-rgans-cyan/50 py-4 rounded-2xl text-white font-black text-xs uppercase shadow-lg active:scale-95 transition-all">👤 TAMU REGULER</button>
+                    
+                    <div class="w-full h-px bg-rgans-border2 my-1"></div>
+                    <p class="text-[9px] text-rgans-muted uppercase font-bold tracking-widest">Atau Gunakan Member</p>
+                    
+                    <div class="bg-rgans-bg border border-rgans-border2 rounded-xl p-2 h-[45px] flex items-center shadow-inner relative">
+                        <select id="cmb-pilih-member" class="bg-transparent w-full text-white text-xs font-bold outline-none cursor-pointer pl-2">
+                            <option value="">-- Pilih Member --</option>
+                        </select>
+                    </div>
+                    
+                    <button id="btn-start-member" class="w-full bg-rgans-gold py-4 rounded-2xl text-black font-black text-xs uppercase shadow-lg active:scale-95 transition-all">⭐ PEMAIN MEMBER</button>
+                </div>
+                <button onclick="document.getElementById('start-modal').classList.replace('flex', 'hidden')" class="text-[10px] text-rgans-muted underline mt-2">Batalkan</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notif-modal" class="fixed inset-0 z-[10001] hidden items-center justify-center p-4 modal-blur">
+        <div class="bg-rgans-card w-full max-w-xs rounded-[30px] border-2 border-rgans-red shadow-[0_0_60px_rgba(239,68,68,0.4)] overflow-hidden animate-pop flex flex-col text-center">
+            <div class="bg-rgans-red py-4 shadow-lg"><p class="font-black text-xl text-white uppercase tracking-tighter">Konfirmasi Stop</p></div>
+            <div class="p-6 flex flex-col gap-5">
+                <div><p class="text-rgans-muted text-[10px] font-bold uppercase tracking-widest mb-1">Unit Station</p><p class="text-3xl font-black text-white" id="nt-unit">--</p></div>
+                <div class="flex flex-col gap-2">
+                    <button id="nt-btn-yes" class="w-full bg-rgans-green py-4 rounded-2xl text-white font-black text-sm uppercase shadow-lg active:scale-95 transition-all">Sudah Bayar (Reset)</button>
+                    <button id="nt-btn-no" class="w-full bg-rgans-card2 border border-rgans-border2 py-3 rounded-2xl text-rgans-muted font-bold text-[10px] uppercase active:scale-95 transition-all">Nanti (Hanya Stop)</button>
+                </div>
+                <button onclick="document.getElementById('notif-modal').classList.replace('flex', 'hidden')" class="text-[10px] text-rgans-muted underline mt-2">Batal</button>
+            </div>
+        </div>
+    </div>
+
     <div id="super-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4 modal-blur">
         <div class="bg-rgans-card w-full max-w-sm rounded-[30px] border-2 border-rgans-cyan shadow-[0_0_60px_rgba(34,211,238,0.4)] overflow-hidden animate-pop flex flex-col">
             <div class="bg-rgans-cyan py-4 px-6 text-center shadow-lg relative">
@@ -112,7 +152,7 @@
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col min-w-0 bg-rgans-bg relative">
+    <main class="flex-1 flex flex-col min-w-0 bg-rgans-bg relative overflow-y-auto">
         <header class="border-b border-rgans-border bg-rgans-card/50 backdrop-blur-md sticky top-0 z-10 p-3 shrink-0">
             <div class="grid grid-cols-3 gap-2 max-w-6xl mx-auto mb-2">
                 <div class="bg-rgans-bg p-2 rounded-xl border border-rgans-border text-center shadow-inner">
@@ -134,7 +174,7 @@
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-4 hide-scroll pb-20">
+        <div class="flex-1 overflow-y-auto p-4 hide-scroll pb-24">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="wadah-ps"></div>
         </div>
     </main>
@@ -147,9 +187,12 @@
         let activeTimers = {};
         let localState = {}; 
         let stationsData = {}; 
+        let globalListMember = []; 
+        let strukTimer = null; 
 
         setInterval(() => { 
-            document.getElementById('jam-digital').innerText = new Date().toLocaleTimeString('id-ID', { hour12: false }); 
+            const el = document.getElementById('jam-digital');
+            if(el) el.innerText = new Date().toLocaleTimeString('id-ID', { hour12: false }); 
         }, 1000);
 
         function showToast(msg, isSuccess = true) {
@@ -221,7 +264,7 @@
         class AppManager {
             constructor() {
                 this.wadah = document.getElementById('wadah-ps');
-                this.isFirstLoadStruk = true; // LOGIKA BARU ANTI-BUG
+                this.isFirstLoadStruk = true; 
                 this.lastReceiptTime = null; 
                 this.setupFirebase();
                 this.startSmoothPricing();
@@ -235,42 +278,41 @@
             setupFirebase() {
                 db.ref('.info/connected').on('value', s => {
                     const el = document.getElementById('connection-status');
-                    el.innerText = s.val() ? '● ONLINE' : '● OFFLINE';
-                    el.className = s.val() ? 'text-[10px] font-bold text-rgans-green' : 'text-[10px] font-bold text-rgans-red';
+                    if(el) {
+                        el.innerText = s.val() ? '● ONLINE' : '● OFFLINE';
+                        el.className = s.val() ? 'text-[10px] font-bold text-rgans-green' : 'text-[10px] font-bold text-rgans-red';
+                    }
                 });
 
-                // ============================================================
-                // LOGIKA LISTENER STRUK YANG SUDAH DIPERBAIKI TOTAL
-                // ============================================================
                 db.ref('struk_terakhir').on('value', snap => {
                     const s = snap.val();
                     if (!s) return;
-
-                    // 1. Saat web pertama kali dibuka, abaikan data struk terakhir
-                    if (this.isFirstLoadStruk) {
-                        this.lastReceiptTime = s.waktu_update;
-                        this.isFirstLoadStruk = false;
-                        return; // Berhenti di sini
+                    if (this.isFirstLoadStruk) { 
+                        this.lastReceiptTime = s.waktu_update; 
+                        this.isFirstLoadStruk = false; 
+                        return; 
                     }
-
-                    // 2. Jika ada data baru masuk
                     if (s.waktu_update !== this.lastReceiptTime) {
-                        this.showSuperModal(s); // Munculkan modal raksasa
-                        this.lastReceiptTime = s.waktu_update; // Perbarui catatan
+                        this.showSuperModal(s);
+                        this.lastReceiptTime = s.waktu_update;
                     }
                 });
 
                 db.ref('dashboard_rgans').on('value', snap => {
                     const data = snap.val(); if (!data) return;
-                    document.getElementById('ui-omset-hari').innerText = `Rp ${parseInt(data.omset_hari_ini || 0).toLocaleString('id-ID')}`;
-                    document.getElementById('ui-omset-minggu').innerText = `Rp ${parseInt(data.omset_minggu_ini || 0).toLocaleString('id-ID')}`;
-                    document.getElementById('ui-omset-bulan').innerText = `Rp ${parseInt(data.omset_bulan_ini || 0).toLocaleString('id-ID')}`;
-                    document.getElementById('ui-kasir').innerText = data.status_kasir || "ADMIN";
-                    document.getElementById('ui-status').innerText = `● LIVE: ${data.terakhir_update ? data.terakhir_update.split(' ')[1] : '--:--'}`;
-                    
+                    try {
+                        document.getElementById('ui-omset-hari').innerText = `Rp ${parseInt(data.omset_hari_ini || 0).toLocaleString('id-ID')}`;
+                        document.getElementById('ui-omset-minggu').innerText = `Rp ${parseInt(data.omset_minggu_ini || 0).toLocaleString('id-ID')}`;
+                        document.getElementById('ui-omset-bulan').innerText = `Rp ${parseInt(data.omset_bulan_ini || 0).toLocaleString('id-ID')}`;
+                        document.getElementById('ui-kasir').innerText = data.status_kasir || "ADMIN";
+                        document.getElementById('ui-status').innerText = `● LIVE: ${data.terakhir_update ? data.terakhir_update.split(' ')[1] : '--:--'}`;
+                        
+                        if(data.daftar_member && Array.isArray(data.daftar_member)){
+                            globalListMember = data.daftar_member;
+                        }
+                    } catch(e) {}
+
                     stationsData = data.station_aktif || {};
-                    
-                    // FIX URUTAN: Menggunakan urutan asli dari Python (urutan_station)
                     const urutan = data.urutan_station || Object.keys(stationsData);
                     
                     urutan.forEach((n, idx) => {
@@ -280,16 +322,12 @@
                             k.id = `box-${n}`;
                             this.wadah.appendChild(k);
                         }
-                        
-                        // Sinkronkan posisi kotak di layar agar sesuai urutan aplikasi PC
                         if (this.wadah.children[idx] !== k) {
                             this.wadah.insertBefore(k, this.wadah.children[idx]);
                         }
-                        
                         this.syncBoxUI(n, stationsData[n], k);
                     });
 
-                    // Hapus kotak dari layar jika unit tersebut dihapus di aplikasi PC
                     Array.from(this.wadah.children).forEach(child => {
                         const idNama = child.id.replace('box-', '');
                         if (!stationsData[idNama]) child.remove();
@@ -297,25 +335,104 @@
                 });
             }
 
-            // --- FUNGSI MUNCULKAN MODAL STRUK ---
             showSuperModal(s) {
                 const modal = document.getElementById('super-modal');
-                // Mengambil isian dari database Firebase persis sesuai aplikasi
-                document.getElementById('sm-unit').innerText = s.unit || '--';
-                document.getElementById('sm-customer').innerText = s.customer || 'TAMU REGULER'; 
-                document.getElementById('sm-tanggal').innerText = s.tanggal || '--/--/----';
-                document.getElementById('sm-mulai').innerText = s.mulai || '--:--';
-                document.getElementById('sm-selesai').innerText = s.selesai || '--:--';
-                document.getElementById('sm-durasi').innerText = s.durasi || '--:--:--';
-                document.getElementById('sm-total').innerText = `Rp ${parseInt(s.total || 0).toLocaleString('id-ID')}`;
+                if(!modal) return;
                 
-                // Tampilkan Modal
+                document.getElementById('sm-unit').innerText = s.unit || '--';
+                
+                // MENGHITUNG DURASI ASLI DAN HARGA MEMBER DI WEB 
+                const waktuMulai = s.mulai || '--:--';
+                const waktuSelesai = s.selesai || '--:--';
+                document.getElementById('sm-tanggal').innerText = s.tanggal || '--/--/----';
+                document.getElementById('sm-mulai').innerText = waktuMulai;
+                document.getElementById('sm-selesai').innerText = waktuSelesai;
+                
+                // Menghitung selisih waktu
+                let durasiAsli = s.durasi || '--:--:--';
+                if (waktuMulai.includes(':') && waktuSelesai.includes(':')) {
+                    const [h1, m1] = waktuMulai.split(':').map(Number);
+                    const [h2, m2] = waktuSelesai.split(':').map(Number);
+                    let menitM1 = (h1 * 60) + m1;
+                    let menitM2 = (h2 * 60) + m2;
+                    if (menitM2 < menitM1) menitM2 += 24 * 60; // Beda hari
+                    let selisihMenit = menitM2 - menitM1;
+                    let jam = Math.floor(selisihMenit / 60);
+                    let mnt = selisihMenit % 60;
+                    durasiAsli = `${jam} Jam ${mnt} Menit`;
+                }
+                document.getElementById('sm-durasi').innerText = durasiAsli;
+
+                // Validasi Tamu / Member
+                if (s.customer && s.customer !== "TAMU REGULER") {
+                    document.getElementById('sm-customer').innerText = s.customer; 
+                    document.getElementById('sm-total').innerText = "MEMBER";
+                } else {
+                    document.getElementById('sm-customer').innerText = 'TAMU REGULER'; 
+                    document.getElementById('sm-total').innerText = `Rp ${parseInt(s.total || 0).toLocaleString('id-ID')}`;
+                }
+
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
+
+                if(strukTimer) clearTimeout(strukTimer);
+                strukTimer = setTimeout(() => {
+                    modal.classList.replace('flex', 'hidden');
+                }, 10000); 
+            }
+
+            showStartModal(n) {
+                const modal = document.getElementById('start-modal');
+                if(!modal) return;
+                document.getElementById('start-unit-name').innerText = n.toUpperCase();
+                
+                const cmb = document.getElementById('cmb-pilih-member');
+                if(cmb) {
+                    cmb.innerHTML = '<option value="">-- Pilih Member --</option>';
+                    globalListMember.forEach(item => {
+                        let opt = document.createElement('option');
+                        opt.value = item; 
+                        opt.innerText = item;
+                        cmb.appendChild(opt);
+                    });
+                }
+                
+                modal.classList.replace('hidden', 'flex');
+                
+                const p = document.getElementById(`paket-${n}`).value;
+                document.getElementById('btn-start-tamu').onclick = () => {
+                    this.kirimPerintah(n, 'START_SESSION', p + "|TAMU");
+                    modal.classList.replace('flex', 'hidden');
+                };
+                document.getElementById('btn-start-member').onclick = () => {
+                    if (cmb && cmb.value !== "") {
+                        const memID = cmb.value.split(" - ")[0];
+                        this.kirimPerintah(n, 'START_SESSION', p + "|" + memID);
+                        modal.classList.replace('flex', 'hidden');
+                    } else {
+                        showToast("Pilih member dulu!", false);
+                    }
+                };
+            }
+
+            showNotifModal(n) {
+                const modal = document.getElementById('notif-modal');
+                if(!modal) return;
+                document.getElementById('nt-unit').innerText = n.toUpperCase();
+                modal.classList.replace('hidden', 'flex');
+                
+                document.getElementById('nt-btn-yes').onclick = () => {
+                    this.kirimPerintah(n, 'STOP_SESSION', 'YES');
+                    modal.classList.replace('flex', 'hidden');
+                };
+                document.getElementById('nt-btn-no').onclick = () => {
+                    this.kirimPerintah(n, 'STOP_SESSION', 'NO');
+                    modal.classList.replace('flex', 'hidden');
+                };
             }
 
             syncBoxUI(n, info, kotak) {
-                if (!kotak) return;
+                if (!kotak || !info) return;
                 const btnU = kotak.querySelector('.btn-utama');
                 const btnUpdate = kotak.querySelector('.btn-update');
                 const btnL = kotak.querySelector('.btn-lunas');
@@ -353,11 +470,18 @@
                     
                     btnU.innerText = "🛑 STOP SESI";
                     btnU.className = "btn-utama btn-klik flex-1 bg-rgans-red_dim/50 border border-rgans-red/50 text-rgans-red text-xs font-bold py-3 rounded-xl transition-all mb-2";
-                    btnU.onclick = () => this.stopSesi(n);
+                    
+                    // JIKA MEMBER ATAU SUDAH LUNAS -> LANGSUNG STOP (TANPA MODAL)
+                    btnU.onclick = () => {
+                        if (info.is_member || info.lunas) {
+                            this.kirimPerintah(n, 'STOP_SESSION', 'YES');
+                        } else {
+                            this.showNotifModal(n);
+                        }
+                    };
 
                     [btnL, btnMove, btnPlus30, btnStruk].forEach(b => { 
-                        b.classList.remove('btn-disabled'); 
-                        b.disabled = false; 
+                        if(b) { b.classList.remove('btn-disabled'); b.disabled = false; }
                     });
 
                     if (hargaEl) {
@@ -386,35 +510,56 @@
                     
                     btnU.innerText = "▶ MULAI SESI";
                     btnU.className = "btn-utama btn-klik flex-1 bg-rgans-green text-white shadow-[0_4px_15px_rgba(16,185,129,0.3)] text-xs font-bold py-3 rounded-xl transition-all mb-2";
-                    btnU.onclick = () => this.mulaiSesi(n);
+                    
+                    btnU.onclick = () => this.showStartModal(n);
+                    
                     btnUpdate.classList.add('hidden');
 
                     [btnL, btnMove, btnPlus30, btnStruk].forEach(b => { 
-                        b.classList.add('btn-disabled'); 
-                        b.disabled = true; 
+                        if(b) { b.classList.add('btn-disabled'); b.disabled = true; }
                     });
 
                     if(localState[n]) sel.value = localState[n];
                     if (activeTimers[n]) { clearInterval(activeTimers[n]); delete activeTimers[n]; }
-                    tim.innerText = "00:00:00"; 
-                    tim.className = 'font-mono text-4xl sm:text-5xl font-bold text-rgans-muted tracking-tighter';
+                    if(tim) {
+                        tim.innerText = "00:00:00"; 
+                        tim.className = 'font-mono text-4xl sm:text-5xl font-bold text-rgans-muted tracking-tighter';
+                    }
                     if (hargaEl) hargaEl.innerText = "Rp 0";
+                    
+                    const modalNotif = document.getElementById('notif-modal');
+                    const ntUnit = document.getElementById('nt-unit');
+                    if (modalNotif && ntUnit && !modalNotif.classList.contains('hidden') && ntUnit.innerText === n.toUpperCase()) {
+                        modalNotif.classList.replace('flex', 'hidden');
+                    }
                 }
 
-                btnL.innerText = info.lunas ? "LUNAS" : "BELUM";
-                btnL.className = `btn-lunas btn-klik col-span-2 text-[9px] font-bold rounded-lg transition border ${info.lunas ? 'bg-rgans-green/20 border-rgans-green/50 text-rgans-green' : 'bg-rgans-red/20 border-rgans-red/50 text-rgans-red'} ${!info.running ? 'btn-disabled' : ''}`;
-                btnL.onclick = () => this.kirimPerintah(n, 'PAY_TOGGLE');
-
-                if (info.is_time_up && !window[`notified_${n}`]) {
-                    window[`notified_${n}`] = true;
-                    if (confirm(`WAKTU HABIS: ${n.toUpperCase()}\nSudah bayar?`)) this.kirimPerintah(n, 'STOP_SESSION', 'YES');
+                if(btnL) {
+                    btnL.innerText = info.lunas ? "LUNAS" : "BELUM";
+                    btnL.className = `btn-lunas btn-klik col-span-2 text-[9px] font-bold rounded-lg transition border ${info.lunas ? 'bg-rgans-green/20 border-rgans-green/50 text-rgans-green' : 'bg-rgans-red/20 border-rgans-red/50 text-rgans-red'} ${!info.running ? 'btn-disabled' : ''}`;
+                    btnL.onclick = () => this.kirimPerintah(n, 'PAY_TOGGLE');
                 }
-                if (!info.running) window[`notified_${n}`] = false;
+
+                // KETIKA WAKTU HABIS OTOMATIS
+                const sessID = info.start_ts || 0;
+                if (info.running && info.is_time_up && window[`notifLock_${n}`] !== sessID) {
+                    window[`notifLock_${n}`] = sessID;
+                    
+                    // BACA STATUS: JIKA MEMBER ATAU SUDAH LUNAS -> LANGSUNG STOP
+                    if (info.is_member || info.lunas) {
+                        this.kirimPerintah(n, 'STOP_SESSION', 'YES');
+                    } else {
+                        // Jika Tamu dan Belum Lunas -> Panggil Modal Notif
+                        this.showNotifModal(n);
+                    }
+                }
+                if (!info.running) window[`notifLock_${n}`] = null;
             }
 
             runTimer(n, info) {
                 if (activeTimers[n]) clearInterval(activeTimers[n]);
                 const el = document.getElementById(`timer-${n}`);
+                if(!el) return;
                 activeTimers[n] = setInterval(() => {
                     const now = new Date().getTime();
                     const start = info.start_ts;
@@ -429,12 +574,9 @@
                     const m = Math.floor((absD%3600000)/60000).toString().padStart(2,'0');
                     const s = Math.floor((absD%60000)/1000).toString().padStart(2,'0');
                     el.innerText = `${h}:${m}:${s}`;
-                    el.className = 'font-mono text-4xl sm:text-5xl font-bold text-white tracking-tighter';
+                    
+                    el.className = (info.is_time_up) ? 'font-mono text-4xl sm:text-5xl font-bold text-rgans-red animate-pulse tracking-tighter' : 'font-mono text-4xl sm:text-5xl font-bold text-white tracking-tighter';
                 }, 1000);
-            }
-
-            startSmoothPricing() {
-                console.log("Mirroring Engine Active");
             }
 
             async kirimPerintah(unit, aksi, val = "") {
@@ -444,20 +586,11 @@
                 } catch (e) { showToast(`Gagal!`, false); }
             }
 
-            mulaiSesi(unit) {
-                const p = document.getElementById(`paket-${unit}`).value;
-                this.kirimPerintah(unit, 'START_SESSION', p);
-            }
-
             updateSesi(unit) {
-                const p = document.getElementById(`paket-${unit}`).value;
-                this.kirimPerintah(unit, 'UPDATE_SESSION', p);
-                localState[unit] = null;
-            }
-
-            stopSesi(unit) {
-                if (confirm(`Yakin ingin STOP ${unit.toUpperCase()}?`)) {
-                    this.kirimPerintah(unit, 'STOP_SESSION', 'YES');
+                const sel = document.getElementById(`paket-${unit}`);
+                if(sel) {
+                    this.kirimPerintah(unit, 'UPDATE_SESSION', sel.value);
+                    localState[unit] = null;
                 }
             }
         }
