@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>R-GANS BOSS - Remote Web (REALTIME)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        rgans: {
+                            bg: '#0f172a', card: '#1e293b', card2: '#334155', border: '#334155', border2: '#475569',
+                            text: '#f8fafc', muted: '#94a3b8', cyan: '#22d3ee', gold: '#fbbf24', green: '#10b981', red: '#ef4444', red_dim: '#7f1d1d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        .btn-klik:active { transform: scale(0.95); transition: 0.1s; }
+        .toast-entry { animation: slideIn 0.3s ease forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        select { -webkit-appearance: none; appearance: none; }
+        .btn-disabled { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
+        .modal-blur { backdrop-filter: blur(8px); background-color: rgba(15, 23, 42, 0.85); }
+        @keyframes popUp { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .animate-pop { animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col md:flex-row font-sans">
+
+    <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"></div>
+
+    <div id="super-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4 modal-blur">
+        <div class="bg-rgans-card w-full max-w-sm rounded-[30px] border-2 border-rgans-cyan shadow-[0_0_60px_rgba(34,211,238,0.4)] overflow-hidden animate-pop flex flex-col">
+            <div class="bg-rgans-cyan py-4 px-6 text-center shadow-lg relative">
+                <div class="absolute w-8 h-8 bg-white/20 rounded-full top-2 right-2 flex items-center justify-center animate-pulse">🛎️</div>
+                <p class="font-black text-xl tracking-tight text-rgans-bg">SESI SELESAI!</p>
+                <p class="text-xs font-bold text-rgans-bg/80 uppercase tracking-widest mt-1">R-Gans Playstation</p>
+            </div>
+            <div class="p-6 flex-1 flex flex-col gap-4">
+                <div class="bg-rgans-bg rounded-2xl p-4 border border-rgans-border2 shadow-inner">
+                    <div class="flex justify-between items-center mb-2 pb-2 border-b border-dashed border-rgans-border2">
+                        <span class="text-rgans-muted text-xs font-bold uppercase tracking-widest">Unit</span>
+                        <span class="text-white text-sm font-black bg-rgans-card px-2 py-0.5 rounded border border-rgans-border2" id="sm-unit">--</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-rgans-muted text-xs">Customer</span>
+                        <span class="text-white font-mono text-[11px] font-bold bg-rgans-card2 px-1.5 py-0.5 rounded" id="sm-customer">--</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-rgans-muted text-xs">Date</span>
+                        <span class="text-white font-mono text-[11px] font-bold" id="sm-tanggal">--/--/----</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-rgans-muted text-xs">Time Started</span>
+                        <span class="text-white font-mono text-[11px] font-bold" id="sm-mulai">--:--</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-rgans-muted text-xs">Time Ended</span>
+                        <span class="text-white font-mono text-[11px] font-bold" id="sm-selesai">--:--</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-rgans-muted text-xs">Total Duration</span>
+                        <span class="text-rgans-cyan font-bold text-xs bg-rgans-cyan/10 px-1.5 py-0.5 rounded border border-rgans-cyan/30" id="sm-durasi">--:--:--</span>
+                    </div>
+                </div>
+                
+                <div class="bg-rgans-card2/50 rounded-2xl p-4 border border-rgans-border text-center">
+                    <p class="text-[10px] text-rgans-gold font-bold uppercase tracking-widest mb-1">Total Tagihan</p>
+                    <p class="text-3xl font-mono font-black text-white" id="sm-total">Rp 0</p>
+                </div>
+                
+                <button onclick="document.getElementById('super-modal').classList.replace('flex', 'hidden')" class="w-full bg-gradient-to-r from-rgans-cyan to-blue-500 py-4 rounded-2xl text-rgans-bg font-black text-sm shadow-[0_10px_20px_rgba(34,211,238,0.3)] active:scale-95 transition-all mt-2 uppercase tracking-widest">
+                    Tutup Struk
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <aside class="w-full md:w-[220px] bg-rgans-card border-b md:border-r border-rgans-border flex md:flex-col shrink-0">
+        <div class="h-16 border-b border-rgans-border flex items-center justify-center md:justify-start px-4">
+            <h1 class="text-rgans-gold font-bold text-lg tracking-tighter">R-GANS <span class="text-white text-xs">BOSS</span></h1>
+        </div>
+        <div class="p-4 border-b border-rgans-border flex items-center gap-3 justify-center md:justify-start">
+            <div class="w-10 h-10 rounded-full bg-rgans-card2 flex items-center justify-center text-lg shadow-inner">👤</div>
+            <div class="hidden md:block">
+                <p class="text-xs font-bold text-white uppercase" id="ui-kasir">ADMIN</p>
+                <p class="text-[10px] text-rgans-green font-semibold">Owner Mode</p>
+            </div>
+        </div>
+        <nav class="flex-1 p-2 flex md:flex-col gap-1">
+            <button class="flex items-center justify-center md:justify-start gap-3 p-3 rounded-xl bg-rgans-cyan/10 text-rgans-cyan border border-rgans-cyan/20 font-bold text-xs shrink-0">
+                <span class="text-lg">🎮</span> <span class="hidden md:inline">DASHBOARD</span>
+            </button>
+        </nav>
+        <div class="p-3 border-t border-rgans-border">
+            <div class="bg-rgans-bg px-2 py-1.5 rounded-lg text-center border border-rgans-border shadow-inner">
+                <p class="text-[9px] text-rgans-muted font-bold uppercase tracking-widest">Koneksi Cloud</p>
+                <p class="text-[10px] font-bold text-rgans-green" id="connection-status">● ONLINE</p>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0 bg-rgans-bg relative">
+        <header class="border-b border-rgans-border bg-rgans-card/50 backdrop-blur-md sticky top-0 z-10 p-3 shrink-0">
+            <div class="grid grid-cols-3 gap-2 max-w-6xl mx-auto mb-2">
+                <div class="bg-rgans-bg p-2 rounded-xl border border-rgans-border text-center shadow-inner">
+                    <p class="text-[8px] text-rgans-muted font-bold uppercase tracking-tighter">Hari Ini</p>
+                    <p class="text-xs font-bold text-rgans-green leading-none mt-1" id="ui-omset-hari">Rp 0</p>
+                </div>
+                <div class="bg-rgans-bg p-2 rounded-xl border border-rgans-border text-center shadow-inner">
+                    <p class="text-[8px] text-rgans-muted font-bold uppercase tracking-tighter">Minggu Ini</p>
+                    <p class="text-xs font-bold text-rgans-gold leading-none mt-1" id="ui-omset-minggu">Rp 0</p>
+                </div>
+                <div class="bg-rgans-bg p-2 rounded-xl border border-rgans-border text-center shadow-inner">
+                    <p class="text-[8px] text-rgans-muted font-bold uppercase tracking-tighter">Bulan Ini</p>
+                    <p class="text-xs font-bold text-rgans-cyan leading-none mt-1" id="ui-omset-bulan">Rp 0</p>
+                </div>
+            </div>
+            <div class="flex justify-between items-center px-1">
+                <p class="text-[9px] text-rgans-green font-bold uppercase" id="ui-status">● LIVE</p>
+                <p class="text-sm font-mono font-bold text-white" id="jam-digital">00:00:00</p>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-4 hide-scroll pb-20">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="wadah-ps"></div>
+        </div>
+    </main>
+
+    <script>
+        const firebaseConfig = { databaseURL: "https://rgans-premier-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let activeTimers = {};
+        let localState = {}; 
+        let stationsData = {}; 
+
+        setInterval(() => { 
+            document.getElementById('jam-digital').innerText = new Date().toLocaleTimeString('id-ID', { hour12: false }); 
+        }, 1000);
+
+        function showToast(msg, isSuccess = true) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-entry pointer-events-auto px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-bold border border-rgans-border2
+                              ${isSuccess ? 'bg-rgans-card text-rgans-cyan' : 'bg-rgans-red_dim text-white'}`;
+            toast.innerHTML = `<span>${isSuccess ? '📡' : '⚠️'}</span> ${msg}`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        class PSBoxUI {
+            constructor(name) { this.name = name; }
+            render() {
+                const kotak = document.createElement('div');
+                kotak.className = `box-ps bg-rgans-card rounded-2xl border border-rgans-border transition-all duration-300 flex flex-col h-full overflow-hidden`;
+                kotak.innerHTML = `
+                    <div class="status-bar h-1.5 shrink-0 bg-rgans-border2"></div>
+                    <div class="p-3.5 flex flex-col flex-1">
+                        <div class="flex justify-between items-center mb-1 shrink-0">
+                            <div class="flex items-center gap-2">
+                                <span class="status-dot text-[11px] text-rgans-border2">●</span>
+                                <span class="font-bold text-sm text-white tracking-tight">${this.name.toUpperCase()}</span>
+                            </div>
+                            <div class="flex bg-rgans-card2 rounded-lg p-[3px] border border-rgans-border2 shadow-inner">
+                                <button onclick="window.R_GANS.kirimPerintah('${this.name}', 'WIZ_ON')" class="btn-on btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md text-rgans-muted transition">ON</button>
+                                <button onclick="window.R_GANS.kirimPerintah('${this.name}', 'WIZ_OFF')" class="btn-off btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md text-rgans-muted transition">OFF</button>
+                            </div>
+                        </div>
+                        <div class="flex-1 flex flex-col items-center justify-center py-4 min-h-[70px]">
+                            <p class="member-label text-[10px] font-bold text-rgans-cyan/80 mb-1 tracking-widest uppercase truncate w-full text-center h-4"></p>
+                            <h2 id="timer-${this.name}" class="font-mono text-4xl sm:text-5xl font-bold text-rgans-muted tracking-tighter">00:00:00</h2>
+                        </div>
+                        <div class="flex justify-between items-center mb-4 shrink-0 px-1 border-b border-rgans-border2/30 pb-2">
+                            <span id="harga-${this.name}" class="font-mono font-bold text-base text-rgans-gold">Rp 0</span>
+                            <span class="mode-label text-[10px] font-extrabold text-rgans-gold/70 bg-rgans-gold/10 px-2 py-0.5 rounded-full border border-rgans-gold/20 uppercase tracking-tighter">IDLE</span>
+                        </div>
+                        <div class="mt-auto shrink-0 flex flex-col gap-2.5">
+                            <div class="flex bg-rgans-bg border border-rgans-border2 rounded-xl p-1 h-[38px] shadow-inner items-center">
+                                <input type="text" placeholder="--:--" class="jam-mulai bg-transparent w-[70%] px-2 text-center font-mono text-xs font-bold text-rgans-muted outline-none" disabled>
+                                <div class="w-[1px] h-4 bg-rgans-border2 mx-1"></div>
+                                <select id="paket-${this.name}" onchange="window.R_GANS.saveLocal('${this.name}', this.value)" class="bg-transparent w-[30%] px-1 text-rgans-cyan text-[11px] font-bold outline-none cursor-pointer text-center">
+                                    <option value="Bebas">Bebas</option>
+                                    <option value="60">1 Jam</option>
+                                    <option value="120">2 Jam</option>
+                                    <option value="180">3 Jam</option>
+                                    <option value="240">4 Jam</option>
+                                    <option value="300">5 Jam</option>
+                                </select>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="btn-utama btn-klik flex-1 bg-rgans-green text-white shadow-[0_4px_15px_rgba(16,185,129,0.3)] text-xs font-bold py-3 rounded-xl transition-all">▶ MULAI SESI</button>
+                                <button class="btn-update btn-klik hidden bg-rgans-cyan text-rgans-bg text-[10px] font-extrabold px-3 py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(34,211,238,0.4)]">💾 UPDATE</button>
+                            </div>
+                            <div class="grid grid-cols-4 gap-1.5 h-[36px]">
+                                <button onclick="window.R_GANS.kirimPerintah('${this.name}', 'MOVE')" class="btn-move btn-klik bg-rgans-card2 border border-rgans-border2 text-rgans-muted text-[9px] font-bold rounded-lg hover:bg-rgans-border transition flex items-center justify-center">⇄</button>
+                                <button class="btn-lunas btn-klik col-span-2 text-[9px] font-bold rounded-lg transition border">BELUM</button>
+                                <button onclick="window.R_GANS.kirimPerintah('${this.name}', 'ADD_TIME', '30')" class="btn-plus30 btn-klik bg-rgans-card2 border border-rgans-border2 text-rgans-muted text-[9px] font-bold rounded-lg hover:bg-rgans-border transition flex items-center justify-center">+30</button>
+                            </div>
+                            <button onclick="window.R_GANS.kirimPerintah('${this.name}', 'PRINT_STRUK')" class="btn-struk btn-klik w-full bg-rgans-cyan/10 border border-rgans-cyan/30 text-rgans-cyan text-[10px] font-bold py-1.5 rounded-lg transition-all">🖨️ CETAK STRUK</button>
+                        </div>
+                    </div>
+                `;
+                return kotak;
+            }
+        }
+
+        class AppManager {
+            constructor() {
+                this.wadah = document.getElementById('wadah-ps');
+                this.isFirstLoadStruk = true; // LOGIKA BARU ANTI-BUG
+                this.lastReceiptTime = null; 
+                this.setupFirebase();
+                this.startSmoothPricing();
+            }
+
+            saveLocal(n, v) { 
+                localState[n] = v; 
+                this.syncBoxUI(n, stationsData[n], document.getElementById(`box-${n}`));
+            }
+
+            setupFirebase() {
+                db.ref('.info/connected').on('value', s => {
+                    const el = document.getElementById('connection-status');
+                    el.innerText = s.val() ? '● ONLINE' : '● OFFLINE';
+                    el.className = s.val() ? 'text-[10px] font-bold text-rgans-green' : 'text-[10px] font-bold text-rgans-red';
+                });
+
+                // ============================================================
+                // LOGIKA LISTENER STRUK YANG SUDAH DIPERBAIKI TOTAL
+                // ============================================================
+                db.ref('struk_terakhir').on('value', snap => {
+                    const s = snap.val();
+                    if (!s) return;
+
+                    // 1. Saat web pertama kali dibuka, abaikan data struk terakhir
+                    if (this.isFirstLoadStruk) {
+                        this.lastReceiptTime = s.waktu_update;
+                        this.isFirstLoadStruk = false;
+                        return; // Berhenti di sini
+                    }
+
+                    // 2. Jika ada data baru masuk
+                    if (s.waktu_update !== this.lastReceiptTime) {
+                        this.showSuperModal(s); // Munculkan modal raksasa
+                        this.lastReceiptTime = s.waktu_update; // Perbarui catatan
+                    }
+                });
+
+                db.ref('dashboard_rgans').on('value', snap => {
+                    const data = snap.val(); if (!data) return;
+                    document.getElementById('ui-omset-hari').innerText = `Rp ${parseInt(data.omset_hari_ini || 0).toLocaleString('id-ID')}`;
+                    document.getElementById('ui-omset-minggu').innerText = `Rp ${parseInt(data.omset_minggu_ini || 0).toLocaleString('id-ID')}`;
+                    document.getElementById('ui-omset-bulan').innerText = `Rp ${parseInt(data.omset_bulan_ini || 0).toLocaleString('id-ID')}`;
+                    document.getElementById('ui-kasir').innerText = data.status_kasir || "ADMIN";
+                    document.getElementById('ui-status').innerText = `● LIVE: ${data.terakhir_update ? data.terakhir_update.split(' ')[1] : '--:--'}`;
+                    
+                    stationsData = data.station_aktif || {};
+                    
+                    // FIX URUTAN: Menggunakan urutan asli dari Python (urutan_station)
+                    const urutan = data.urutan_station || Object.keys(stationsData);
+                    
+                    urutan.forEach((n, idx) => {
+                        let k = document.getElementById(`box-${n}`);
+                        if (!k) {
+                            k = (new PSBoxUI(n)).render(); 
+                            k.id = `box-${n}`;
+                            this.wadah.appendChild(k);
+                        }
+                        
+                        // Sinkronkan posisi kotak di layar agar sesuai urutan aplikasi PC
+                        if (this.wadah.children[idx] !== k) {
+                            this.wadah.insertBefore(k, this.wadah.children[idx]);
+                        }
+                        
+                        this.syncBoxUI(n, stationsData[n], k);
+                    });
+
+                    // Hapus kotak dari layar jika unit tersebut dihapus di aplikasi PC
+                    Array.from(this.wadah.children).forEach(child => {
+                        const idNama = child.id.replace('box-', '');
+                        if (!stationsData[idNama]) child.remove();
+                    });
+                });
+            }
+
+            // --- FUNGSI MUNCULKAN MODAL STRUK ---
+            showSuperModal(s) {
+                const modal = document.getElementById('super-modal');
+                // Mengambil isian dari database Firebase persis sesuai aplikasi
+                document.getElementById('sm-unit').innerText = s.unit || '--';
+                document.getElementById('sm-customer').innerText = s.customer || 'TAMU REGULER'; 
+                document.getElementById('sm-tanggal').innerText = s.tanggal || '--/--/----';
+                document.getElementById('sm-mulai').innerText = s.mulai || '--:--';
+                document.getElementById('sm-selesai').innerText = s.selesai || '--:--';
+                document.getElementById('sm-durasi').innerText = s.durasi || '--:--:--';
+                document.getElementById('sm-total').innerText = `Rp ${parseInt(s.total || 0).toLocaleString('id-ID')}`;
+                
+                // Tampilkan Modal
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            syncBoxUI(n, info, kotak) {
+                if (!kotak) return;
+                const btnU = kotak.querySelector('.btn-utama');
+                const btnUpdate = kotak.querySelector('.btn-update');
+                const btnL = kotak.querySelector('.btn-lunas');
+                const btnOn = kotak.querySelector('.btn-on');
+                const btnOff = kotak.querySelector('.btn-off');
+                const btnMove = kotak.querySelector('.btn-move');
+                const btnPlus30 = kotak.querySelector('.btn-plus30');
+                const btnStruk = kotak.querySelector('.btn-struk');
+                const dot = kotak.querySelector('.status-dot');
+                const bar = kotak.querySelector('.status-bar');
+                const mem = kotak.querySelector('.member-label');
+                const mod = kotak.querySelector('.mode-label');
+                const jam = kotak.querySelector('.jam-mulai');
+                const sel = kotak.querySelector('select');
+                const tim = document.getElementById(`timer-${n}`);
+                const hargaEl = document.getElementById(`harga-${n}`);
+
+                if (info.wiz_status === "ON") {
+                    btnOn.className = "btn-on btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md bg-rgans-green/20 text-rgans-green border border-rgans-green/50 shadow-[0_0_5px_rgba(16,185,129,0.3)]";
+                    btnOff.className = "btn-off btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted hover:text-rgans-red transition";
+                } else {
+                    btnOff.className = "btn-off btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md bg-rgans-red/20 text-rgans-red border border-rgans-red/50 shadow-[0_0_5px_rgba(239,68,68,0.3)]";
+                    btnOn.className = "btn-on btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted hover:text-rgans-green transition";
+                }
+
+                if (info.running) {
+                    kotak.style.borderColor = "#22d3ee";
+                    kotak.classList.add('shadow-[0_0_15px_rgba(34,211,238,0.2)]');
+                    bar.className = 'status-bar h-1.5 shrink-0 bg-rgans-cyan';
+                    dot.className = 'status-dot text-[11px] text-rgans-green animate-pulse';
+                    mem.innerText = info.member_name || 'TAMU REGULER';
+                    mod.innerText = info.durasi || 'PAKET';
+                    jam.value = info.mulai ? info.mulai.substring(0,5) : '--:--';
+                    jam.classList.replace('text-rgans-muted', 'text-rgans-cyan');
+                    
+                    btnU.innerText = "🛑 STOP SESI";
+                    btnU.className = "btn-utama btn-klik flex-1 bg-rgans-red_dim/50 border border-rgans-red/50 text-rgans-red text-xs font-bold py-3 rounded-xl transition-all mb-2";
+                    btnU.onclick = () => this.stopSesi(n);
+
+                    [btnL, btnMove, btnPlus30, btnStruk].forEach(b => { 
+                        b.classList.remove('btn-disabled'); 
+                        b.disabled = false; 
+                    });
+
+                    if (hargaEl) {
+                        hargaEl.innerText = `Rp ${parseInt(info.total_sementara || 0).toLocaleString('id-ID')}`;
+                    }
+
+                    const valPC = info.durasi.includes("Jam") ? (parseInt(info.durasi)*60).toString() : "Bebas";
+                    const currentSel = localState[n] || valPC;
+                    sel.value = currentSel;
+                    if (currentSel !== valPC) { 
+                        btnUpdate.classList.remove('hidden'); 
+                        btnUpdate.onclick = () => this.updateSesi(n); 
+                    } else { 
+                        btnUpdate.classList.add('hidden'); 
+                    }
+
+                    this.runTimer(n, info);
+                } else {
+                    kotak.style.borderColor = "#334155";
+                    kotak.classList.remove('shadow-[0_0_15px_rgba(34,211,238,0.2)]');
+                    bar.className = 'status-bar h-1.5 shrink-0 bg-rgans-border2';
+                    dot.className = 'status-dot text-[11px] text-rgans-border2';
+                    dot.classList.remove('animate-pulse');
+                    mem.innerText = ''; mod.innerText = 'IDLE'; jam.value = '';
+                    jam.classList.replace('text-rgans-cyan', 'text-rgans-muted');
+                    
+                    btnU.innerText = "▶ MULAI SESI";
+                    btnU.className = "btn-utama btn-klik flex-1 bg-rgans-green text-white shadow-[0_4px_15px_rgba(16,185,129,0.3)] text-xs font-bold py-3 rounded-xl transition-all mb-2";
+                    btnU.onclick = () => this.mulaiSesi(n);
+                    btnUpdate.classList.add('hidden');
+
+                    [btnL, btnMove, btnPlus30, btnStruk].forEach(b => { 
+                        b.classList.add('btn-disabled'); 
+                        b.disabled = true; 
+                    });
+
+                    if(localState[n]) sel.value = localState[n];
+                    if (activeTimers[n]) { clearInterval(activeTimers[n]); delete activeTimers[n]; }
+                    tim.innerText = "00:00:00"; 
+                    tim.className = 'font-mono text-4xl sm:text-5xl font-bold text-rgans-muted tracking-tighter';
+                    if (hargaEl) hargaEl.innerText = "Rp 0";
+                }
+
+                btnL.innerText = info.lunas ? "LUNAS" : "BELUM";
+                btnL.className = `btn-lunas btn-klik col-span-2 text-[9px] font-bold rounded-lg transition border ${info.lunas ? 'bg-rgans-green/20 border-rgans-green/50 text-rgans-green' : 'bg-rgans-red/20 border-rgans-red/50 text-rgans-red'} ${!info.running ? 'btn-disabled' : ''}`;
+                btnL.onclick = () => this.kirimPerintah(n, 'PAY_TOGGLE');
+
+                if (info.is_time_up && !window[`notified_${n}`]) {
+                    window[`notified_${n}`] = true;
+                    if (confirm(`WAKTU HABIS: ${n.toUpperCase()}\nSudah bayar?`)) this.kirimPerintah(n, 'STOP_SESSION', 'YES');
+                }
+                if (!info.running) window[`notified_${n}`] = false;
+            }
+
+            runTimer(n, info) {
+                if (activeTimers[n]) clearInterval(activeTimers[n]);
+                const el = document.getElementById(`timer-${n}`);
+                activeTimers[n] = setInterval(() => {
+                    const now = new Date().getTime();
+                    const start = info.start_ts;
+                    const end = info.end_ts; 
+                    
+                    let diff = (end > 0) ? end - now : now - start;
+
+                    if (diff <= 0 && end > 0) { el.innerText = "00:00:00"; return; }
+                    
+                    const absD = Math.abs(diff);
+                    const h = Math.floor(absD/3600000).toString().padStart(2,'0');
+                    const m = Math.floor((absD%3600000)/60000).toString().padStart(2,'0');
+                    const s = Math.floor((absD%60000)/1000).toString().padStart(2,'0');
+                    el.innerText = `${h}:${m}:${s}`;
+                    el.className = 'font-mono text-4xl sm:text-5xl font-bold text-white tracking-tighter';
+                }, 1000);
+            }
+
+            startSmoothPricing() {
+                console.log("Mirroring Engine Active");
+            }
+
+            async kirimPerintah(unit, aksi, val = "") {
+                try {
+                    await db.ref(`commands/${unit}`).set({ aksi, value: val, time: new Date().getTime() });
+                    showToast(`Sinyal ${aksi} Terkirim!`);
+                } catch (e) { showToast(`Gagal!`, false); }
+            }
+
+            mulaiSesi(unit) {
+                const p = document.getElementById(`paket-${unit}`).value;
+                this.kirimPerintah(unit, 'START_SESSION', p);
+            }
+
+            updateSesi(unit) {
+                const p = document.getElementById(`paket-${unit}`).value;
+                this.kirimPerintah(unit, 'UPDATE_SESSION', p);
+                localState[unit] = null;
+            }
+
+            stopSesi(unit) {
+                if (confirm(`Yakin ingin STOP ${unit.toUpperCase()}?`)) {
+                    this.kirimPerintah(unit, 'STOP_SESSION', 'YES');
+                }
+            }
+        }
+        window.R_GANS = new AppManager();
+    </script>
+</body>
+</html>
