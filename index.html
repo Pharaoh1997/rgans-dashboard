@@ -520,6 +520,7 @@
 
                     this.runTimer(n, info);
                 } else {
+                    // --- KONDISI SAAT PS SUDAH IDLE / BERHENTI ---
                     kotak.style.borderColor = "#334155";
                     kotak.classList.remove('shadow-[0_0_15px_rgba(34,211,238,0.2)]');
                     bar.className = 'status-bar h-1.5 shrink-0 bg-rgans-border2';
@@ -530,30 +531,30 @@
                     
                     btnU.innerText = "▶ MULAI SESI";
                     btnU.className = "btn-utama btn-klik flex-1 bg-rgans-green text-white shadow-[0_4px_15px_rgba(16,185,129,0.3)] text-xs font-bold py-3 rounded-xl transition-all mb-2";
-                    
                     btnU.onclick = () => this.showStartModal(n);
                     
                     btnUpdate.classList.add('hidden');
+                    [btnL, btnMove, btnPlus30, btnStruk].forEach(b => { if(b) { b.classList.add('btn-disabled'); b.disabled = true; } });
 
-                    [btnL, btnMove, btnPlus30, btnStruk].forEach(b => { 
-                        if(b) { b.classList.add('btn-disabled'); b.disabled = true; }
-                    });
+                    // ========================================================
+                    // TAMBAHKAN INI: AUTO-CLOSE MODAL JIKA PC SUDAH RESET
+                    // ========================================================
+                    const modalNotif = document.getElementById('notif-modal');
+                    const ntUnit = document.getElementById('nt-unit');
+                    
+                    // Jika modal sedang terbuka DAN menampilkan unit yang sama, langsung tutup!
+                    if (modalNotif && ntUnit && !modalNotif.classList.contains('hidden')) {
+                        if (ntUnit.innerText === n.toUpperCase()) {
+                            modalNotif.classList.replace('flex', 'hidden');
+                        }
+                    }
+                    window[`notifLock_${n}`] = null;
+                    // ========================================================
 
                     if(localState[n]) sel.value = localState[n];
                     if (activeTimers[n]) { clearInterval(activeTimers[n]); delete activeTimers[n]; }
-                    if(tim) {
-                        tim.innerText = "00:00:00"; 
-                        tim.className = 'font-mono text-4xl sm:text-5xl font-bold text-rgans-muted tracking-tighter';
-                    }
+                    if(tim) { tim.innerText = "00:00:00"; tim.className = 'font-mono text-4xl sm:text-5xl font-bold text-rgans-muted tracking-tighter'; }
                     if (hargaEl) hargaEl.innerText = "Rp 0";
-                    
-                    const modalNotif = document.getElementById('notif-modal');
-                    const ntUnit = document.getElementById('nt-unit');
-                    if (modalNotif && ntUnit && !modalNotif.classList.contains('hidden') && ntUnit.innerText === n.toUpperCase()) {
-                        modalNotif.classList.replace('flex', 'hidden');
-                    }
-
-                    window[`notifLock_${n}`] = null;
                 }
 
                 if(btnL) {
