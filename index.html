@@ -340,36 +340,39 @@
                 if(!modal) return;
                 
                 document.getElementById('sm-unit').innerText = s.unit || '--';
-                
-                // MENGHITUNG DURASI ASLI DAN HARGA MEMBER DI WEB 
-                const waktuMulai = s.mulai || '--:--';
-                const waktuSelesai = s.selesai || '--:--';
                 document.getElementById('sm-tanggal').innerText = s.tanggal || '--/--/----';
-                document.getElementById('sm-mulai').innerText = waktuMulai;
-                document.getElementById('sm-selesai').innerText = waktuSelesai;
                 
-                // Menghitung selisih waktu
-                let durasiAsli = s.durasi || '--:--:--';
-                if (waktuMulai.includes(':') && waktuSelesai.includes(':')) {
-                    const [h1, m1] = waktuMulai.split(':').map(Number);
-                    const [h2, m2] = waktuSelesai.split(':').map(Number);
-                    let menitM1 = (h1 * 60) + m1;
-                    let menitM2 = (h2 * 60) + m2;
-                    if (menitM2 < menitM1) menitM2 += 24 * 60; // Beda hari
-                    let selisihMenit = menitM2 - menitM1;
-                    let jam = Math.floor(selisihMenit / 60);
-                    let mnt = selisihMenit % 60;
-                    durasiAsli = `${jam} Jam ${mnt} Menit`;
+                const wMulai = s.mulai || '--:--';
+                const wSelesai = s.selesai || '--:--';
+                document.getElementById('sm-mulai').innerText = wMulai;
+                document.getElementById('sm-selesai').innerText = wSelesai;
+                
+                // MENGHITUNG DURASI ASLI
+                let textDurasi = s.durasi || '--:--:--';
+                if (wMulai.includes(':') && wSelesai.includes(':')) {
+                    const [h1, m1] = wMulai.split(':').map(Number);
+                    const [h2, m2] = wSelesai.split(':').map(Number);
+                    let minMulai = (h1 * 60) + m1;
+                    let minSelesai = (h2 * 60) + m2;
+                    if (minSelesai < minMulai) minSelesai += 1440; 
+                    let slsh = minSelesai - minMulai;
+                    let jam = Math.floor(slsh / 60);
+                    let menit = slsh % 60;
+                    textDurasi = `${jam} Jam ${menit} Menit`;
                 }
-                document.getElementById('sm-durasi').innerText = durasiAsli;
+                document.getElementById('sm-durasi').innerText = textDurasi;
 
-                // Validasi Tamu / Member
+                // LOGIKA TOTAL TAGIHAN (GANTI MEMBER JADI NAMA)
+                const totalEl = document.getElementById('sm-total');
                 if (s.customer && s.customer !== "TAMU REGULER") {
-                    document.getElementById('sm-customer').innerText = s.customer; 
-                    document.getElementById('sm-total').innerText = "MEMBER";
+                    document.getElementById('sm-customer').innerText = s.customer;
+                    // Tampilkan Nama Member di kotak Total dengan huruf kapital semua
+                    totalEl.innerText = s.customer.toUpperCase();
+                    totalEl.className = "text-2xl font-mono font-black text-rgans-cyan tracking-tighter uppercase";
                 } else {
-                    document.getElementById('sm-customer').innerText = 'TAMU REGULER'; 
-                    document.getElementById('sm-total').innerText = `Rp ${parseInt(s.total || 0).toLocaleString('id-ID')}`;
+                    document.getElementById('sm-customer').innerText = 'TAMU REGULER';
+                    totalEl.innerText = `Rp ${parseInt(s.total || 0).toLocaleString('id-ID')}`;
+                    totalEl.className = "text-3xl font-mono font-black text-white";
                 }
 
                 modal.classList.remove('hidden');
@@ -380,7 +383,7 @@
                     modal.classList.replace('flex', 'hidden');
                 }, 10000); 
             }
-
+            
             showStartModal(n) {
                 const modal = document.getElementById('start-modal');
                 if(!modal) return;
@@ -399,15 +402,15 @@
                 
                 modal.classList.replace('hidden', 'flex');
                 
-                const p = document.getElementById(`paket-${n}`).value;
+                const paketValue = document.getElementById(`paket-${n}`).value;
                 document.getElementById('btn-start-tamu').onclick = () => {
-                    this.kirimPerintah(n, 'START_SESSION', p + "|TAMU");
+                    this.kirimPerintah(n, 'START_SESSION', paketValue + "|TAMU");
                     modal.classList.replace('flex', 'hidden');
                 };
                 document.getElementById('btn-start-member').onclick = () => {
                     if (cmb && cmb.value !== "") {
                         const memID = cmb.value.split(" - ")[0];
-                        this.kirimPerintah(n, 'START_SESSION', p + "|" + memID);
+                        this.kirimPerintah(n, 'START_SESSION', paketValue + "|" + memID);
                         modal.classList.replace('flex', 'hidden');
                     } else {
                         showToast("Pilih member dulu!", false);
@@ -450,6 +453,12 @@
                 const tim = document.getElementById(`timer-${n}`);
                 const hargaEl = document.getElementById(`harga-${n}`);
 
+                // ==========================================
+                // FIX ON/OFF: PASANG KEMBALI FUNGSI KLIKNYA
+                // ==========================================
+                btnOn.onclick = () => this.kirimPerintah(n, 'WIZ_ON');
+                btnOff.onclick = () => this.kirimPerintah(n, 'WIZ_OFF');
+
                 if (info.wiz_status === "ON") {
                     btnOn.className = "btn-on btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md bg-rgans-green/20 text-rgans-green border border-rgans-green/50 shadow-[0_0_5px_rgba(16,185,129,0.3)]";
                     btnOff.className = "btn-off btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted hover:text-rgans-red transition";
@@ -471,7 +480,6 @@
                     btnU.innerText = "🛑 STOP SESI";
                     btnU.className = "btn-utama btn-klik flex-1 bg-rgans-red_dim/50 border border-rgans-red/50 text-rgans-red text-xs font-bold py-3 rounded-xl transition-all mb-2";
                     
-                    // JIKA MEMBER ATAU SUDAH LUNAS -> LANGSUNG STOP (TANPA MODAL)
                     btnU.onclick = () => {
                         if (info.is_member || info.lunas) {
                             this.kirimPerintah(n, 'STOP_SESSION', 'YES');
@@ -496,6 +504,18 @@
                         btnUpdate.onclick = () => this.updateSesi(n); 
                     } else { 
                         btnUpdate.classList.add('hidden'); 
+                    }
+
+                    if (info.is_time_up) {
+                        if (info.is_member || info.lunas) {
+                            this.kirimPerintah(n, 'STOP_SESSION', 'YES');
+                        } else {
+                            const sessID = info.start_ts || 0;
+                            if (window[`notifLock_${n}`] !== sessID) {
+                                window[`notifLock_${n}`] = sessID;
+                                this.showNotifModal(n);
+                            }
+                        }
                     }
 
                     this.runTimer(n, info);
@@ -532,6 +552,8 @@
                     if (modalNotif && ntUnit && !modalNotif.classList.contains('hidden') && ntUnit.innerText === n.toUpperCase()) {
                         modalNotif.classList.replace('flex', 'hidden');
                     }
+
+                    window[`notifLock_${n}`] = null;
                 }
 
                 if(btnL) {
@@ -539,21 +561,6 @@
                     btnL.className = `btn-lunas btn-klik col-span-2 text-[9px] font-bold rounded-lg transition border ${info.lunas ? 'bg-rgans-green/20 border-rgans-green/50 text-rgans-green' : 'bg-rgans-red/20 border-rgans-red/50 text-rgans-red'} ${!info.running ? 'btn-disabled' : ''}`;
                     btnL.onclick = () => this.kirimPerintah(n, 'PAY_TOGGLE');
                 }
-
-                // KETIKA WAKTU HABIS OTOMATIS
-                const sessID = info.start_ts || 0;
-                if (info.running && info.is_time_up && window[`notifLock_${n}`] !== sessID) {
-                    window[`notifLock_${n}`] = sessID;
-                    
-                    // BACA STATUS: JIKA MEMBER ATAU SUDAH LUNAS -> LANGSUNG STOP
-                    if (info.is_member || info.lunas) {
-                        this.kirimPerintah(n, 'STOP_SESSION', 'YES');
-                    } else {
-                        // Jika Tamu dan Belum Lunas -> Panggil Modal Notif
-                        this.showNotifModal(n);
-                    }
-                }
-                if (!info.running) window[`notifLock_${n}`] = null;
             }
 
             runTimer(n, info) {
@@ -581,16 +588,30 @@
 
             async kirimPerintah(unit, aksi, val = "") {
                 try {
-                    await db.ref(`commands/${unit}`).set({ aksi, value: val, time: new Date().getTime() });
+                    // Gunakan fetch (REST API) seperti pada asdw.html yang terbukti berhasil
+                    const url = `https://rgans-premier-default-rtdb.asia-southeast1.firebasedatabase.app/commands/${unit}.json`;
+                    
+                    await fetch(url, { 
+                        method: 'PUT', 
+                        body: JSON.stringify({ 
+                            aksi: aksi, 
+                            value: val, 
+                            time: new Date().getTime() 
+                        }) 
+                    });
+                    
                     showToast(`Sinyal ${aksi} Terkirim!`);
-                } catch (e) { showToast(`Gagal!`, false); }
-            }
-
-            updateSesi(unit) {
-                const sel = document.getElementById(`paket-${unit}`);
-                if(sel) {
-                    this.kirimPerintah(unit, 'UPDATE_SESSION', sel.value);
-                    localState[unit] = null;
+                    
+                    // Tambahkan refresh data otomatis setelah mengirim perintah (seperti di asdw)
+                    setTimeout(() => {
+                        if(typeof this.syncBoxUI === 'function' || typeof this.setupFirebase === 'function') {
+                           // Sinyal terkirim, Firebase akan mengupdate UI secara otomatis via listener .on('value')
+                        }
+                    }, 500);
+                    
+                } catch (e) { 
+                    console.error("Error kirim sinyal:", e);
+                    showToast(`Gagal kirim sinyal!`, false); 
                 }
             }
         }
