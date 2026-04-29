@@ -43,6 +43,7 @@
 
     <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"></div>
 
+    <!-- MODAL MULAI SESI -->
     <div id="start-modal" class="fixed inset-0 z-[10002] hidden items-center justify-center p-4 modal-blur">
         <div class="bg-rgans-card w-full max-w-xs rounded-[30px] border-2 border-rgans-cyan shadow-[0_0_60px_rgba(34,211,238,0.4)] overflow-hidden animate-pop flex flex-col text-center">
             <div class="bg-rgans-cyan py-4 px-6 shadow-lg">
@@ -69,6 +70,7 @@
         </div>
     </div>
 
+    <!-- MODAL KONFIRMASI STOP -->
     <div id="notif-modal" class="fixed inset-0 z-[10001] hidden items-center justify-center p-4 modal-blur">
         <div class="bg-rgans-card w-full max-w-xs rounded-[30px] border-2 border-rgans-red shadow-[0_0_60px_rgba(239,68,68,0.4)] overflow-hidden animate-pop flex flex-col text-center">
             <div class="bg-rgans-red py-4 shadow-lg"><p class="font-black text-xl text-white uppercase tracking-tighter">Konfirmasi Stop</p></div>
@@ -83,6 +85,7 @@
         </div>
     </div>
 
+    <!-- MODAL STRUK SELESAI -->
     <div id="super-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4 modal-blur">
         <div class="bg-rgans-card w-full max-w-sm rounded-[30px] border-2 border-rgans-cyan shadow-[0_0_60px_rgba(34,211,238,0.4)] overflow-hidden animate-pop flex flex-col">
             <div class="bg-rgans-cyan py-4 px-6 text-center shadow-lg relative">
@@ -130,6 +133,7 @@
         </div>
     </div>
 
+    <!-- SIDEBAR -->
     <aside class="w-full md:w-[220px] bg-rgans-card border-b md:border-r border-rgans-border flex md:flex-col shrink-0">
         <div class="h-16 border-b border-rgans-border flex items-center justify-center md:justify-start px-4">
             <h1 class="text-rgans-gold font-bold text-lg tracking-tighter">R-GANS <span class="text-white text-xs">BOSS</span></h1>
@@ -154,6 +158,7 @@
         </div>
     </aside>
 
+    <!-- MAIN CONTENT -->
     <main class="flex-1 flex flex-col min-w-0 bg-rgans-bg relative overflow-y-auto">
         <header class="border-b border-rgans-border bg-rgans-card/50 backdrop-blur-md sticky top-0 z-10 p-3 shrink-0">
             <div class="grid grid-cols-3 gap-2 max-w-6xl mx-auto mb-2 text-center">
@@ -194,20 +199,15 @@
             measurementId: "G-R40E2YGERJ"
         };
 
-        // --- 2. INISIALISASI ---
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // --- 3. VARIABEL STATE APLIKASI ---
         let activeTimers = {};
         let localState = {}; 
         let stationsData = {}; 
         let globalListMember = []; 
         let strukTimer = null; 
 
-        console.log("Menyambungkan ke Cloud R-Gans...");
-
-        // --- 4. FUNGSI PENDUKUNG (JAM & TOAST) ---
         setInterval(() => { 
             const el = document.getElementById('jam-digital');
             if(el) el.innerText = new Date().toLocaleTimeString('id-ID', { hour12: false }); 
@@ -223,12 +223,12 @@
             setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
-        // --- 5. CLASS UI RENDERER (CARD STATION) ---
         class PSBoxUI {
             constructor(name) { this.name = name; }
             render() {
                 const kotak = document.createElement('div');
                 kotak.className = `box-ps bg-rgans-card rounded-2xl border border-rgans-border transition-all duration-300 flex flex-col h-full overflow-hidden`;
+                kotak.id = `box-${this.name}`;
                 kotak.innerHTML = `
                     <div class="status-bar h-1.5 shrink-0 bg-rgans-border2"></div>
                     <div class="p-3.5 flex flex-col flex-1">
@@ -238,8 +238,8 @@
                                 <span class="font-bold text-sm text-white tracking-tight">${this.name.toUpperCase()}</span>
                             </div>
                             <div class="flex bg-rgans-card2 rounded-lg p-[3px] border border-rgans-border2 shadow-inner">
-                                <button onclick="window.R_GANS.kirimPerintah('${this.name}', 'WIZ_ON')" class="btn-on btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md text-rgans-muted transition">ON</button>
-                                <button onclick="window.R_GANS.kirimPerintah('${this.name}', 'WIZ_OFF')" class="btn-off btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md text-rgans-muted transition">OFF</button>
+                                <button class="btn-on btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md text-rgans-muted transition">ON</button>
+                                <button class="btn-off btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md text-rgans-muted transition">OFF</button>
                             </div>
                         </div>
                         <div class="flex-1 flex flex-col items-center justify-center py-4 min-h-[70px]">
@@ -254,7 +254,7 @@
                             <div class="flex bg-rgans-bg border border-rgans-border2 rounded-xl p-1 h-[38px] shadow-inner items-center">
                                 <input type="text" placeholder="--:--" class="jam-mulai bg-transparent w-[70%] px-2 text-center font-mono text-xs font-bold text-rgans-muted outline-none" disabled>
                                 <div class="w-[1px] h-4 bg-rgans-border2 mx-1"></div>
-                                <select id="paket-${this.name}" onchange="window.R_GANS.updateSesi('${this.name}')" class="bg-transparent w-[30%] px-1 text-rgans-cyan text-[11px] font-bold outline-none cursor-pointer text-center">
+                                <select id="paket-${this.name}" class="bg-transparent w-[30%] px-1 text-rgans-cyan text-[11px] font-bold outline-none cursor-pointer text-center">
                                     <option value="Bebas">Bebas</option>
                                     <option value="60">1 Jam</option>
                                     <option value="120">2 Jam</option>
@@ -268,11 +268,11 @@
                                 <button class="btn-update btn-klik hidden bg-rgans-cyan text-rgans-bg text-[10px] font-extrabold px-3 py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(34,211,238,0.4)]">💾 UPDATE</button>
                             </div>
                             <div class="grid grid-cols-4 gap-1.5 h-[36px]">
-                                <button onclick="window.R_GANS.kirimPerintah('${this.name}', 'MOVE_STATION')" class="btn-move btn-klik bg-rgans-card2 border border-rgans-border2 text-rgans-muted text-[9px] font-bold rounded-lg hover:bg-rgans-border transition flex items-center justify-center">⇄</button>
+                                <button class="btn-move btn-klik bg-rgans-card2 border border-rgans-border2 text-rgans-muted text-[9px] font-bold rounded-lg hover:bg-rgans-border transition flex items-center justify-center">⇄</button>
                                 <button class="btn-lunas btn-klik col-span-2 text-[9px] font-bold rounded-lg transition border">BELUM</button>
-                                <button onclick="window.R_GANS.kirimPerintah('${this.name}', 'ADD_TIME', '30')" class="btn-plus30 btn-klik bg-rgans-card2 border border-rgans-border2 text-rgans-muted text-[9px] font-bold rounded-lg hover:bg-rgans-border transition flex items-center justify-center">+30</button>
+                                <button class="btn-plus30 btn-klik bg-rgans-card2 border border-rgans-border2 text-rgans-muted text-[9px] font-bold rounded-lg hover:bg-rgans-border transition flex items-center justify-center">+30</button>
                             </div>
-                            <button onclick="window.R_GANS.kirimPerintah('${this.name}', 'PRINT_STRUK')" class="btn-struk btn-klik w-full bg-rgans-cyan/10 border border-rgans-cyan/30 text-rgans-cyan text-[10px] font-bold py-1.5 rounded-lg transition-all">🖨️ CETAK STRUK</button>
+                            <button class="btn-struk btn-klik w-full bg-rgans-cyan/10 border border-rgans-cyan/30 text-rgans-cyan text-[10px] font-bold py-1.5 rounded-lg transition-all">🖨️ CETAK STRUK</button>
                         </div>
                     </div>
                 `;
@@ -280,7 +280,6 @@
             }
         }
 
-        // --- 6. CLASS APP MANAGER (PENGENDALI UTAMA) ---
         class AppManager {
             constructor() {
                 this.wadah = document.getElementById('wadah-ps');
@@ -294,15 +293,14 @@
                 this.syncBoxUI(n, stationsData[n], document.getElementById(`box-${n}`));
             }
 
-            // Fungsi Update Waktu 
             updateSesi(n) {
                 const val = document.getElementById(`paket-${n}`).value;
-                this.kirimPerintah(n, 'START_SESSION', val); // Kirim sebagai Start baru
+                document.getElementById(`box-${n}`).querySelector('.btn-update').innerText = "⏳...";
+                this.kirimPerintah(n, 'UPDATE_SESSION', val); 
                 delete localState[n]; 
             }
 
             setupFirebase() {
-                // 6.1 Deteksi Koneksi Internet
                 db.ref('.info/connected').on('value', s => {
                     const el = document.getElementById('connection-status');
                     if(el) {
@@ -311,7 +309,6 @@
                     }
                 });
 
-                // 6.2 Deteksi Struk Terakhir (Auto-Popup)
                 db.ref('struk_terakhir').on('value', snap => {
                     const s = snap.val();
                     if (!s) return;
@@ -326,7 +323,6 @@
                     }
                 });
 
-                // 6.3 FIX UTAMA: TARIK DATA OMSET DARI FOLDER STATISTIK
                 db.ref('statistik_rgans').on('value', snap => {
                     const stats = snap.val();
                     if (!stats) return;
@@ -335,49 +331,53 @@
                         document.getElementById('ui-omset-minggu').innerText = `Rp ${parseInt(stats.omset_minggu_ini || 0).toLocaleString('id-ID')}`;
                         document.getElementById('ui-omset-bulan').innerText = `Rp ${parseInt(stats.omset_bulan_ini || 0).toLocaleString('id-ID')}`;
                         document.getElementById('ui-status').innerText = `● LIVE: ${stats.terakhir_update || '--:--'}`;
-                    } catch(e) { console.error("Error merender statistik:", e); }
+                    } catch(e) {}
                 });
 
-                // 6.4 FIX UTAMA: TARIK DATA KOTAK PS DARI FOLDER DASHBOARD
                 db.ref('dashboard_rgans').on('value', snap => {
                     stationsData = snap.val(); 
                     if (!stationsData) {
-                        this.wadah.innerHTML = '';
+                        this.wadah.innerHTML = ''; 
                         return;
                     }
                     
-                    // Susun urutan berdasarkan angka PS agar rapi (Contoh: Station 1, Station 2)
+                    // --- MENGEMBALIKAN SORTING YANG BENAR (SUDAH DIKEMBALIKAN SEPERTI REQUEST MAS RON) ---
                     const urutan = Object.keys(stationsData).sort((a, b) => {
-                        const numA = parseInt(a.replace(/\D/g, '')) || 0;
-                        const numB = parseInt(b.replace(/\D/g, '')) || 0;
-                        return numA - numB;
+                        const isStationA = a.toUpperCase().startsWith('STATION');
+                        const isStationB = b.toUpperCase().startsWith('STATION');
+                        
+                        if (isStationA && !isStationB) return -1;
+                        if (!isStationA && isStationB) return 1;
+                        
+                        return a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'});
+                    });
+
+                    Array.from(this.wadah.children).forEach(child => {
+                        const idNama = child.id.replace('box-', '');
+                        if (!stationsData[idNama]) {
+                             child.remove();
+                        }
                     });
                     
                     urutan.forEach((n, idx) => {
                         let k = document.getElementById(`box-${n}`);
+                        
                         if (!k) {
                             k = (new PSBoxUI(n)).render(); 
-                            k.id = `box-${n}`;
                             this.wadah.appendChild(k);
                         }
+                        
                         if (this.wadah.children[idx] !== k) {
                             this.wadah.insertBefore(k, this.wadah.children[idx]);
                         }
+                        
                         this.syncBoxUI(n, stationsData[n], k);
-                    });
-
-                    // Hapus kotak yang sudah dihapus dari PC
-                    Array.from(this.wadah.children).forEach(child => {
-                        const idNama = child.id.replace('box-', '');
-                        if (!stationsData[idNama]) child.remove();
                     });
                 });
 
-                // 6.5 FIX UTAMA: TARIK DATA MEMBER DARI FOLDER MEMBERS_DB
                 db.ref('members_db').on('value', snap => {
                     const memData = snap.val();
                     if (!memData) return;
-                    // Format Dictionary Python ke format Dropdown Web "M-001 - Nama"
                     globalListMember = Object.keys(memData).map(key => `${key} - ${memData[key].nama}`);
                 });
             }
@@ -442,15 +442,53 @@
                 
                 modal.classList.replace('hidden', 'flex');
                 
-                const paketValue = document.getElementById(`paket-${n}`).value;
                 document.getElementById('btn-start-tamu').onclick = () => {
-                    this.kirimPerintah(n, 'START_SESSION', paketValue + "|TAMU");
+                    const paketValue = document.getElementById(`paket-${n}`).value;
+                    // FIX MENGHAPUS STRING "|TAMU" AGAR PYTHON MAU MEMBACA ANGKANYA
+                    let pVal = paketValue === "Bebas" ? "0" : paketValue;
+                    
+                    const kotak = document.getElementById(`box-${n}`);
+                    if(kotak) {
+                        delete localState[n]; 
+                        kotak.querySelector('.btn-update').classList.add('hidden');
+                        kotak.querySelector('.btn-utama').innerText = "⏳ MEMPROSES...";
+                    }
+                    
+                    this.kirimPerintah(n, 'START_SESSION', pVal);
+                    
+                    // --- AUTO-UPDATE SAKTI MENGATASI PYTHON DELAY ---
+                    // Secara diam-diam mengirim sinyal update ke PC 1.5 detik kemudian agar Web dan PC sinkron ke Jam yang dipilih
+                    if (pVal !== "0") {
+                        setTimeout(() => {
+                            this.kirimPerintah(n, 'UPDATE_SESSION', pVal);
+                        }, 1500);
+                    }
+                    
                     modal.classList.replace('flex', 'hidden');
                 };
+                
                 document.getElementById('btn-start-member').onclick = () => {
                     if (cmb && cmb.value !== "") {
                         const memID = cmb.value.split(" - ")[0];
-                        this.kirimPerintah(n, 'START_SESSION', paketValue + "|" + memID);
+                        const paketValue = document.getElementById(`paket-${n}`).value;
+                        let pVal = paketValue === "Bebas" ? "0" : paketValue;
+                        
+                        const kotak = document.getElementById(`box-${n}`);
+                        if(kotak) {
+                            delete localState[n]; 
+                            kotak.querySelector('.btn-update').classList.add('hidden');
+                            kotak.querySelector('.btn-utama').innerText = "⏳ MEMPROSES...";
+                        }
+                        
+                        this.kirimPerintah(n, 'START_SESSION', pVal, memID);
+                        
+                        // Auto-Update untuk Member (Jika ada paketnya)
+                        if (pVal !== "0") {
+                            setTimeout(() => {
+                                this.kirimPerintah(n, 'UPDATE_SESSION', pVal, memID);
+                            }, 1500);
+                        }
+                        
                         modal.classList.replace('flex', 'hidden');
                     } else {
                         showToast("Pilih member dulu!", false);
@@ -476,6 +514,7 @@
 
             syncBoxUI(n, info, kotak) {
                 if (!kotak || !info) return;
+                
                 const btnU = kotak.querySelector('.btn-utama');
                 const btnUpdate = kotak.querySelector('.btn-update');
                 const btnL = kotak.querySelector('.btn-lunas');
@@ -493,6 +532,41 @@
                 const tim = document.getElementById(`timer-${n}`);
                 const hargaEl = document.getElementById(`harga-${n}`);
 
+                // --- BINDING FUNGSI KLIK PADA SETIAP TOMBOL KOTAK ---
+                btnOn.onclick = () => {
+                    btnOn.className = "btn-on btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md bg-rgans-green/20 text-rgans-green border border-rgans-green/50 shadow-[0_0_5px_rgba(16,185,129,0.3)]";
+                    btnOff.className = "btn-off btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted transition";
+                    this.kirimPerintah(n, 'TOGGLE_WIZ', 'ON');
+                };
+                
+                btnOff.onclick = () => {
+                    btnOff.className = "btn-off btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md bg-rgans-red/20 text-rgans-red border border-rgans-red/50 shadow-[0_0_5px_rgba(239,68,68,0.3)]";
+                    btnOn.className = "btn-on btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted transition";
+                    this.kirimPerintah(n, 'TOGGLE_WIZ', 'OFF');
+                };
+                
+                sel.onchange = () => this.saveLocal(n, sel.value);
+                
+                btnStruk.onclick = () => {
+                    this.kirimPerintah(n, 'PRINT_STRUK');
+                };
+                
+                btnMove.onclick = () => {
+                    const newStation = prompt(`Pindahkan ${n} ke Unit mana?\n(Ketik nama yang kosong, cth: STATION 2)`);
+                    if (newStation) {
+                        btnMove.innerText = "⏳";
+                        this.kirimPerintah(n, 'MOVE_STATION', newStation.toUpperCase());
+                        setTimeout(() => btnMove.innerText = "⇄", 2000);
+                    }
+                };
+                
+                btnPlus30.onclick = () => {
+                    btnPlus30.innerText = "⏳";
+                    this.kirimPerintah(n, 'ADD_TIME', '30');
+                    setTimeout(() => btnPlus30.innerText = "+30", 2000);
+                };
+
+                // VISUAL LAMPU
                 if (info.wiz_status === "ON" || info.wiz_on === true) {
                     btnOn.className = "btn-on btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md bg-rgans-green/20 text-rgans-green border border-rgans-green/50 shadow-[0_0_5px_rgba(16,185,129,0.3)]";
                     btnOff.className = "btn-off btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted transition";
@@ -516,6 +590,7 @@
                     
                     btnU.onclick = () => {
                         if (info.is_member || info.lunas) {
+                            btnU.innerText = "⏳ MEMPROSES..."; 
                             this.kirimPerintah(n, 'STOP_SESSION', 'YES');
                         } else {
                             this.showNotifModal(n);
@@ -530,7 +605,21 @@
                         hargaEl.innerText = `Rp ${parseInt(info.total_sementara || 0).toLocaleString('id-ID')}`;
                     }
 
-                    const valPC = info.mode === "BEBAS" ? "Bebas" : (info.durasi ? (parseInt(info.durasi)*60).toString() : "Bebas");
+                    // --- KALKULASI WAKTU PAKET ---
+                    let valPC = "Bebas";
+                    if (info.mode === "PAKET" && info.start_time_iso && info.end_time_iso) {
+                        const startT = new Date(info.start_time_iso).getTime();
+                        const endT = new Date(info.end_time_iso).getTime();
+                        
+                        const diffMins = Math.round((endT - startT) / 60000);
+                        if (diffMins > 0) {
+                            const nearestHour = Math.round(diffMins / 60) * 60;
+                            if (nearestHour > 0) {
+                                valPC = nearestHour.toString(); 
+                            }
+                        }
+                    }
+
                     const currentSel = localState[n] || valPC;
                     sel.value = currentSel;
                     
@@ -554,6 +643,7 @@
 
                     this.runTimer(n, info);
                 } else {
+                    // KONDISI IDLE
                     kotak.style.borderColor = "#334155";
                     kotak.classList.remove('shadow-[0_0_15px_rgba(34,211,238,0.2)]');
                     bar.className = 'status-bar h-1.5 shrink-0 bg-rgans-border2';
@@ -564,6 +654,7 @@
                     
                     btnU.innerText = "▶ MULAI SESI";
                     btnU.className = "btn-utama btn-klik flex-1 bg-rgans-green text-white shadow-[0_4px_15px_rgba(16,185,129,0.3)] text-xs font-bold py-3 rounded-xl transition-all mb-2";
+                    
                     btnU.onclick = () => this.showStartModal(n);
                     
                     btnUpdate.classList.add('hidden');
@@ -588,7 +679,9 @@
                 if(btnL) {
                     btnL.innerText = info.lunas ? "LUNAS" : "BELUM";
                     btnL.className = `btn-lunas btn-klik col-span-2 text-[9px] font-bold rounded-lg transition border ${info.lunas ? 'bg-rgans-green/20 border-rgans-green/50 text-rgans-green' : 'bg-rgans-red/20 border-rgans-red/50 text-rgans-red'} ${!info.running ? 'btn-disabled' : ''}`;
-                    btnL.onclick = () => this.kirimPerintah(n, 'PAY_TOGGLE');
+                    btnL.onclick = () => {
+                         showToast('Pilih Lunas / Cetak Struk via Kasir', false);
+                    }
                 }
             }
 
@@ -616,20 +709,25 @@
                 }, 1000);
             }
 
-            async kirimPerintah(unit, aksi, val = "") {
+            async kirimPerintah(unit, aksi, val = "", member_id = null) {
                 try {
                     const url = `https://rgans-premier-default-rtdb.asia-southeast1.firebasedatabase.app/commands/${unit}.json`;
                     
+                    let payload = { 
+                        aksi: aksi, 
+                        value: val, 
+                        time: new Date().getTime() 
+                    };
+                    
+                    if (member_id) {
+                        payload.member_id = member_id;
+                    }
+                    
                     await fetch(url, { 
                         method: 'PUT', 
-                        body: JSON.stringify({ 
-                            aksi: aksi, 
-                            value: val, 
-                            time: new Date().getTime() 
-                        }) 
+                        body: JSON.stringify(payload) 
                     });
                     
-                    showToast(`Sinyal ${aksi} Terkirim!`);
                 } catch (e) { 
                     console.error("Error kirim sinyal:", e);
                     showToast(`Gagal kirim sinyal!`, false); 
@@ -637,7 +735,6 @@
             }
         }
 
-        // --- 7. EKSEKUSI APLIKASI ---
         window.R_GANS = new AppManager();
     </script>
 </body>
