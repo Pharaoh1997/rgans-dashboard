@@ -6,8 +6,10 @@
     <title>R-GANS BOSS - Remote Web (REALTIME)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -50,16 +52,13 @@
                 <p class="text-white text-xs font-bold uppercase" id="start-unit-name">UNIT --</p>
                 <div class="flex flex-col gap-3">
                     <button id="btn-start-tamu" class="w-full bg-rgans-card2 border border-rgans-cyan/50 py-4 rounded-2xl text-white font-black text-xs uppercase shadow-lg active:scale-95 transition-all">👤 TAMU REGULER</button>
-                    
                     <div class="w-full h-px bg-rgans-border2 my-1"></div>
                     <p class="text-[9px] text-rgans-muted uppercase font-bold tracking-widest">Atau Gunakan Member</p>
-                    
                     <div class="bg-rgans-bg border border-rgans-border2 rounded-xl p-2 h-[45px] flex items-center shadow-inner relative">
                         <select id="cmb-pilih-member" class="bg-transparent w-full text-white text-xs font-bold outline-none cursor-pointer pl-2">
                             <option value="">-- Pilih Member --</option>
                         </select>
                     </div>
-                    
                     <button id="btn-start-member" class="w-full bg-rgans-gold py-4 rounded-2xl text-black font-black text-xs uppercase shadow-lg active:scale-95 transition-all">⭐ PEMAIN MEMBER</button>
                 </div>
                 <button onclick="document.getElementById('start-modal').classList.replace('flex', 'hidden')" class="text-[10px] text-rgans-muted underline mt-2">Batalkan</button>
@@ -84,46 +83,22 @@
     <div id="super-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4 modal-blur">
         <div class="bg-rgans-card w-full max-w-sm rounded-[30px] border-2 border-rgans-cyan shadow-[0_0_60px_rgba(34,211,238,0.4)] overflow-hidden animate-pop flex flex-col">
             <div class="bg-rgans-cyan py-4 px-6 text-center shadow-lg relative">
-                <div class="absolute w-8 h-8 bg-white/20 rounded-full top-2 right-2 flex items-center justify-center animate-pulse">🛎️</div>
                 <p class="font-black text-xl tracking-tight text-rgans-bg">SESI SELESAI!</p>
                 <p class="text-xs font-bold text-rgans-bg/80 uppercase tracking-widest mt-1">R-Gans Playstation</p>
             </div>
             <div class="p-6 flex-1 flex flex-col gap-4">
-                <div class="bg-rgans-bg rounded-2xl p-4 border border-rgans-border2 shadow-inner">
-                    <div class="flex justify-between items-center mb-2 pb-2 border-b border-dashed border-rgans-border2">
-                        <span class="text-rgans-muted text-xs font-bold uppercase tracking-widest">Unit</span>
-                        <span class="text-white text-sm font-black bg-rgans-card px-2 py-0.5 rounded border border-rgans-border2" id="sm-unit">--</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-rgans-muted text-xs">Customer</span>
-                        <span class="text-white font-mono text-[11px] font-bold bg-rgans-card2 px-1.5 py-0.5 rounded" id="sm-customer">--</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-rgans-muted text-xs">Date</span>
-                        <span class="text-white font-mono text-[11px] font-bold" id="sm-tanggal">--/--/----</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-rgans-muted text-xs">Time Started</span>
-                        <span class="text-white font-mono text-[11px] font-bold" id="sm-mulai">--:--</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-rgans-muted text-xs">Time Ended</span>
-                        <span class="text-white font-mono text-[11px] font-bold" id="sm-selesai">--:--</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-rgans-muted text-xs">Total Duration</span>
-                        <span class="text-rgans-cyan font-bold text-xs bg-rgans-cyan/10 px-1.5 py-0.5 rounded border border-rgans-cyan/30" id="sm-durasi">--:--:--</span>
-                    </div>
+                <div class="bg-rgans-bg rounded-2xl p-4 border border-rgans-border2 shadow-inner text-sm">
+                    <div class="flex justify-between mb-2"><span>Unit:</span> <span id="sm-unit" class="font-bold text-white">--</span></div>
+                    <div class="flex justify-between mb-2"><span>Customer:</span> <span id="sm-customer" class="font-bold text-white">--</span></div>
+                    <div class="flex justify-between mb-2"><span>Mulai:</span> <span id="sm-mulai" class="font-mono text-white">--:--</span></div>
+                    <div class="flex justify-between mb-2"><span>Selesai:</span> <span id="sm-selesai" class="font-mono text-white">--:--</span></div>
+                    <div class="flex justify-between mb-2"><span>Durasi:</span> <span id="sm-durasi" class="font-bold text-rgans-cyan">--:--:--</span></div>
                 </div>
-                
                 <div class="bg-rgans-card2/50 rounded-2xl p-4 border border-rgans-border text-center">
-                    <p class="text-[10px] text-rgans-gold font-bold uppercase tracking-widest mb-1">Total Tagihan</p>
+                    <p class="text-[10px] text-rgans-gold font-bold uppercase mb-1">Total Tagihan</p>
                     <p class="text-3xl font-mono font-black text-white" id="sm-total">Rp 0</p>
                 </div>
-                
-                <button onclick="document.getElementById('super-modal').classList.replace('flex', 'hidden')" class="w-full bg-gradient-to-r from-rgans-cyan to-blue-500 py-4 rounded-2xl text-rgans-bg font-black text-sm shadow-[0_10px_20px_rgba(34,211,238,0.3)] active:scale-95 transition-all mt-2 uppercase tracking-widest">
-                    Tutup Struk
-                </button>
+                <button onclick="document.getElementById('super-modal').classList.replace('flex', 'hidden')" class="w-full bg-rgans-cyan py-4 rounded-2xl text-rgans-bg font-black text-sm uppercase tracking-widest active:scale-95">Tutup Struk</button>
             </div>
         </div>
     </div>
@@ -180,7 +155,7 @@
     </main>
 
     <script>
-        // --- 1. KONFIGURASI RESMI R-GANS ---
+        // 1. Firebase Config Resmi
         const firebaseConfig = {
             apiKey: "AIzaSyDAD47-malAVNF0pvG-zb68VSlPT4KftU4",
             authDomain: "rgans-premier.firebaseapp.com",
@@ -192,29 +167,8 @@
             measurementId: "G-R40E2YGERJ"
         };
 
-        // --- 2. INISIALISASI ---
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
-        // --- 3. TEST KONEKSI (CEK DI F12) ---
-        console.log("Menyambungkan ke Cloud R-Gans...");
-
-        db.ref('dashboard_rgans').on('value', snap => {
-            const data = snap.val();
-            console.log("Data Diterima:", data); // Muncul di Inspect Console
-            
-            if (!data) {
-                console.warn("Data dashboard_rgans tidak ditemukan di database!");
-                return;
-            }
-
-            // Update UI secara otomatis
-            document.getElementById('ui-omset-hari').innerText = `Rp ${parseInt(data.omset_hari_ini || 0).toLocaleString('id-ID')}`;
-            document.getElementById('ui-omset-minggu').innerText = `Rp ${parseInt(data.omset_minggu_ini || 0).toLocaleString('id-ID')}`;
-            document.getElementById('ui-omset-bulan').innerText = `Rp ${parseInt(data.omset_bulan_ini || 0).toLocaleString('id-ID')}`;
-            document.getElementById('ui-kasir').innerText = data.status_kasir || "ADMIN";
-        });
-    </script>
 
         let activeTimers = {};
         let localState = {}; 
@@ -222,6 +176,7 @@
         let globalListMember = []; 
         let strukTimer = null; 
 
+        // Update Jam Digital
         setInterval(() => { 
             const el = document.getElementById('jam-digital');
             if(el) el.innerText = new Date().toLocaleTimeString('id-ID', { hour12: false }); 
@@ -230,8 +185,7 @@
         function showToast(msg, isSuccess = true) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `toast-entry pointer-events-auto px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-bold border border-rgans-border2
-                              ${isSuccess ? 'bg-rgans-card text-rgans-cyan' : 'bg-rgans-red_dim text-white'}`;
+            toast.className = `toast-entry pointer-events-auto px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-bold border border-rgans-border2 ${isSuccess ? 'bg-rgans-card text-rgans-cyan' : 'bg-rgans-red_dim text-white'}`;
             toast.innerHTML = `<span>${isSuccess ? '📡' : '⚠️'}</span> ${msg}`;
             container.appendChild(toast);
             setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
@@ -251,8 +205,8 @@
                                 <span class="font-bold text-sm text-white tracking-tight">${this.name.toUpperCase()}</span>
                             </div>
                             <div class="flex bg-rgans-card2 rounded-lg p-[3px] border border-rgans-border2 shadow-inner">
-                                <button onclick="window.R_GANS.kirimPerintah('${this.name}', 'WIZ_ON')" class="btn-on btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md text-rgans-muted transition">ON</button>
-                                <button onclick="window.R_GANS.kirimPerintah('${this.name}', 'WIZ_OFF')" class="btn-off btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md text-rgans-muted transition">OFF</button>
+                                <button class="btn-on btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md text-rgans-muted transition">ON</button>
+                                <button class="btn-off btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md text-rgans-muted transition">OFF</button>
                             </div>
                         </div>
                         <div class="flex-1 flex flex-col items-center justify-center py-4 min-h-[70px]">
@@ -299,13 +253,9 @@
                 this.isFirstLoadStruk = true; 
                 this.lastReceiptTime = null; 
                 this.setupFirebase();
-                this.startSmoothPricing();
             }
 
-            saveLocal(n, v) { 
-                localState[n] = v; 
-                this.syncBoxUI(n, stationsData[n], document.getElementById(`box-${n}`));
-            }
+            saveLocal(n, v) { localState[n] = v; this.syncBoxUI(n, stationsData[n], document.getElementById(`box-${n}`)); }
 
             setupFirebase() {
                 db.ref('.info/connected').on('value', s => {
@@ -319,31 +269,20 @@
                 db.ref('struk_terakhir').on('value', snap => {
                     const s = snap.val();
                     if (!s) return;
-                    if (this.isFirstLoadStruk) { 
-                        this.lastReceiptTime = s.waktu_update; 
-                        this.isFirstLoadStruk = false; 
-                        return; 
-                    }
-                    if (s.waktu_update !== this.lastReceiptTime) {
-                        this.showSuperModal(s);
-                        this.lastReceiptTime = s.waktu_update;
-                    }
+                    if (this.isFirstLoadStruk) { this.lastReceiptTime = s.waktu_update; this.isFirstLoadStruk = false; return; }
+                    if (s.waktu_update !== this.lastReceiptTime) { this.showSuperModal(s); this.lastReceiptTime = s.waktu_update; }
                 });
 
                 db.ref('dashboard_rgans').on('value', snap => {
                     const data = snap.val(); if (!data) return;
-                    try {
-                        document.getElementById('ui-omset-hari').innerText = `Rp ${parseInt(data.omset_hari_ini || 0).toLocaleString('id-ID')}`;
-                        document.getElementById('ui-omset-minggu').innerText = `Rp ${parseInt(data.omset_minggu_ini || 0).toLocaleString('id-ID')}`;
-                        document.getElementById('ui-omset-bulan').innerText = `Rp ${parseInt(data.omset_bulan_ini || 0).toLocaleString('id-ID')}`;
-                        document.getElementById('ui-kasir').innerText = data.status_kasir || "ADMIN";
-                        document.getElementById('ui-status').innerText = `● LIVE: ${data.terakhir_update ? data.terakhir_update.split(' ')[1] : '--:--'}`;
-                        
-                        if(data.daftar_member && Array.isArray(data.daftar_member)){
-                            globalListMember = data.daftar_member;
-                        }
-                    } catch(e) {}
-
+                    
+                    document.getElementById('ui-omset-hari').innerText = `Rp ${parseInt(data.omset_hari_ini || 0).toLocaleString('id-ID')}`;
+                    document.getElementById('ui-omset-minggu').innerText = `Rp ${parseInt(data.omset_minggu_ini || 0).toLocaleString('id-ID')}`;
+                    document.getElementById('ui-omset-bulan').innerText = `Rp ${parseInt(data.omset_bulan_ini || 0).toLocaleString('id-ID')}`;
+                    document.getElementById('ui-kasir').innerText = data.status_kasir || "ADMIN";
+                    document.getElementById('ui-status').innerText = `● LIVE: ${data.terakhir_update ? data.terakhir_update.split(' ')[1] : '--:--'}`;
+                    
+                    if(data.daftar_member) globalListMember = data.daftar_member;
                     stationsData = data.station_aktif || {};
                     const urutan = data.urutan_station || Object.keys(stationsData);
                     
@@ -354,116 +293,43 @@
                             k.id = `box-${n}`;
                             this.wadah.appendChild(k);
                         }
-                        if (this.wadah.children[idx] !== k) {
-                            this.wadah.insertBefore(k, this.wadah.children[idx]);
-                        }
                         this.syncBoxUI(n, stationsData[n], k);
-                    });
-
-                    Array.from(this.wadah.children).forEach(child => {
-                        const idNama = child.id.replace('box-', '');
-                        if (!stationsData[idNama]) child.remove();
                     });
                 });
             }
 
             showSuperModal(s) {
                 const modal = document.getElementById('super-modal');
-                if(!modal) return;
-                
                 document.getElementById('sm-unit').innerText = s.unit || '--';
-                document.getElementById('sm-tanggal').innerText = s.tanggal || '--/--/----';
-                
-                const wMulai = s.mulai || '--:--';
-                const wSelesai = s.selesai || '--:--';
-                document.getElementById('sm-mulai').innerText = wMulai;
-                document.getElementById('sm-selesai').innerText = wSelesai;
-                
-                // MENGHITUNG DURASI ASLI
-                let textDurasi = s.durasi || '--:--:--';
-                if (wMulai.includes(':') && wSelesai.includes(':')) {
-                    const [h1, m1] = wMulai.split(':').map(Number);
-                    const [h2, m2] = wSelesai.split(':').map(Number);
-                    let minMulai = (h1 * 60) + m1;
-                    let minSelesai = (h2 * 60) + m2;
-                    if (minSelesai < minMulai) minSelesai += 1440; 
-                    let slsh = minSelesai - minMulai;
-                    let jam = Math.floor(slsh / 60);
-                    let menit = slsh % 60;
-                    textDurasi = `${jam} Jam ${menit} Menit`;
-                }
-                document.getElementById('sm-durasi').innerText = textDurasi;
-
-                // LOGIKA TOTAL TAGIHAN (GANTI MEMBER JADI NAMA)
-                const totalEl = document.getElementById('sm-total');
-                if (s.customer && s.customer !== "TAMU REGULER") {
-                    document.getElementById('sm-customer').innerText = s.customer;
-                    // Tampilkan Nama Member di kotak Total dengan huruf kapital semua
-                    totalEl.innerText = s.customer.toUpperCase();
-                    totalEl.className = "text-2xl font-mono font-black text-rgans-cyan tracking-tighter uppercase";
-                } else {
-                    document.getElementById('sm-customer').innerText = 'TAMU REGULER';
-                    totalEl.innerText = `Rp ${parseInt(s.total || 0).toLocaleString('id-ID')}`;
-                    totalEl.className = "text-3xl font-mono font-black text-white";
-                }
-
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-
+                document.getElementById('sm-customer').innerText = s.customer || 'TAMU REGULER';
+                document.getElementById('sm-durasi').innerText = s.durasi || '--:--:--';
+                document.getElementById('sm-total').innerText = `Rp ${parseInt(s.total || 0).toLocaleString('id-ID')}`;
+                modal.classList.replace('hidden', 'flex');
                 if(strukTimer) clearTimeout(strukTimer);
-                strukTimer = setTimeout(() => {
-                    modal.classList.replace('flex', 'hidden');
-                }, 10000); 
+                strukTimer = setTimeout(() => modal.classList.replace('flex', 'hidden'), 10000); 
             }
-            
+
             showStartModal(n) {
                 const modal = document.getElementById('start-modal');
-                if(!modal) return;
                 document.getElementById('start-unit-name').innerText = n.toUpperCase();
-                
                 const cmb = document.getElementById('cmb-pilih-member');
-                if(cmb) {
-                    cmb.innerHTML = '<option value="">-- Pilih Member --</option>';
-                    globalListMember.forEach(item => {
-                        let opt = document.createElement('option');
-                        opt.value = item; 
-                        opt.innerText = item;
-                        cmb.appendChild(opt);
-                    });
-                }
-                
+                cmb.innerHTML = '<option value="">-- Pilih Member --</option>';
+                globalListMember.forEach(item => { let opt = document.createElement('option'); opt.value = item; opt.innerText = item; cmb.appendChild(opt); });
                 modal.classList.replace('hidden', 'flex');
-                
                 const paketValue = document.getElementById(`paket-${n}`).value;
-                document.getElementById('btn-start-tamu').onclick = () => {
-                    this.kirimPerintah(n, 'START_SESSION', paketValue + "|TAMU");
-                    modal.classList.replace('flex', 'hidden');
-                };
+                document.getElementById('btn-start-tamu').onclick = () => { this.kirimPerintah(n, 'START_SESSION', paketValue + "|TAMU"); modal.classList.replace('flex', 'hidden'); };
                 document.getElementById('btn-start-member').onclick = () => {
-                    if (cmb && cmb.value !== "") {
-                        const memID = cmb.value.split(" - ")[0];
-                        this.kirimPerintah(n, 'START_SESSION', paketValue + "|" + memID);
-                        modal.classList.replace('flex', 'hidden');
-                    } else {
-                        showToast("Pilih member dulu!", false);
-                    }
+                    if (cmb.value !== "") { this.kirimPerintah(n, 'START_SESSION', paketValue + "|" + cmb.value.split(" - ")[0]); modal.classList.replace('flex', 'hidden'); }
+                    else showToast("Pilih member dulu!", false);
                 };
             }
 
             showNotifModal(n) {
                 const modal = document.getElementById('notif-modal');
-                if(!modal) return;
                 document.getElementById('nt-unit').innerText = n.toUpperCase();
                 modal.classList.replace('hidden', 'flex');
-                
-                document.getElementById('nt-btn-yes').onclick = () => {
-                    this.kirimPerintah(n, 'STOP_SESSION', 'YES');
-                    modal.classList.replace('flex', 'hidden');
-                };
-                document.getElementById('nt-btn-no').onclick = () => {
-                    this.kirimPerintah(n, 'STOP_SESSION', 'NO');
-                    modal.classList.replace('flex', 'hidden');
-                };
+                document.getElementById('nt-btn-yes').onclick = () => { this.kirimPerintah(n, 'STOP_SESSION', 'YES'); modal.classList.replace('flex', 'hidden'); };
+                document.getElementById('nt-btn-no').onclick = () => { this.kirimPerintah(n, 'STOP_SESSION', 'NO'); modal.classList.replace('flex', 'hidden'); };
             }
 
             syncBoxUI(n, info, kotak) {
@@ -473,179 +339,61 @@
                 const btnL = kotak.querySelector('.btn-lunas');
                 const btnOn = kotak.querySelector('.btn-on');
                 const btnOff = kotak.querySelector('.btn-off');
-                const btnMove = kotak.querySelector('.btn-move');
-                const btnPlus30 = kotak.querySelector('.btn-plus30');
-                const btnStruk = kotak.querySelector('.btn-struk');
-                const dot = kotak.querySelector('.status-dot');
-                const bar = kotak.querySelector('.status-bar');
-                const mem = kotak.querySelector('.member-label');
-                const mod = kotak.querySelector('.mode-label');
-                const jam = kotak.querySelector('.jam-mulai');
-                const sel = kotak.querySelector('select');
                 const tim = document.getElementById(`timer-${n}`);
                 const hargaEl = document.getElementById(`harga-${n}`);
+                const mem = kotak.querySelector('.member-label');
 
-                // ==========================================
-                // FIX ON/OFF: PASANG KEMBALI FUNGSI KLIKNYA
-                // ==========================================
                 btnOn.onclick = () => this.kirimPerintah(n, 'WIZ_ON');
                 btnOff.onclick = () => this.kirimPerintah(n, 'WIZ_OFF');
 
                 if (info.wiz_status === "ON") {
                     btnOn.className = "btn-on btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md bg-rgans-green/20 text-rgans-green border border-rgans-green/50 shadow-[0_0_5px_rgba(16,185,129,0.3)]";
-                    btnOff.className = "btn-off btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted hover:text-rgans-red transition";
+                    btnOff.className = "btn-off btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted transition";
                 } else {
                     btnOff.className = "btn-off btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md bg-rgans-red/20 text-rgans-red border border-rgans-red/50 shadow-[0_0_5px_rgba(239,68,68,0.3)]";
-                    btnOn.className = "btn-on btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted hover:text-rgans-green transition";
+                    btnOn.className = "btn-on btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted transition";
                 }
 
                 if (info.running) {
                     kotak.style.borderColor = "#22d3ee";
-                    kotak.classList.add('shadow-[0_0_15px_rgba(34,211,238,0.2)]');
-                    bar.className = 'status-bar h-1.5 shrink-0 bg-rgans-cyan';
-                    dot.className = 'status-dot text-[11px] text-rgans-green animate-pulse';
                     mem.innerText = info.member_name || 'TAMU REGULER';
-                    mod.innerText = info.durasi || 'PAKET';
-                    jam.value = info.mulai ? info.mulai.substring(0,5) : '--:--';
-                    jam.classList.replace('text-rgans-muted', 'text-rgans-cyan');
-                    
                     btnU.innerText = "🛑 STOP SESI";
                     btnU.className = "btn-utama btn-klik flex-1 bg-rgans-red_dim/50 border border-rgans-red/50 text-rgans-red text-xs font-bold py-3 rounded-xl transition-all mb-2";
-                    
-                    btnU.onclick = () => {
-                        if (info.is_member || info.lunas) {
-                            this.kirimPerintah(n, 'STOP_SESSION', 'YES');
-                        } else {
-                            this.showNotifModal(n);
-                        }
-                    };
-
-                    [btnL, btnMove, btnPlus30, btnStruk].forEach(b => { 
-                        if(b) { b.classList.remove('btn-disabled'); b.disabled = false; }
-                    });
-
-                    if (hargaEl) {
-                        hargaEl.innerText = `Rp ${parseInt(info.total_sementara || 0).toLocaleString('id-ID')}`;
-                    }
-
-                    const valPC = info.durasi.includes("Jam") ? (parseInt(info.durasi)*60).toString() : "Bebas";
-                    const currentSel = localState[n] || valPC;
-                    sel.value = currentSel;
-                    if (currentSel !== valPC) { 
-                        btnUpdate.classList.remove('hidden'); 
-                        btnUpdate.onclick = () => this.updateSesi(n); 
-                    } else { 
-                        btnUpdate.classList.add('hidden'); 
-                    }
-
-                    if (info.is_time_up) {
-                        if (info.is_member || info.lunas) {
-                            this.kirimPerintah(n, 'STOP_SESSION', 'YES');
-                        } else {
-                            const sessID = info.start_ts || 0;
-                            if (window[`notifLock_${n}`] !== sessID) {
-                                window[`notifLock_${n}`] = sessID;
-                                this.showNotifModal(n);
-                            }
-                        }
-                    }
-
+                    btnU.onclick = () => (info.is_member || info.lunas) ? this.kirimPerintah(n, 'STOP_SESSION', 'YES') : this.showNotifModal(n);
+                    if (hargaEl) hargaEl.innerText = `Rp ${parseInt(info.total_sementara || 0).toLocaleString('id-ID')}`;
                     this.runTimer(n, info);
                 } else {
-                    // --- KONDISI SAAT PS SUDAH IDLE / BERHENTI ---
                     kotak.style.borderColor = "#334155";
-                    kotak.classList.remove('shadow-[0_0_15px_rgba(34,211,238,0.2)]');
-                    bar.className = 'status-bar h-1.5 shrink-0 bg-rgans-border2';
-                    dot.className = 'status-dot text-[11px] text-rgans-border2';
-                    dot.classList.remove('animate-pulse');
-                    mem.innerText = ''; mod.innerText = 'IDLE'; jam.value = '';
-                    jam.classList.replace('text-rgans-cyan', 'text-rgans-muted');
-                    
+                    mem.innerText = '';
                     btnU.innerText = "▶ MULAI SESI";
-                    btnU.className = "btn-utama btn-klik flex-1 bg-rgans-green text-white shadow-[0_4px_15px_rgba(16,185,129,0.3)] text-xs font-bold py-3 rounded-xl transition-all mb-2";
+                    btnU.className = "btn-utama btn-klik flex-1 bg-rgans-green text-white shadow-[0_4px_15_rgba(16,185,129,0.3)] text-xs font-bold py-3 rounded-xl transition-all mb-2";
                     btnU.onclick = () => this.showStartModal(n);
-                    
-                    btnUpdate.classList.add('hidden');
-                    [btnL, btnMove, btnPlus30, btnStruk].forEach(b => { if(b) { b.classList.add('btn-disabled'); b.disabled = true; } });
-
-                    // ========================================================
-                    // TAMBAHKAN INI: AUTO-CLOSE MODAL JIKA PC SUDAH RESET
-                    // ========================================================
-                    const modalNotif = document.getElementById('notif-modal');
-                    const ntUnit = document.getElementById('nt-unit');
-                    
-                    // Jika modal sedang terbuka DAN menampilkan unit yang sama, langsung tutup!
-                    if (modalNotif && ntUnit && !modalNotif.classList.contains('hidden')) {
-                        if (ntUnit.innerText === n.toUpperCase()) {
-                            modalNotif.classList.replace('flex', 'hidden');
-                        }
-                    }
-                    window[`notifLock_${n}`] = null;
-                    // ========================================================
-
-                    if(localState[n]) sel.value = localState[n];
                     if (activeTimers[n]) { clearInterval(activeTimers[n]); delete activeTimers[n]; }
-                    if(tim) { tim.innerText = "00:00:00"; tim.className = 'font-mono text-4xl sm:text-5xl font-bold text-rgans-muted tracking-tighter'; }
-                    if (hargaEl) hargaEl.innerText = "Rp 0";
-                }
-
-                if(btnL) {
-                    btnL.innerText = info.lunas ? "LUNAS" : "BELUM";
-                    btnL.className = `btn-lunas btn-klik col-span-2 text-[9px] font-bold rounded-lg transition border ${info.lunas ? 'bg-rgans-green/20 border-rgans-green/50 text-rgans-green' : 'bg-rgans-red/20 border-rgans-red/50 text-rgans-red'} ${!info.running ? 'btn-disabled' : ''}`;
-                    btnL.onclick = () => this.kirimPerintah(n, 'PAY_TOGGLE');
+                    if(tim) tim.innerText = "00:00:00";
                 }
             }
 
             runTimer(n, info) {
                 if (activeTimers[n]) clearInterval(activeTimers[n]);
                 const el = document.getElementById(`timer-${n}`);
-                if(!el) return;
                 activeTimers[n] = setInterval(() => {
                     const now = new Date().getTime();
-                    const start = info.start_ts;
-                    const end = info.end_ts; 
-                    
-                    let diff = (end > 0) ? end - now : now - start;
-
-                    if (diff <= 0 && end > 0) { el.innerText = "00:00:00"; return; }
-                    
+                    let diff = (info.end_ts > 0) ? info.end_ts - now : now - info.start_ts;
                     const absD = Math.abs(diff);
                     const h = Math.floor(absD/3600000).toString().padStart(2,'0');
                     const m = Math.floor((absD%3600000)/60000).toString().padStart(2,'0');
                     const s = Math.floor((absD%60000)/1000).toString().padStart(2,'0');
                     el.innerText = `${h}:${m}:${s}`;
-                    
-                    el.className = (info.is_time_up) ? 'font-mono text-4xl sm:text-5xl font-bold text-rgans-red animate-pulse tracking-tighter' : 'font-mono text-4xl sm:text-5xl font-bold text-white tracking-tighter';
+                    el.className = (info.is_time_up) ? 'font-mono text-4xl sm:text-5xl font-bold text-rgans-red animate-pulse' : 'font-mono text-4xl sm:text-5xl font-bold text-white';
                 }, 1000);
             }
 
             async kirimPerintah(unit, aksi, val = "") {
                 try {
-                    // Gunakan fetch (REST API) seperti pada asdw.html yang terbukti berhasil
                     const url = `https://rgans-premier-default-rtdb.asia-southeast1.firebasedatabase.app/commands/${unit}.json`;
-                    
-                    await fetch(url, { 
-                        method: 'PUT', 
-                        body: JSON.stringify({ 
-                            aksi: aksi, 
-                            value: val, 
-                            time: new Date().getTime() 
-                        }) 
-                    });
-                    
+                    await fetch(url, { method: 'PUT', body: JSON.stringify({ aksi, value: val, time: new Date().getTime() }) });
                     showToast(`Sinyal ${aksi} Terkirim!`);
-                    
-                    // Tambahkan refresh data otomatis setelah mengirim perintah (seperti di asdw)
-                    setTimeout(() => {
-                        if(typeof this.syncBoxUI === 'function' || typeof this.setupFirebase === 'function') {
-                           // Sinyal terkirim, Firebase akan mengupdate UI secara otomatis via listener .on('value')
-                        }
-                    }, 500);
-                    
-                } catch (e) { 
-                    console.error("Error kirim sinyal:", e);
-                    showToast(`Gagal kirim sinyal!`, false); 
-                }
+                } catch (e) { showToast(`Gagal kirim sinyal!`, false); }
             }
         }
         window.R_GANS = new AppManager();
