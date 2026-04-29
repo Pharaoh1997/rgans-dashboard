@@ -156,17 +156,17 @@
 
     <main class="flex-1 flex flex-col min-w-0 bg-rgans-bg relative overflow-y-auto">
         <header class="border-b border-rgans-border bg-rgans-card/50 backdrop-blur-md sticky top-0 z-10 p-3 shrink-0">
-            <div class="grid grid-cols-3 gap-2 max-w-6xl mx-auto mb-2">
-                <div class="bg-rgans-bg p-2 rounded-xl border border-rgans-border text-center shadow-inner">
-                    <p class="text-[8px] text-rgans-muted font-bold uppercase tracking-tighter">Hari Ini</p>
+            <div class="grid grid-cols-3 gap-2 max-w-6xl mx-auto mb-2 text-center">
+                <div class="bg-rgans-bg p-2 rounded-xl border border-rgans-border">
+                    <p class="text-[8px] text-rgans-muted font-bold uppercase">Hari Ini</p>
                     <p class="text-xs font-bold text-rgans-green leading-none mt-1" id="ui-omset-hari">Rp 0</p>
                 </div>
-                <div class="bg-rgans-bg p-2 rounded-xl border border-rgans-border text-center shadow-inner">
-                    <p class="text-[8px] text-rgans-muted font-bold uppercase tracking-tighter">Minggu Ini</p>
+                <div class="bg-rgans-bg p-2 rounded-xl border border-rgans-border">
+                    <p class="text-[8px] text-rgans-muted font-bold uppercase">Minggu Ini</p>
                     <p class="text-xs font-bold text-rgans-gold leading-none mt-1" id="ui-omset-minggu">Rp 0</p>
                 </div>
-                <div class="bg-rgans-bg p-2 rounded-xl border border-rgans-border text-center shadow-inner">
-                    <p class="text-[8px] text-rgans-muted font-bold uppercase tracking-tighter">Bulan Ini</p>
+                <div class="bg-rgans-bg p-2 rounded-xl border border-rgans-border">
+                    <p class="text-[8px] text-rgans-muted font-bold uppercase">Bulan Ini</p>
                     <p class="text-xs font-bold text-rgans-cyan leading-none mt-1" id="ui-omset-bulan">Rp 0</p>
                 </div>
             </div>
@@ -182,7 +182,7 @@
     </main>
 
     <script>
-        // 1. KONFIGURASI API KEY
+        // --- 1. KONFIGURASI FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyDAD47-malAVNF0pvG-zb68VSlPT4KftU4",
             authDomain: "rgans-premier.firebaseapp.com",
@@ -194,18 +194,17 @@
             measurementId: "G-R40E2YGERJ"
         };
 
-        // 2. INISIALISASI
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 3. VARIABEL STATE APLIKASI
+        // --- 2. VARIABEL GLOBAL ---
         let activeTimers = {};
         let localState = {}; 
         let stationsData = {}; 
         let globalListMember = []; 
         let strukTimer = null; 
 
-        // 4. FUNGSI PENDUKUNG JAM & TOAST
+        // --- 3. FUNGSI PENDUKUNG ---
         setInterval(() => { 
             const el = document.getElementById('jam-digital');
             if(el) el.innerText = new Date().toLocaleTimeString('id-ID', { hour12: false }); 
@@ -221,7 +220,7 @@
             setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
-        // 5. CLASS UI RENDERER (SEMUA TOMBOL FITUR ADA DI SINI)
+        // --- 4. CLASS KOTAK PS UI ---
         class PSBoxUI {
             constructor(name) { this.name = name; }
             render() {
@@ -278,7 +277,7 @@
             }
         }
 
-        // 6. CLASS APP MANAGER (PENGENDALI UTAMA)
+        // --- 5. CLASS MANAGER UTAMA ---
         class AppManager {
             constructor() {
                 this.wadah = document.getElementById('wadah-ps');
@@ -292,11 +291,11 @@
                 this.syncBoxUI(n, stationsData[n], document.getElementById(`box-${n}`));
             }
 
-            // Fungsi Update Waktu yang sempat hilang
+            // Fungsi Update Waktu (Sempat Hilang, Sekarang Dikembalikan!)
             updateSesi(n) {
                 const val = document.getElementById(`paket-${n}`).value;
                 this.kirimPerintah(n, 'UPDATE_SESSION', val);
-                delete localState[n]; // Hapus state agar kembali ikut server
+                delete localState[n]; 
             }
 
             setupFirebase() {
@@ -365,7 +364,6 @@
                 if(!modal) return;
                 
                 document.getElementById('sm-unit').innerText = s.unit || '--';
-                document.getElementById('sm-tanggal').innerText = s.tanggal || '--/--/----';
                 
                 const wMulai = s.mulai || '--:--';
                 const wSelesai = s.selesai || '--:--';
@@ -413,9 +411,7 @@
                 if(cmb) {
                     cmb.innerHTML = '<option value="">-- Pilih Member --</option>';
                     globalListMember.forEach(item => {
-                        let opt = document.createElement('option');
-                        opt.value = item; 
-                        opt.innerText = item;
+                        let opt = document.createElement('option'); opt.value = item; opt.innerText = item;
                         cmb.appendChild(opt);
                     });
                 }
@@ -473,16 +469,12 @@
                 const tim = document.getElementById(`timer-${n}`);
                 const hargaEl = document.getElementById(`harga-${n}`);
 
-                // Pemasangan Fungsi ON/OFF
-                btnOn.onclick = () => this.kirimPerintah(n, 'WIZ_ON');
-                btnOff.onclick = () => this.kirimPerintah(n, 'WIZ_OFF');
-
                 if (info.wiz_status === "ON") {
                     btnOn.className = "btn-on btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md bg-rgans-green/20 text-rgans-green border border-rgans-green/50 shadow-[0_0_5px_rgba(16,185,129,0.3)]";
-                    btnOff.className = "btn-off btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted hover:text-rgans-red transition";
+                    btnOff.className = "btn-off btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted transition";
                 } else {
                     btnOff.className = "btn-off btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md bg-rgans-red/20 text-rgans-red border border-rgans-red/50 shadow-[0_0_5px_rgba(239,68,68,0.3)]";
-                    btnOn.className = "btn-on btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted hover:text-rgans-green transition";
+                    btnOn.className = "btn-on btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted transition";
                 }
 
                 if (info.running) {
@@ -614,19 +606,14 @@
                     });
                     
                     showToast(`Sinyal ${aksi} Terkirim!`);
-                    
-                    setTimeout(() => {
-                        if(typeof this.syncBoxUI === 'function') {} // Placeholder pancingan
-                    }, 500);
-                    
                 } catch (e) { 
                     console.error("Error kirim sinyal:", e);
                     showToast(`Gagal kirim sinyal!`, false); 
                 }
             }
         }
-        
-        // JALANKAN APLIKASI
+
+        // --- 6. EKSEKUSI APLIKASI ---
         window.R_GANS = new AppManager();
     </script>
 </body>
