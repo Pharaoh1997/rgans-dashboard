@@ -205,6 +205,8 @@
         let globalListMember = []; 
         let strukTimer = null; 
 
+        console.log("Menyambungkan ke Cloud R-Gans...");
+
         // --- 4. FUNGSI PENDUKUNG (JAM & TOAST) ---
         setInterval(() => { 
             const el = document.getElementById('jam-digital');
@@ -252,7 +254,7 @@
                             <div class="flex bg-rgans-bg border border-rgans-border2 rounded-xl p-1 h-[38px] shadow-inner items-center">
                                 <input type="text" placeholder="--:--" class="jam-mulai bg-transparent w-[70%] px-2 text-center font-mono text-xs font-bold text-rgans-muted outline-none" disabled>
                                 <div class="w-[1px] h-4 bg-rgans-border2 mx-1"></div>
-                                <select id="paket-${this.name}" onchange="window.R_GANS.saveLocal('${this.name}', this.value)" class="bg-transparent w-[30%] px-1 text-rgans-cyan text-[11px] font-bold outline-none cursor-pointer text-center">
+                                <select id="paket-${this.name}" onchange="window.R_GANS.updateSesi('${this.name}')" class="bg-transparent w-[30%] px-1 text-rgans-cyan text-[11px] font-bold outline-none cursor-pointer text-center">
                                     <option value="Bebas">Bebas</option>
                                     <option value="60">1 Jam</option>
                                     <option value="120">2 Jam</option>
@@ -266,7 +268,7 @@
                                 <button class="btn-update btn-klik hidden bg-rgans-cyan text-rgans-bg text-[10px] font-extrabold px-3 py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(34,211,238,0.4)]">💾 UPDATE</button>
                             </div>
                             <div class="grid grid-cols-4 gap-1.5 h-[36px]">
-                                <button onclick="window.R_GANS.kirimPerintah('${this.name}', 'MOVE')" class="btn-move btn-klik bg-rgans-card2 border border-rgans-border2 text-rgans-muted text-[9px] font-bold rounded-lg hover:bg-rgans-border transition flex items-center justify-center">⇄</button>
+                                <button onclick="window.R_GANS.kirimPerintah('${this.name}', 'MOVE_STATION')" class="btn-move btn-klik bg-rgans-card2 border border-rgans-border2 text-rgans-muted text-[9px] font-bold rounded-lg hover:bg-rgans-border transition flex items-center justify-center">⇄</button>
                                 <button class="btn-lunas btn-klik col-span-2 text-[9px] font-bold rounded-lg transition border">BELUM</button>
                                 <button onclick="window.R_GANS.kirimPerintah('${this.name}', 'ADD_TIME', '30')" class="btn-plus30 btn-klik bg-rgans-card2 border border-rgans-border2 text-rgans-muted text-[9px] font-bold rounded-lg hover:bg-rgans-border transition flex items-center justify-center">+30</button>
                             </div>
@@ -292,9 +294,10 @@
                 this.syncBoxUI(n, stationsData[n], document.getElementById(`box-${n}`));
             }
 
+            // Fungsi Update Waktu 
             updateSesi(n) {
                 const val = document.getElementById(`paket-${n}`).value;
-                this.kirimPerintah(n, 'UPDATE_SESSION', val);
+                this.kirimPerintah(n, 'START_SESSION', val); // Kirim sebagai Start baru
                 delete localState[n]; 
             }
 
@@ -323,7 +326,7 @@
                     }
                 });
 
-                // 6.3 FIX UTAMA: TARIK DATA OMSET DARI STATISTIK (Sesuai Python)
+                // 6.3 FIX UTAMA: TARIK DATA OMSET DARI FOLDER STATISTIK
                 db.ref('statistik_rgans').on('value', snap => {
                     const stats = snap.val();
                     if (!stats) return;
@@ -335,10 +338,13 @@
                     } catch(e) { console.error("Error merender statistik:", e); }
                 });
 
-                // 6.4 FIX UTAMA: TARIK DATA KOTAK PS DARI DASHBOARD (Sesuai Python)
+                // 6.4 FIX UTAMA: TARIK DATA KOTAK PS DARI FOLDER DASHBOARD
                 db.ref('dashboard_rgans').on('value', snap => {
                     stationsData = snap.val(); 
-                    if (!stationsData) return;
+                    if (!stationsData) {
+                        this.wadah.innerHTML = '';
+                        return;
+                    }
                     
                     // Susun urutan berdasarkan angka PS agar rapi (Contoh: Station 1, Station 2)
                     const urutan = Object.keys(stationsData).sort((a, b) => {
@@ -367,7 +373,7 @@
                     });
                 });
 
-                // 6.5 FIX UTAMA: TARIK DATA MEMBER DARI FOLDER YANG BENAR
+                // 6.5 FIX UTAMA: TARIK DATA MEMBER DARI FOLDER MEMBERS_DB
                 db.ref('members_db').on('value', snap => {
                     const memData = snap.val();
                     if (!memData) return;
@@ -487,11 +493,7 @@
                 const tim = document.getElementById(`timer-${n}`);
                 const hargaEl = document.getElementById(`harga-${n}`);
 
-                // Pemasangan Fungsi ON/OFF
-                btnOn.onclick = () => this.kirimPerintah(n, 'WIZ_ON');
-                btnOff.onclick = () => this.kirimPerintah(n, 'WIZ_OFF');
-
-                if (info.wiz_status === "ON" || info.wiz_on === True) {
+                if (info.wiz_status === "ON" || info.wiz_on === true) {
                     btnOn.className = "btn-on btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md bg-rgans-green/20 text-rgans-green border border-rgans-green/50 shadow-[0_0_5px_rgba(16,185,129,0.3)]";
                     btnOff.className = "btn-off btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted transition";
                 } else {
@@ -504,7 +506,7 @@
                     kotak.classList.add('shadow-[0_0_15px_rgba(34,211,238,0.2)]');
                     bar.className = 'status-bar h-1.5 shrink-0 bg-rgans-cyan';
                     dot.className = 'status-dot text-[11px] text-rgans-green animate-pulse';
-                    mem.innerText = info.customer || 'TAMU REGULER'; // Match with python `customer`
+                    mem.innerText = info.customer || 'TAMU REGULER'; 
                     mod.innerText = info.mode || 'PAKET';
                     jam.value = info.start_time_iso ? info.start_time_iso.substring(11, 16) : '--:--';
                     jam.classList.replace('text-rgans-muted', 'text-rgans-cyan');
@@ -534,7 +536,6 @@
                     
                     if (currentSel !== valPC) { 
                         btnUpdate.classList.remove('hidden'); 
-                        btnUpdate.onclick = () => this.updateSesi(n); 
                     } else { 
                         btnUpdate.classList.add('hidden'); 
                     }
