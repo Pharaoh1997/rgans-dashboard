@@ -180,9 +180,41 @@
     </main>
 
     <script>
-        const firebaseConfig = { databaseURL: "https://rgans-premier-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+        // --- 1. KONFIGURASI RESMI R-GANS ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDAD47-malAVNF0pvG-zb68VSlPT4KftU4",
+            authDomain: "rgans-premier.firebaseapp.com",
+            databaseURL: "https://rgans-premier-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rgans-premier",
+            storageBucket: "rgans-premier.firebasestorage.app",
+            messagingSenderId: "483724142361",
+            appId: "1:483724142361:web:18517acb9e31a2962e4788",
+            measurementId: "G-R40E2YGERJ"
+        };
+
+        // --- 2. INISIALISASI ---
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+
+        // --- 3. TEST KONEKSI (CEK DI F12) ---
+        console.log("Menyambungkan ke Cloud R-Gans...");
+
+        db.ref('dashboard_rgans').on('value', snap => {
+            const data = snap.val();
+            console.log("Data Diterima:", data); // Muncul di Inspect Console
+            
+            if (!data) {
+                console.warn("Data dashboard_rgans tidak ditemukan di database!");
+                return;
+            }
+
+            // Update UI secara otomatis
+            document.getElementById('ui-omset-hari').innerText = `Rp ${parseInt(data.omset_hari_ini || 0).toLocaleString('id-ID')}`;
+            document.getElementById('ui-omset-minggu').innerText = `Rp ${parseInt(data.omset_minggu_ini || 0).toLocaleString('id-ID')}`;
+            document.getElementById('ui-omset-bulan').innerText = `Rp ${parseInt(data.omset_bulan_ini || 0).toLocaleString('id-ID')}`;
+            document.getElementById('ui-kasir').innerText = data.status_kasir || "ADMIN";
+        });
+    </script>
 
         let activeTimers = {};
         let localState = {}; 
