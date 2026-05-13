@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>R-GANS PREMIER - PS5 Cinematic OS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,9 +12,9 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0a0c10;
-  --surface:#11151e;
-  --surface-inset:#05070a;
+  --bg:#030509;
+  --surface:#0b101a;
+  --surface2:#121927;
   --border:rgba(255,255,255,0.06);
   --text:#f8fafc;
   --muted:#64748b;
@@ -24,36 +24,31 @@
   
   /* PS5 System Colors */
   --c-idle: #334155;
-  --c-unpaid: #0ea5e9; /* Cyan */
-  --c-paid: #10b981;   /* Emerald */
-  --c-open: #8b5cf6;   /* Amethyst */
+  --c-unpaid: #0ea5e9; /* Cyan Blue */
+  --c-paid: #10b981;   /* Emerald Green */
+  --c-open: #8b5cf6;   /* Purple/Amethyst */
   --c-vip: #facc15;    /* Luxury Gold */
-  --c-timeup: #ef4444; /* Red Alert */
+  --c-timeup: #ef4444; /* Alert Red */
 }
 
 body {
     background: var(--bg); color: var(--text); font-family: var(--font);
     min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
-    /* PS5 Subtle Gradient */
-    background-image: radial-gradient(circle at 50% 0%, #172136 0%, var(--bg) 75%);
+    background-image: 
+        radial-gradient(circle at 50% 0%, #10182b 0%, transparent 80%),
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 100% 100%, 24px 24px, 24px 24px;
     background-attachment: fixed;
 }
 ::-webkit-scrollbar { width: 0px; }
-
-/* Background Watermark Simbol PS */
-.ps-shapes-bg {
-    position: fixed; inset: 0; z-index: -1; pointer-events: none;
-    background-image: url('data:image/svg+xml;utf8,<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><path d="M10,25 L20,10 L30,25 Z" fill="none" stroke="rgba(255,255,255,0.01)" stroke-width="2"/><circle cx="80" cy="18" r="8" fill="none" stroke="rgba(255,255,255,0.01)" stroke-width="2"/><path d="M12,72 L28,88 M28,72 L12,88" stroke="rgba(255,255,255,0.01)" stroke-width="2" stroke-linecap="round"/><rect x="72" y="72" width="16" height="16" fill="none" stroke="rgba(255,255,255,0.01)" stroke-width="2"/></svg>');
-    opacity: 0.8;
-}
 
 /* =========================================
    HEADER
    ========================================= */
 .hdr {
-    position: sticky; top: 0; z-index: 50; background: rgba(10,12,16,.9);
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border); padding: 14px 20px;
+    position: sticky; top: 0; z-index: 50; background: rgba(3,5,9,.9);
+    border-bottom: 1px solid rgba(255,255,255,0.03); padding: 14px 20px;
     display: flex; align-items: center; justify-content: space-between;
     box-shadow: 0 10px 30px rgba(0,0,0,0.8);
 }
@@ -61,31 +56,32 @@ body {
 .logo-mark {
     width: 36px; height: 36px; border-radius: 10px;
     background: linear-gradient(135deg, #0284c7, #0f172a);
+    border: 1px solid rgba(255,255,255,0.1);
     display: flex; align-items: center; justify-content: center;
     box-shadow: inset 0 2px 5px rgba(255,255,255,0.1), 0 0 15px rgba(14,165,233,0.2);
 }
-.logo-mark span { font-size: 18px; font-weight: 900; color: #fff; line-height: 1; }
+.logo-mark span { font-size: 18px; font-weight: 900; color: #fff; line-height: 1; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
 .logo-title { font-size: 15px; font-weight: 900; letter-spacing: 2px; line-height: 1.1; text-transform: uppercase; color: #fff; }
 .logo-title em { color: #38bdf8; font-style: normal; font-weight: 400; }
 .logo-sub { font-size: 8px; color: var(--muted); letter-spacing: 4px; text-transform: uppercase; margin-top: 2px; font-weight: 600; }
 .hdr-r { text-align: right; }
 #conn { font-size: 8px; font-weight: 900; letter-spacing: 3px; color: #10b981; text-transform: uppercase; margin-bottom: 2px; text-shadow: 0 0 10px rgba(16,185,129,0.5); }
-#clk { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--muted2); }
+#clk { font-family: var(--mono); font-size: 14px; font-weight: 700; letter-spacing: 1px; color: var(--muted2); }
 
 /* MAIN CONTAINER */
 .main { position: relative; z-index: 1; padding: 20px 16px 50px; display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 480px; margin: 0 auto; width: 100%; }
 
 /* =========================================
-   VIP PROMO BANNER (Luxury Star)
+   VIP PROMO BANNER (Sesuai Screenshot User)
    ========================================= */
 .promo-banner {
     display: flex; justify-content: space-between; align-items: center;
     background: #0f1219; border: 1px solid rgba(250,204,21,0.2);
     border-radius: 18px; padding: 14px 18px; width: 100%;
     box-shadow: 0 10px 25px rgba(0,0,0,0.6); cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
-.promo-banner:active { transform: scale(0.97); }
+.promo-banner:active { transform: scale(0.97); border-color: rgba(250,204,21,0.5); }
 .pb-left { display: flex; align-items: center; gap: 14px; }
 .pb-icon {
     width: 42px; height: 42px; background: rgba(250,204,21,0.1);
@@ -93,24 +89,26 @@ body {
     display: flex; align-items: center; justify-content: center;
     color: #facc15; font-size: 22px; box-shadow: 0 0 15px rgba(250,204,21,0.15);
 }
-.pb-title { font-size: 14px; font-weight: 900; color: #fff; letter-spacing: 1.5px; text-transform: uppercase; }
+.pb-text { display: flex; flex-direction: column; }
+.pb-title { font-size: 14px; font-weight: 900; color: #fff; letter-spacing: 1.5px; line-height: 1.2; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 .pb-sub { font-size: 9px; font-weight: 800; color: #facc15; letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
 .pb-btn {
     padding: 8px 14px; border: 1px solid rgba(250,204,21,0.5); border-radius: 10px;
-    color: #facc15; font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;
+    color: #facc15; font-size: 10px; font-weight: 900; letter-spacing: 2px; 
+    background: rgba(250,204,21,0.05); text-transform: uppercase;
 }
 
 /* =========================================
-   STATION CARD (CINEMATIC CENTERED)
+   STATION CARD
    ========================================= */
 .stn-card {
     width: 100%; border-radius: 28px; overflow: hidden; border: 1px solid var(--border);
     background: var(--surface); transform: translateZ(0); contain: layout style paint;
     transition: border-color 0.4s, box-shadow 0.4s; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-    display: flex; flex-direction: column; position: relative; text-align: center;
+    display: flex; flex-direction: column; position: relative;
 }
 
-/* Dynamic Accent Colors */
+/* Dynamic State CSS Variables */
 .stn-card { --accent: var(--c-idle); --glow: rgba(51,65,85,0.4); }
 .st-unpaid { --accent: var(--c-unpaid); --glow: rgba(14,165,233,0.4); border-color: rgba(14,165,233,0.3); }
 .st-paid { --accent: var(--c-paid); --glow: rgba(16,185,129,0.4); border-color: rgba(16,185,129,0.3); }
@@ -118,127 +116,154 @@ body {
 .st-vip { --accent: var(--c-vip); --glow: rgba(250,204,21,0.4); border-color: rgba(250,204,21,0.3); }
 .st-timeup { --accent: var(--c-timeup); --glow: rgba(239,68,68,0.4); border-color: rgba(239,68,68,0.5); }
 
-/* PS5 Lightbar Indicator */
-.ps-lightbar {
-    position: absolute; top: 0; left: 0; width: 100%; height: 3px;
-    background: var(--accent); box-shadow: 0 0 15px var(--accent);
-    opacity: 0; transition: opacity 0.4s, background 0.4s; z-index: 10;
+/* Ambient Light dalam kartu */
+.stn-card::before {
+    content: ''; position: absolute; top: -50px; left: 50%; transform: translateX(-50%);
+    width: 200px; height: 100px; border-radius: 50%;
+    background: var(--accent); opacity: 0.15; filter: blur(40px); pointer-events: none; transition: background 0.4s ease;
 }
-.stn-card:not(.st-idle) .ps-lightbar { opacity: 1; }
-.st-timeup .ps-lightbar { animation: blink 1s infinite; }
-@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-/* Art Section */
 .art {
-    position: relative; overflow: hidden; padding: 24px 20px 18px;
-    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    position: relative; overflow: hidden; padding: 24px 20px;
+    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px;
     border-bottom: 1px solid rgba(255,255,255,0.03);
 }
+
 .art-wm {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    font-size: 55px; letter-spacing: 15px; font-weight: 300; white-space: nowrap; pointer-events: none;
-    color: var(--accent); opacity: 0.08; transition: color 0.4s; text-shadow: 0 0 20px var(--glow);
+    font-size: 55px; letter-spacing: 12px; font-weight: 300; white-space: nowrap; pointer-events: none;
+    color: var(--accent); opacity: 0.05; text-shadow: 0 0 20px var(--glow); transition: color 0.4s;
 }
-.stn-name { font-size: 30px; font-weight: 900; letter-spacing: 2px; color: #fff; text-transform: uppercase; text-shadow: 0 4px 15px rgba(0,0,0,0.8); position: relative; z-index: 2; }
 
-.badge-group { display: flex; justify-content: center; gap: 8px; position: relative; z-index: 2; }
-.badge { display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 10px; font-size: 9px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--accent); color: var(--accent); background: rgba(0,0,0,0.4); box-shadow: 0 0 10px var(--glow); transition: all 0.4s ease; }
+@keyframes sweep { 0% { transform: translateX(-150%) skewX(-20deg); opacity: 0;} 40% { opacity: 0.15; } 100% { transform: translateX(250%) skewX(-20deg); opacity: 0;} }
+.art-shim { position: absolute; top: 0; left: 0; width: 40%; height: 100%; background: linear-gradient(90deg, transparent, #fff, transparent); pointer-events: none; animation: sweep 6s infinite; }
+.st-idle .art-shim { display: none; }
+
+.art-top { display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; z-index: 2; width: 100%; }
+.stn-name { font-size: 32px; font-weight: 900; letter-spacing: 2px; color: #fff; line-height: 1; text-transform: uppercase; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }
+
+.badge { display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 10px; font-size: 9px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--accent); color: var(--accent); background: rgba(0,0,0,0.4); box-shadow: 0 0 10px var(--glow); transition: all 0.4s ease; }
 .st-idle .badge { border-color: rgba(255,255,255,0.1); color: var(--muted2); box-shadow: none; }
 
-.art-bot { position: relative; z-index: 2; margin-top: 5px; }
-.ps-prompt { display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(0,0,0,0.4); padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
-.ps-sym { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 900; color: var(--accent); border: 1.5px solid var(--accent); border-radius: 5px; transition: all 0.4s; }
-.ps-txt { font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); transition: color 0.4s; }
+.art-bot { position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 10px; }
+.cust-row { display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.4); padding: 8px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+.ps-prompt { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 6px 14px; }
+.ps-sym { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 900; color: var(--accent); border: 1.5px solid var(--accent); border-radius: 5px; transition: all 0.4s ease; }
+.ps-txt { font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); transition: color 0.4s; }
 .st-idle .ps-sym, .st-idle .ps-txt { color: var(--muted); border-color: var(--muted); }
 
 /* CONTENT PANEL */
-.content { width: 100%; background: var(--surface); display: flex; flex-direction: column; align-items: center; }
+.content { background: var(--surface); display: flex; flex-direction: column; align-items: center; }
 
+/* IDLE screen */
 .idle-body { padding: 40px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
-.idle-ico { font-size: 44px; filter: grayscale(1); opacity: .15; }
-.idle-lbl { font-size: 24px; font-weight: 900; letter-spacing: 6px; color: rgba(255,255,255,.15); text-transform: uppercase; }
-.idle-sub { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; }
+.idle-ico { font-size: 40px; filter: grayscale(1); opacity: .15; }
+.idle-lbl { font-size: 24px; font-weight: 900; letter-spacing: 4px; color: rgba(255,255,255,.15); text-transform: uppercase; }
+.idle-sub { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
 
+/* RUNNING screen */
 .run-body { display: none; flex-direction: column; width: 100%; align-items: center; }
 
-/* INSET HUD DISPLAY */
+/* INSET HUD TIMER */
 .timer-wrap { 
     width: calc(100% - 32px); margin: 16px 16px 0; padding: 24px 16px; text-align: center; 
-    background: var(--surface-inset); border-radius: 20px;
-    border: 1px solid rgba(0,0,0,0.8);
-    box-shadow: inset 0 15px 35px rgba(0,0,0,1), 0 2px 0 rgba(255,255,255,0.05);
+    background: #020408; border-radius: 20px; border: 1px solid rgba(255,255,255,0.03);
+    box-shadow: inset 0 15px 30px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.3);
     display: flex; flex-direction: column; align-items: center; position: relative; overflow: hidden;
 }
-.hud-scanline { position: absolute; top: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.03)); animation: scanline 4s linear infinite; pointer-events: none; }
-@keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(200%); } }
-
 .timer-lbl { font-size: 10px; font-weight: 800; letter-spacing: 4px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
 .timer-dg { 
     font-family: var(--mono); font-size: clamp(48px, 12vw, 64px); 
     font-weight: 900; letter-spacing: 1px; line-height: 1; font-variant-numeric: tabular-nums; 
-    color: var(--accent); text-shadow: 0 0 25px var(--glow); transition: all 0.4s ease;
+    color: #fff; transition: color .4s, text-shadow .4s; position: relative; z-index: 2;
 }
-.st-timeup .timer-dg { animation: blink 0.8s step-end infinite; }
 
-.paket-chip { display: inline-flex; align-items: center; padding: 6px 18px; border-radius: 12px; font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-top: 16px; background: rgba(0,0,0,0.4); color: var(--accent); border: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 2; }
+.stn-card:not(.st-idle):not(.st-timeup) .timer-dg { color: var(--accent); text-shadow: 0 0 20px var(--glow); animation: breathe 3s ease-in-out infinite; }
+.stn-card.st-timeup .timer-dg { color: var(--accent); text-shadow: 0 0 25px var(--glow); animation: blink .8s step-end infinite; }
+@keyframes breathe { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
 
-.time-meta { display: flex; justify-content: center; gap: 30px; margin-top: 20px; width: 100%; border-top: 1px solid rgba(255,255,255,0.03); padding-top: 16px; }
+.paket-chip { display: inline-flex; align-items: center; padding: 6px 16px; border-radius: 12px; font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-top: 16px; background: rgba(0,0,0,0.4); color: var(--accent); border: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 2; }
+
+.time-meta { display: flex; justify-content: center; gap: 30px; margin-top: 20px; width: 100%; border-top: 1px solid rgba(255,255,255,0.03); padding-top: 16px; position: relative; z-index: 2; }
 .tmi { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .tmi-lbl { font-size: 8px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
 .tmi-val { font-family: var(--mono); font-size: 14px; font-weight: 800; color: var(--muted2); }
 
-/* BILLING FOOTER */
+/* BILLING FOOTER - (Pintar Menyesuaikan Mode VIP) */
 .bill-row { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px 20px; width: 100%; }
-.bill-lbl { font-size: 10px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); text-align: center; }
-.bill-amt { font-family: var(--mono); font-size: 30px; font-weight: 900; color: var(--accent); text-shadow: 0 0 15px var(--glow); transition: all 0.4s ease; text-align: center; line-height: 1; }
+.bill-lbl { font-size: 9px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; text-align: center; }
+.bill-amt { font-family: var(--mono); font-size: 28px; font-weight: 900; color: var(--text); transition: color .4s, text-shadow .4s; text-align: center; line-height: 1; }
 
-.pay-chip { display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; border-radius: 16px; font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; border: 1.5px solid var(--accent); color: var(--accent); background: rgba(0,0,0,0.4); box-shadow: 0 5px 20px var(--glow); width: 100%; max-width: 260px; transition: all 0.4s ease; }
+.stn-card:not(.st-idle) .bill-amt { color: var(--accent); text-shadow: 0 0 15px var(--glow); }
+
+/* Tombol Status Bawah */
+.pay-chip { 
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; 
+    border-radius: 14px; font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; 
+    width: 100%; max-width: 250px; background: rgba(0,0,0,0.3); color: var(--accent); border: 1px solid var(--accent);
+    box-shadow: 0 5px 20px var(--glow); transition: all 0.4s ease;
+}
 .st-idle .pay-chip { color: var(--muted); border-color: var(--border); box-shadow: none; background: rgba(255,255,255,0.05); }
 
+/* TIME UP ALERT */
 .timeup-bar { width: 100%; background: #2a0808; border-top: 1px solid #ef4444; padding: 14px 16px; text-align: center; font-size: 10px; font-weight: 900; letter-spacing: 3px; color: #ef4444; text-transform: uppercase; margin-top: 16px; animation: blink 1.2s ease-in-out infinite; box-shadow: 0 0 20px rgba(239,68,68,0.2); }
 
 /* =========================================
    FOOTER WHATSAPP
    ========================================= */
 .footer-wa { 
-    width: 100%; padding: 20px; border-radius: 20px; text-decoration: none; 
+    width: 100%; padding: 18px; border-radius: 20px; text-decoration: none; 
     display: flex; flex-direction: column; align-items: center; 
     background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.5); transition: transform 0.2s, border-color 0.2s; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: transform 0.2s, border-color 0.2s, background 0.2s; 
 }
-.footer-wa:active { transform: scale(0.97); border-color: #10b981; }
-.footer-wa p { font-size: 10px; font-weight: 800; color: var(--muted2); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 6px; }
-.footer-wa strong { font-size: 16px; font-weight: 900; color: #fff; letter-spacing: 1.5px; }
-.footer-wa em { color: #10b981; font-style: normal; text-shadow: 0 0 10px rgba(16,185,129,0.4); }
+.footer-wa:hover { border-color: var(--c-paid); background: rgba(16,185,129,0.05); }
+.footer-wa:active { transform: scale(0.97); }
+.footer-wa p { font-size: 10px; font-weight: 800; color: var(--muted2); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+.footer-wa strong { font-size: 14px; font-weight: 900; color: #fff; letter-spacing: 1px; }
+.footer-wa em { color: var(--c-paid); font-style: normal; text-shadow: 0 0 10px rgba(16,185,129,0.4); }
 
 /* =========================================
    MODAL VIP
    ========================================= */
-.modal-bg { position: fixed; inset: 0; z-index: 200; background: rgba(3,5,9,.96); display: flex; justify-content: center; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity .3s ease; padding: 20px; }
+.modal-bg { position: fixed; inset: 0; z-index: 200; background: rgba(3,5,9,.95); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity .3s ease; padding: 20px; }
 .modal-bg.open { opacity: 1; pointer-events: auto; }
 .modal-box { 
     background: linear-gradient(180deg, #151926 0%, #0b0e14 100%); 
-    border: 1px solid rgba(250,204,21,.3); border-radius: 32px; width: 100%; max-width: 480px; 
+    border: 1px solid rgba(250,204,21,.3); border-radius: 28px; width: 100%; max-width: 440px; 
     padding: 30px 24px; overflow-y: auto; max-height: 90vh; 
-    transform: translateY(100%); transition: transform .4s cubic-bezier(.2,1,.4,1); 
-    box-shadow: 0 -20px 60px rgba(0,0,0,0.9), inset 0 2px 0 rgba(255,255,255,0.1); 
-    display: flex; flex-direction: column; align-items: center; 
+    transform: scale(0.95) translateY(20px); transition: transform .4s cubic-bezier(.2,1,.4,1); 
+    box-shadow: 0 20px 50px rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; 
 }
-.modal-bg.open .modal-box { transform: translateY(0); }
-.modal-handle { width: 40px; height: 5px; background: rgba(255,255,255,.1); border-radius: 3px; margin: 0 auto 20px; }
-.modal-title { font-size: 32px; font-weight: 900; color: #fff; letter-spacing: 1px; margin-bottom: 24px; text-align: center; }
+.modal-bg.open .modal-box { transform: scale(1) translateY(0); }
+.modal-handle { width: 40px; height: 4px; background: rgba(255,255,255,.1); border-radius: 2px; margin: 0 auto 20px; }
+.modal-eyebrow { font-size: 10px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; color: var(--c-vip); margin-bottom: 8px; text-align: center; text-shadow: 0 0 10px rgba(250,204,21,0.4); }
+.modal-title { font-size: 28px; font-weight: 900; color: #fff; letter-spacing: 1px; margin-bottom: 24px; text-align: center; line-height: 1; }
 
-.brow { display: flex; gap: 16px; align-items: center; padding: 16px; border-radius: 20px; background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.05); margin-bottom: 12px; width: 100%; }
-.brow-ico { width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0; background: linear-gradient(135deg, rgba(250,204,21,.15), transparent); border: 1px solid rgba(250,204,21,.3); display: flex; align-items: center; justify-content: center; font-size: 22px; color: #facc15; }
-.brow-text h4 { font-size: 14px; font-weight: 800; color: #fff; text-transform: uppercase; margin-bottom: 2px; }
-.brow-text p { font-size: 11px; color: var(--muted2); line-height: 1.5; }
+.brow { display: flex; gap: 16px; align-items: flex-start; padding: 16px; border-radius: 16px; background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.05); margin-bottom: 12px; width: 100%; }
+.brow-ico { width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0; background: linear-gradient(135deg, rgba(250,204,21,.15), transparent); border: 1px solid rgba(250,204,21,.3); display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--c-vip); }
+.brow-text { display: flex; flex-direction: column; gap: 4px; }
+.brow-text h4 { font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+.brow-text p { font-size: 11px; font-weight: 400; color: var(--muted2); line-height: 1.5; }
+.brow-text b { color: var(--c-vip); font-weight: 800; }
 
-.modal-close-btn { width: 100%; margin-top: 20px; padding: 18px; border-radius: 16px; border: none; cursor: pointer; background: linear-gradient(135deg, #facc15, #a16207); color: #000; font-family: var(--font); font-size: 13px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; box-shadow: 0 10px 25px rgba(234,179,8,0.3); }
+.modal-footer-txt { font-size: 10px; color: var(--muted); text-align: center; margin-top: 16px; line-height: 1.5; font-weight: 600; padding: 0 10px; }
+.modal-close-btn { width: 100%; margin-top: 16px; padding: 16px; border-radius: 14px; border: none; cursor: pointer; background: linear-gradient(135deg, #facc15, #a16207); color: #000; font-family: var(--font); font-size: 12px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; box-shadow: 0 10px 20px rgba(234,179,8,0.2); }
+.modal-close-btn:active { transform: scale(.98); }
+
+/* ALERT */
+.alert-box { width: 100%; padding: 12px 16px; background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); border-radius: 16px; text-align: center; margin-bottom: 16px; }
+.alert-box p:first-child { font-size: 11px; font-weight: 900; color: var(--c-timeup); letter-spacing: 2px; text-transform: uppercase; }
+.alert-box p:last-child { font-size: 10px; font-weight: 600; color: var(--muted2); margin-top: 4px; }
+
+@media(min-width:900px){
+  #wadah-ps { display: grid !important; grid-template-columns: repeat(2,1fr) !important; gap: 20px !important; align-items: start !important; }
+  .main { max-width: 960px; }
+}
 </style>
 </head>
 <body>
-
-<div class="ps-shapes-bg"></div>
 
 <header class="hdr">
   <div class="logo-row">
@@ -255,9 +280,12 @@ body {
 </header>
 
 <main class="main">
-  <div id="alert-box" class="hidden w-full p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-center mb-4"><p class="text-xs text-red-500 font-bold tracking-widest uppercase">Semua Unit Ditampilkan</p></div>
+  <div id="alert-box" class="alert-box" style="display:none">
+    <p>MENAMPILKAN SEMUA STASIUN</p>
+    <p>Scan QR di meja untuk memfilter stasiun spesifik.</p>
+  </div>
 
-  <!-- PROMO BANNER -->
+  <!-- PROMO BANNER (BINTANG/TROPHY) -->
   <div class="promo-banner" onclick="openModal()">
     <div class="pb-left">
         <div class="pb-icon">★</div>
@@ -271,7 +299,7 @@ body {
 
   <div id="wadah-ps" style="width:100%;display:flex;flex-direction:column;gap:24px;align-items:center"></div>
 
-  <!-- FOOTER WA -->
+  <!-- FOOTER -->
   <a href="https://wa.me/6282221586680" target="_blank" class="footer-wa">
     <p>Ada Masalah / Kendala?</p>
     <strong>HUBUNGI WHATSAPP: <em>0822 2158 6680</em></strong>
@@ -282,13 +310,15 @@ body {
 <div id="modal-vip" class="modal-bg" onclick="closeModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
-    <div style="font-size:10px; font-weight:900; letter-spacing:4px; text-transform:uppercase; color:#facc15; margin-bottom:8px;">EXCLUSIVE PRIVILEGES</div>
+    <div class="modal-eyebrow">EXCLUSIVE PRIVILEGES</div>
     <div class="modal-title">R-GANS VIP</div>
-    <div class="brow"><div class="brow-ico">💸</div><div class="brow-text"><h4>Tarif Flat Eksklusif</h4><p>Top-up <b>Rp 50.000</b> langsung dapat <b>12 JAM</b>. Bebas main sepuasnya dengan harga terbaik.</p></div></div>
+    
+    <div class="brow"><div class="brow-ico">★</div><div class="brow-text"><h4>Tarif Flat Eksklusif</h4><p>Top-up <b>Rp 50.000</b> langsung dapat <b>12 JAM</b>. Bebas main sepuasnya dengan harga terbaik.</p></div></div>
     <div class="brow"><div class="brow-ico">⏳</div><div class="brow-text"><h4>Bebas Nominal Top-up</h4><p>Isi saldo berapapun bisa. Pecahan di bawah 50rb akan dikonversi menjadi <b>66 Menit</b> per 5rb.</p></div></div>
     <div class="brow"><div class="brow-ico">💾</div><div class="brow-text"><h4>Waktu Aman Tersimpan</h4><p>Sisa waktu otomatis tersimpan di ID kamu. <b>Anti hangus</b>, bisa dilanjut kapan saja.</p></div></div>
     <div class="brow"><div class="brow-ico">📱</div><div class="brow-text"><h4>Sistem Smart WA</h4><p>Pendaftaran cukup dengan No WhatsApp. Menerima struk top-up & sisa waktu secara otomatis.</p></div></div>
-    <p style="font-size:10px; color:var(--muted); text-align:center; margin-top:16px; font-weight:600;">Untuk informasi lebih lanjut, silakan hubungi WhatsApp kami.</p>
+    
+    <p class="modal-footer-txt">Untuk informasi pendaftaran lebih lanjut, silakan hubungi WhatsApp kami atau langsung ke Kasir.</p>
     <button class="modal-close-btn" onclick="closeModal(event)">TUTUP MENU</button>
   </div>
 </div>
@@ -317,146 +347,173 @@ function fRp(n){return'Rp '+parseInt(n||0).toLocaleString('id-ID')}
 function fT(iso){return iso?iso.substring(11,16):'--:--'}
 function fMs(ms){const a=Math.abs(ms);return[Math.floor(a/3600000),Math.floor((a%3600000)/60000),Math.floor((a%60000)/1000)].map(v=>v.toString().padStart(2,'0')).join(':')}
 
-class StationConsoleUI {
-    constructor(name) { this.name = name; }
-    render() {
-        const div = document.createElement('div');
-        div.id = `box-${this.name}`;
-        div.className = `stn-card st-idle w-full`;
-        div.innerHTML = `
-            <div class="ps-lightbar"></div>
-            <div class="art">
-                <div class="art-wm">△ ○ □ ✕</div>
-                <div class="art-top">
-                    <h2 class="stn-name">${this.name}</h2>
-                    <div class="badge-group">
-                        <span class="badge b-vip vip-el" style="display:none">★ VIP ACTIVE</span>
-                        <span class="badge st-badge">— STANDBY</span>
-                    </div>
-                </div>
-                <div class="art-bot">
-                    <div class="ps-prompt">
-                        <span class="ps-sym ps-sym-el">□</span>
-                        <span class="ps-txt ps-txt-el">STANDBY</span>
-                    </div>
-                </div>
-            </div>
-            <div class="content">
-                <div class="idle-body">
-                    <div class="idle-ico">🎮</div>
-                    <div class="idle-lbl">STANDBY</div>
-                    <div class="idle-sub">Unit Siap Digunakan</div>
-                </div>
-                <div class="run-body">
-                    <div class="timer-wrap">
-                        <div class="hud-scanline"></div>
-                        <div class="timer-lbl">SISA WAKTU BERMAIN</div>
-                        <div id="timer-${this.name}" class="timer-dg">00:00:00</div>
-                        <div class="mt-1"><span class="paket-chip paket-el">—</span></div>
-                        <div class="time-meta">
-                            <div class="tmi"><span class="tmi-lbl">MULAI</span><span class="tmi-val jam-mulai">--:--</span></div>
-                            <div class="tmi est-wrap" style="display:none"><span class="tmi-lbl">EST SELESAI</span><span class="tmi-val jam-est">--:--</span></div>
-                        </div>
-                    </div>
-                    <div class="bill-row">
-                        <div class="bill-lbl bill-lbl-el">TOTAL BIAYA</div>
-                        <div class="bill-amt bill-el">Rp 0</div>
-                        <div class="pay-chip pay-el"><span class="pay-txt-el">STANDBY</span></div>
-                    </div>
-                    <div class="timeup-bar timeup-el" style="display:none">⚠ WAKTU HABIS — SEGERA PERPANJANG ⚠</div>
-                </div>
-            </div>`;
-        return div;
-    }
+function buildCard(name){
+  const el=document.createElement('div');
+  el.className='stn-card st-idle';el.id='box-'+name;
+  el.innerHTML=`
+<div class="art">
+  <div class="art-shim"></div>
+  <div class="art-wm">△ ○ □ ✕</div>
+  <div class="art-top">
+    <div class="badge-group">
+      <span class="badge st-badge">— STANDBY</span>
+    </div>
+    <div class="stn-name">${name}</div>
+  </div>
+  <div class="art-bot">
+    <div class="ps-prompt">
+      <span class="ps-sym ps-sym-el">□</span>
+      <span class="ps-txt ps-txt-el">STANDBY</span>
+    </div>
+  </div>
+</div>
+<div class="content">
+  <div class="idle-body">
+    <div class="idle-ico">🎮</div>
+    <div class="idle-lbl">STANDBY</div>
+    <div class="idle-sub">Unit Siap Digunakan</div>
+  </div>
+  <div class="run-body">
+    <div class="timer-wrap">
+      <div class="timer-lbl">SISA WAKTU BERMAIN</div>
+      <div class="timer-dg" id="timer-${name}">00:00:00</div>
+      <div><span class="paket-chip paket-el">—</span></div>
+      <div class="time-meta">
+        <div class="tmi"><span class="tmi-lbl">MULAI</span><span class="tmi-val jam-mulai">--:--</span></div>
+        <div class="tmi est-wrap" style="display:none"><span class="tmi-lbl">EST SELESAI</span><span class="tmi-val jam-est">--:--</span></div>
+      </div>
+    </div>
+    <div class="bill-row">
+      <div style="display:flex; flex-direction:column; align-items:center;">
+          <div class="bill-lbl bill-lbl-el">TOTAL BIAYA</div>
+          <div class="bill-amt bill-el">Rp 0</div>
+      </div>
+      <div class="pay-chip pc-idle pay-el">
+          <span class="pay-txt-el">STANDBY</span>
+      </div>
+    </div>
+    <div class="timeup-bar timeup-el" style="display:none">⚠ WAKTU HABIS — SEGERA PERPANJANG ⚠</div>
+  </div>
+</div>`;
+  return el;
 }
 
 function sync(name,info,card){
-    if(!card||!info)return;
-    const q=s=>card.querySelector(s);
-    card.classList.remove('st-idle','st-unpaid','st-paid','st-open','st-vip','st-timeup');
-    
-    const vipEl=q('.vip-el'), stBadge=q('.st-badge'), psSym=q('.ps-sym-el'), psTxt=q('.ps-txt-el');
-    const timerEl=document.getElementById('timer-'+name);
-    const paketEl=q('.paket-el'), jamM=q('.jam-mulai'), estW=q('.est-wrap'), jamE=q('.jam-est');
-    const billLbl=q('.bill-lbl-el'), billEl=q('.bill-el'), payEl=q('.pay-el'), payTxt=q('.pay-txt-el');
-    const idleB=q('.idle-body'), runB=q('.run-body'), tuBar=q('.timeup-el');
+  if(!card||!info)return;
+  const q=s=>card.querySelector(s);
+  
+  card.classList.remove('st-idle','st-unpaid','st-paid','st-open','st-vip','st-timeup');
+  
+  const stBadge=q('.st-badge');
+  const psSym=q('.ps-sym-el'),psTxt=q('.ps-txt-el'),timerEl=document.getElementById('timer-'+name);
+  const paketEl=q('.paket-el'),jamM=q('.jam-mulai'),estW=q('.est-wrap'),jamE=q('.jam-est');
+  const billLbl=q('.bill-lbl-el'), billEl=q('.bill-el'), payEl=q('.pay-el'), payTxt=q('.pay-txt-el');
+  const idleB=q('.idle-body'),runB=q('.run-body'),tuBar=q('.timeup-el');
 
-    if(!info.running){
-        card.classList.add('st-idle'); idleB.style.display='flex'; runB.style.display='none';
-        stBadge.textContent='— STANDBY'; psSym.textContent='□'; psTxt.textContent='STANDBY';
-        if(timers[name]){clearInterval(timers[name]);delete timers[name]} return;
-    }
+  if(!info.running){
+    card.classList.add('st-idle');
+    idleB.style.display='flex';runB.style.display='none';
+    stBadge.textContent='— STANDBY';
+    psSym.textContent='□';psTxt.textContent='STANDBY';
+    if(timers[name]){clearInterval(timers[name]);delete timers[name]}
+    return;
+  }
 
-    idleB.style.display='none'; runB.style.display='flex';
-    const isBebas=(info.mode||'').toUpperCase()==='BEBAS';
-    const isLunas=info.status_bayar==='LUNAS';
-    const isTimeup=!!info.is_time_up;
-    const isMember=info.is_member===true;
+  idleB.style.display='none';runB.style.display='flex';
+  
+  const isBebas=(info.mode||'').toUpperCase()==='BEBAS';
+  const isLunas=info.status_bayar==='LUNAS';
+  const isTimeup=!!info.is_time_up;
+  const isMember=info.is_member===true;
 
-    let sc='st-unpaid';
-    if(isTimeup) sc='st-timeup'; else if(isMember) sc='st-vip'; else if(isBebas) sc='st-open'; else if(isLunas) sc='st-paid';
-    card.classList.add(sc);
+  // Menentukan Theme Prioritas
+  let sc='st-unpaid';
+  if(isTimeup) sc='st-timeup';
+  else if(isMember) sc='st-vip';
+  else if(isBebas) sc='st-open';
+  else if(isLunas) sc='st-paid';
+  
+  card.classList.add(sc);
 
-    vipEl.style.display=isMember?'inline-flex':'none';
+  // Status Badge Atas
+  if(isTimeup){stBadge.textContent='✕ WAKTU HABIS';}
+  else if(isMember){stBadge.textContent='★ VIP ACTIVE';}
+  else if(isBebas){stBadge.textContent='△ OPEN BILLING';}
+  else if(isLunas){stBadge.textContent='○ LUNAS';}
+  else{stBadge.textContent='□ BELUM BAYAR';}
 
-    if(isTimeup){ stBadge.textContent='✕ WAKTU HABIS'; psSym.textContent='✕'; psTxt.textContent='SESI BERAKHIR'; }
-    else if(isMember){ stBadge.textContent='★ VIP ACTIVE'; psSym.textContent='★'; psTxt.textContent='VIP ACCESS'; }
-    else if(isBebas){ stBadge.textContent='△ OPEN BILLING'; psSym.textContent='△'; psTxt.textContent='OPEN BILLING AKTIF'; }
-    else if(isLunas){ stBadge.textContent='○ LUNAS'; psSym.textContent='○'; psTxt.textContent='SESI AKTIF'; }
-    else{ stBadge.textContent='□ BELUM BAYAR'; psSym.textContent='□'; psTxt.textContent='MENUNGGU PEMBAYARAN'; }
+  // PS Action Prompt
+  if(isTimeup){psSym.textContent='✕';psTxt.textContent='SESI BERAKHIR'}
+  else if(isBebas){psSym.style.borderRadius='5px'; psSym.textContent='△';psTxt.textContent='OPEN BILLING AKTIF'}
+  else if(isLunas){psSym.style.borderRadius='50%'; psSym.textContent='○';psTxt.textContent='SESI AKTIF'}
+  else{psSym.style.borderRadius='5px'; psSym.textContent='□';psTxt.textContent='MENUNGGU PEMBAYARAN'}
 
-    let paket=info.mode||'PAKET', harga=parseInt(info.total_sementara||0);
-    if(info.end_time_iso&&info.start_time_iso){
-        const diff=new Date(info.end_time_iso)-new Date(info.start_time_iso);
-        if(diff>0){
-            const jD=diff/3600000, jP=Math.floor(jD), sM=Math.round((jD-jP)*60);
-            if(jP>0&&sM>=25) paket=jP+' JAM 30 MNT'; else if(jP>0) paket=jP+' JAM'; else if(sM>=25) paket='30 MNT';
-            harga=(jP*5000)+(sM>=25?3000:0);
-        }
-        estW.style.display='flex'; jamE.textContent=info.end_time_iso.substring(11,16);
-    } else estW.style.display='none';
+  // Kalkulasi Harga & Sisa Waktu
+  let paket=info.mode||'PAKET', harga=parseInt(info.total_sementara||0);
+  if(info.end_time_iso&&info.start_time_iso){
+    const diff=new Date(info.end_time_iso)-new Date(info.start_time_iso);
+    if(diff>0){const jD=diff/3600000,jP=Math.floor(jD),sM=Math.round((jD-jP)*60);
+      if(jP>0&&sM>=25)paket=jP+' JAM 30 MENIT';else if(jP>0)paket=jP+' JAM';else if(sM>=25)paket='30 MENIT';
+      harga=(jP*5000)+(sM>=25?3000:0);}
+    estW.style.display='flex';jamE.textContent=fT(info.end_time_iso);
+  }else estW.style.display='none';
 
-    paketEl.textContent=paket; jamM.textContent=info.start_time_iso?info.start_time_iso.substring(11,16):'--:--';
+  paketEl.textContent=paket; jamM.textContent=fT(info.start_time_iso);
 
-    if(isMember) {
-        billLbl.innerHTML = '<span style="color:var(--accent); letter-spacing:4px;">★ VIP MEMBER ★</span>';
-        billEl.textContent = info.customer ? info.customer.toUpperCase() : 'VIP GUEST';
-    } else {
-        billLbl.textContent = 'TOTAL BIAYA'; billEl.textContent = fRp(harga);
-    }
+  // FOOTER LOGIC - JIKA VIP, TAMPILKAN NAMA BUKAN TAGIHAN
+  if(isMember) {
+      billLbl.innerHTML = '<span style="color:var(--accent); letter-spacing:4px;">★ VIP MEMBER ★</span>';
+      billEl.textContent = info.customer ? info.customer.toUpperCase() : 'VIP GUEST';
+  } else {
+      billLbl.textContent = 'TOTAL BIAYA';
+      billEl.textContent = fRp(harga);
+  }
 
-    if(isTimeup){ payTxt.textContent='WAKTU HABIS'; tuBar.style.display='block'; }
-    else {
-        tuBar.style.display='none';
-        if(isMember) payTxt.textContent='VIP ACCESS'; else if(isBebas) payTxt.textContent='OPEN BILLING';
-        else if(isLunas) payTxt.textContent='LUNAS'; else payTxt.textContent='BELUM BAYAR';
-    }
+  // Tombol Pay Chip
+  payEl.className = 'pay-chip';
+  if(isTimeup){payEl.classList.add('pc-timeup');payTxt.textContent='WAKTU HABIS'; tuBar.style.display='block';}
+  else {
+      tuBar.style.display='none';
+      if(isMember) { payEl.classList.add('pc-open'); payEl.style.borderColor='var(--accent)'; payEl.style.color='var(--accent)'; payTxt.textContent='VIP ACCESS'; }
+      else if(isBebas) { payEl.classList.add('pc-open'); payTxt.textContent='OPEN BILLING'; }
+      else if(isLunas) { payEl.classList.add('pc-paid'); payTxt.textContent='LUNAS'; }
+      else { payEl.classList.add('pc-unpaid'); payTxt.textContent='BELUM BAYAR'; }
+  }
 
-    if(timers[name])clearInterval(timers[name]);
-    if(!timerEl||!info.start_time_iso)return;
-    timers[name]=setInterval(()=>{
-        const now=Date.now(),end=info.end_time_iso?new Date(info.end_time_iso).getTime():0,start=new Date(info.start_time_iso).getTime();
-        const diff=end>0?end-now:now-start;
-        timerEl.textContent=fMs(diff<=0&&end>0?0:diff);
-    },1000);
+  // Timer Engine
+  if(timers[name])clearInterval(timers[name]);
+  if(!timerEl||!info.start_time_iso)return;
+  timers[name]=setInterval(()=>{
+    const now=Date.now(),end=info.end_time_iso?new Date(info.end_time_iso).getTime():0,start=new Date(info.start_time_iso).getTime();
+    const diff=end>0?end-now:now-start;
+    if(diff<=0&&end>0){timerEl.textContent='00:00:00';return}
+    timerEl.textContent=fMs(diff);
+  },1000);
 }
 
 db.ref('.info/connected').on('value',s=>{
-    const e=document.getElementById('conn'); if(!e)return;
-    e.textContent=s.val()?'● LIVE':'● OFFLINE'; e.style.color=s.val()?'#10b981':'#ef4444';
+  const e=document.getElementById('conn');if(!e)return;
+  e.textContent=s.val()?'● LIVE CONNECTED':'● OFFLINE';
+  e.style.color=s.val()?'var(--c-paid)':'var(--c-timeup)';
+  e.style.textShadow=s.val()?'0 0 10px rgba(16,185,129,0.5)':'0 0 10px rgba(239,68,68,0.5)';
 });
 
 const wadah=document.getElementById('wadah-ps');
 db.ref('dashboard_rgans').on('value',snap=>{
-    const data=snap.val(); if(!data){wadah.innerHTML='<p style="color:var(--muted);text-align:center;padding:40px;font-size:12px;letter-spacing:4px;font-weight:800;">NO DATA FOUND</p>';return}
-    if(!tU)document.getElementById('alert-box').classList.remove('hidden');
-    const order=Object.keys(data).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));
-    order.forEach(n=>{
-        if(tU&&n.toLowerCase()!==tU.toLowerCase())return;
-        let card=document.getElementById('box-'+n);
-        if(!card){card=(new StationConsoleUI(n)).render(); wadah.appendChild(card)}
-        sync(n,data[n],card);
-    });
+  const data=snap.val();
+  if(!data){wadah.innerHTML='<p style="color:var(--muted);text-align:center;padding:40px;font-size:12px;letter-spacing:4px;font-weight:800;">NO DATA FOUND</p>';return}
+  if(!tU)document.getElementById('alert-box').style.display='block';
+  const order=Object.keys(data).sort((a,b)=>{
+    const aS=a.toUpperCase().startsWith('STATION'),bS=b.toUpperCase().startsWith('STATION');
+    if(aS&&!bS)return -1;if(!aS&&bS)return 1;
+    return a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'});
+  });
+  order.forEach(n=>{
+    if(tU&&n.toLowerCase()!==tU.toLowerCase())return;
+    let card=document.getElementById('box-'+n);
+    if(!card){card=buildCard(n);wadah.appendChild(card)}
+    sync(n,data[n],card);
+  });
 });
 </script>
 </body>
