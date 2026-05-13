@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>R-GANS BOSS - Remote Web (REALTIME)</title>
+    <title>R-GANS PREMIER - Luxury Monitor</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700;800;900&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -17,8 +17,11 @@
                     fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
                     colors: {
                         rgans: {
-                            bg: '#0f172a', card: '#1e293b', card2: '#334155', border: '#334155', border2: '#475569',
-                            text: '#f8fafc', muted: '#94a3b8', cyan: '#22d3ee', gold: '#fbbf24', green: '#10b981', red: '#ef4444', red_dim: '#7f1d1d'
+                            bg: '#050b14', /* Darker cinematic background */
+                            card: 'rgba(15, 23, 42, 0.4)', 
+                            border: 'rgba(255, 255, 255, 0.08)',
+                            text: '#f8fafc', muted: '#94a3b8', 
+                            cyan: '#00f0ff', gold: '#ffd700', green: '#00ffa3', red: '#ff2a2a', purple: '#b52aff'
                         }
                     }
                 }
@@ -26,168 +29,192 @@
         }
     </script>
     <style>
-        body { background-color: #0f172a; color: #f8fafc; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+        /* ╔══════════════════════════════════════════════════════════╗
+           ║   LUXURY GLASSMORPHISM TOKENS & CINEMATIC LIGHTING       ║
+           ╚══════════════════════════════════════════════════════════╝ */
+        :root {
+            --cyan-glow: rgba(0, 240, 255, 0.4);   --cyan-dim: rgba(0, 240, 255, 0.1);
+            --gold-glow: rgba(255, 215, 0, 0.4);   --gold-dim: rgba(255, 215, 0, 0.1);
+            --green-glow: rgba(0, 255, 163, 0.4);  --green-dim: rgba(0, 255, 163, 0.1);
+            --red-glow: rgba(255, 42, 42, 0.4);    --red-dim: rgba(255, 42, 42, 0.1);
+            --purple-glow: rgba(181, 42, 255, 0.4);--purple-dim: rgba(181, 42, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-highlight: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Cinematic Studio Background */
+        body { 
+            background: radial-gradient(circle at 50% 0%, #111827 0%, #050b14 70%);
+            color: #f8fafc; overflow-x: hidden; -webkit-tap-highlight-color: transparent; 
+        }
+        
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-        .btn-klik:active { transform: scale(0.95); transition: 0.1s; }
-        .toast-entry { animation: slideIn 0.3s ease forwards; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        select { -webkit-appearance: none; appearance: none; }
-        .btn-disabled { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
-        .modal-blur { backdrop-filter: blur(8px); background-color: rgba(15, 23, 42, 0.85); }
-        @keyframes popUp { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        .animate-pop { animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        
+        /* ALIGNMENT & CENTERING UNTUK HP */
+        #wadah-ps {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 100%; min-height: 100%; gap: 2rem; position: relative; z-index: 10;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-fullscreen { min-height: 85vh; justify-content: center; }
+            .stn-card { width: 90vw !important; max-width: 400px; margin: 0 auto; }
+        }
+
+        /* ╔══════════════════════════════════════════════════════════╗
+           ║   ANIMASI HD MEWAH                                       ║
+           ╚══════════════════════════════════════════════════════════╝ */
+        @keyframes borderSpin { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes timerPulse { 0%,100% { filter: drop-shadow(0 0 15px currentColor) brightness(1); } 50% { filter: drop-shadow(0 0 35px currentColor) brightness(1.3); } }
+        @keyframes glassShimmer { 
+            0% { transform: translateX(-150%) skewX(-45deg); opacity: 0; } 
+            50% { opacity: 0.1; }
+            100% { transform: translateX(150%) skewX(-45deg); opacity: 0; } 
+        }
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+        /* KARTU LUXURY GLASSMORPHISM */
+        .stn-card {
+            position: relative; border-radius: 32px; overflow: hidden; display: flex; flex-direction: column;
+            min-height: 440px; 
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%);
+            backdrop-filter: blur(24px) saturate(150%); -webkit-backdrop-filter: blur(24px) saturate(150%);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
+            transition: all .5s cubic-bezier(.4,0,.2,1);
+            user-select: none; margin-bottom: 20px;
+        }
+
+        /* Ambient Glow di belakang kartu */
+        .stn-card::before {
+            content: ''; position: absolute; inset: -20px; z-index: -1; border-radius: 40px;
+            filter: blur(40px); opacity: 0.5; transition: all .5s; pointer-events: none;
+        }
+        .stn-card.st-idle::before { background: rgba(0,0,0,0.5); }
+        .stn-card.st-running-belum::before { background: var(--cyan-dim); }
+        .stn-card.st-running-lunas::before { background: var(--green-dim); }
+        .stn-card.st-running-bebas::before { background: var(--purple-dim); }
+        .stn-card.st-timeup::before { background: var(--red-dim); animation: timerPulse 1s infinite; }
+
+        /* Kilauan Kaca (Shimmer) berjalan tiap 6 detik */
+        .stn-shimmer {
+            position: absolute; top: 0; left: 0; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            z-index: 5; pointer-events: none; opacity: 0;
+            animation: glassShimmer 6s infinite ease-in-out;
+        }
+
+        /* Border Animasi Elegan */
+        .stn-border {
+            position: absolute; inset: 0; border-radius: inherit; padding: 2px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(0,0,0,0));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+            pointer-events: none; z-index: 2; transition: all .5s;
+        }
+        
+        .stn-card.st-running-belum .stn-border { background: linear-gradient(90deg, transparent, #00f0ff, transparent); background-size: 200% 100%; animation: borderSpin 3s linear infinite; }
+        .stn-card.st-running-lunas .stn-border { background: linear-gradient(90deg, transparent, #00ffa3, transparent); background-size: 200% 100%; animation: borderSpin 3s linear infinite; }
+        .stn-card.st-running-bebas .stn-border { background: linear-gradient(90deg, transparent, #b52aff, transparent); background-size: 200% 100%; animation: borderSpin 3s linear infinite; }
+        .stn-card.st-timeup .stn-border { background: linear-gradient(90deg, transparent, #ff2a2a, transparent); background-size: 200% 100%; animation: borderSpin 1.5s linear infinite; }
+
+        /* Header Station - HD Text */
+        .stn-name {
+            font-size: 28px; font-weight: 900; letter-spacing: 4px;
+            background: linear-gradient(to bottom, #ffffff, #94a3b8);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        /* Timer Area - Cinematic Digits */
+        .stn-timer-wrap {
+            position:relative; z-index:3; flex:1; display:flex; flex-direction:column; justify-content:center; align-items: center;
+            margin: 10px 20px; padding: 30px 10px; border-radius: 20px;
+            background: rgba(0,0,0,0.2); box-shadow: inset 0 2px 15px rgba(0,0,0,0.5);
+            border-top: 1px solid rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.03);
+            transition: all .5s;
+        }
+
+        .stn-timer-digits {
+            font-family:'JetBrains Mono',monospace; font-size: 58px; font-weight: 900; 
+            letter-spacing: 2px; line-height: 1; font-variant-numeric: tabular-nums; 
+            margin: 15px 0; transition: color .5s, filter .5s;
+        }
+        
+        .stn-card.st-idle .stn-timer-digits { color: #475569; }
+        .stn-card.st-running-belum .stn-timer-digits { color: #00f0ff; filter: drop-shadow(0 0 20px var(--cyan-glow)); animation: timerPulse 3s ease-in-out infinite; }
+        .stn-card.st-running-lunas .stn-timer-digits { color: #00ffa3; filter: drop-shadow(0 0 20px var(--green-glow)); animation: timerPulse 3s ease-in-out infinite; }
+        .stn-card.st-running-bebas .stn-timer-digits { color: #b52aff; filter: drop-shadow(0 0 20px var(--purple-glow)); animation: timerPulse 3s ease-in-out infinite; }
+        .stn-card.st-timeup .stn-timer-digits { color: #ff2a2a; filter: drop-shadow(0 0 20px var(--red-glow)); animation: timerPulse 0.8s ease-in-out infinite; }
+
+        /* Tag Label Mewah */
+        .stn-mode-tag {
+            display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:6px 16px; border-radius:12px;
+            font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:2px; 
+            backdrop-filter: blur(10px); transition:all .5s; margin: 0 auto;
+        }
+        .stn-card.st-idle .stn-mode-tag { background: rgba(255,255,255,0.05); color: var(--muted-color); border: 1px solid rgba(255,255,255,0.1); }
+        .stn-card.st-running-belum .stn-mode-tag { background: var(--cyan-dim); color: #00f0ff; border: 1px solid rgba(0,240,255,0.3); box-shadow: 0 4px 15px var(--cyan-dim); }
+        .stn-card.st-running-lunas .stn-mode-tag { background: var(--green-dim); color: #00ffa3; border: 1px solid rgba(0,255,163,0.3); box-shadow: 0 4px 15px var(--green-dim); }
+        .stn-card.st-running-bebas .stn-mode-tag { background: var(--purple-dim); color: #b52aff; border: 1px solid rgba(181,42,255,0.3); box-shadow: 0 4px 15px var(--purple-dim); }
+        .stn-card.st-timeup .stn-mode-tag { background: var(--red-dim); color: #ff2a2a; border: 1px solid rgba(255,42,42,0.4); box-shadow: 0 4px 15px var(--red-dim); }
+
+        /* Billing Area */
+        .stn-billing {
+            position:relative; z-index:3; margin: 5px 20px 20px; padding: 20px; border-radius: 20px;
+            display:flex; align-items:center; justify-content:space-between;
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4); transition: all .5s;
+        }
+
+        .stn-billing-label { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:2.5px; color:#64748b; margin-bottom:4px; display: block;}
+        .stn-billing-val { font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:900; transition: color .5s; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        
+        .stn-card.st-idle .stn-billing-val { color: #64748b; }
+        .stn-card.st-running-belum .stn-billing-val { color: #00f0ff; }
+        .stn-card.st-running-lunas .stn-billing-val { color: #00ffa3; }
+        .stn-card.st-running-bebas .stn-billing-val { color: #b52aff; }
+        .stn-card.st-timeup .stn-billing-val { color: #ff2a2a; }
+
+        .badge-front { padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; border: 1px solid transparent; display: inline-block;}
+        .badge-lunas { background: rgba(0,255,163,0.1); color: #00ffa3; border-color: rgba(0,255,163,0.3); }
+        .badge-belum { background: rgba(255,42,42,0.1); color: #ff2a2a; border-color: rgba(255,42,42,0.3); }
+        .badge-bebas { background: rgba(181,42,255,0.1); color: #b52aff; border-color: rgba(181,42,255,0.3); }
+        .badge-idle { background: rgba(255,255,255,0.02); color: #64748b; border-color: rgba(255,255,255,0.05); }
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col md:flex-row font-sans">
+<body class="h-screen w-screen flex flex-col font-sans">
 
-    <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"></div>
-
-    <!-- MODAL MULAI SESI -->
-    <div id="start-modal" class="fixed inset-0 z-[10002] hidden items-center justify-center p-4 modal-blur">
-        <div class="bg-rgans-card w-full max-w-xs rounded-[30px] border-2 border-rgans-cyan shadow-[0_0_60px_rgba(34,211,238,0.4)] overflow-hidden animate-pop flex flex-col text-center">
-            <div class="bg-rgans-cyan py-4 px-6 shadow-lg">
-                <p class="font-black text-xl text-rgans-bg uppercase tracking-tighter">Mulai Sesi</p>
-            </div>
-            <div class="p-6 flex flex-col gap-4">
-                <p class="text-white text-xs font-bold uppercase" id="start-unit-name">UNIT --</p>
-                <div class="flex flex-col gap-3">
-                    <button id="btn-start-tamu" class="w-full bg-rgans-card2 border border-rgans-cyan/50 py-4 rounded-2xl text-white font-black text-xs uppercase shadow-lg active:scale-95 transition-all">👤 TAMU REGULER</button>
-                    
-                    <div class="w-full h-px bg-rgans-border2 my-1"></div>
-                    <p class="text-[9px] text-rgans-muted uppercase font-bold tracking-widest">Atau Gunakan Member</p>
-                    
-                    <div class="bg-rgans-bg border border-rgans-border2 rounded-xl p-2 h-[45px] flex items-center shadow-inner relative">
-                        <select id="cmb-pilih-member" class="bg-transparent w-full text-white text-xs font-bold outline-none cursor-pointer pl-2">
-                            <option value="">-- Pilih Member --</option>
-                        </select>
-                    </div>
-                    
-                    <button id="btn-start-member" class="w-full bg-rgans-gold py-4 rounded-2xl text-black font-black text-xs uppercase shadow-lg active:scale-95 transition-all">⭐ PEMAIN MEMBER</button>
-                </div>
-                <button onclick="document.getElementById('start-modal').classList.replace('flex', 'hidden')" class="text-[10px] text-rgans-muted underline mt-2">Batalkan</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL KONFIRMASI STOP -->
-    <div id="notif-modal" class="fixed inset-0 z-[10001] hidden items-center justify-center p-4 modal-blur">
-        <div class="bg-rgans-card w-full max-w-xs rounded-[30px] border-2 border-rgans-red shadow-[0_0_60px_rgba(239,68,68,0.4)] overflow-hidden animate-pop flex flex-col text-center">
-            <div class="bg-rgans-red py-4 shadow-lg"><p class="font-black text-xl text-white uppercase tracking-tighter">Konfirmasi Stop</p></div>
-            <div class="p-6 flex flex-col gap-5">
-                <div><p class="text-rgans-muted text-[10px] font-bold uppercase tracking-widest mb-1">Unit Station</p><p class="text-3xl font-black text-white" id="nt-unit">--</p></div>
-                <div class="flex flex-col gap-2">
-                    <button id="nt-btn-yes" class="w-full bg-rgans-green py-4 rounded-2xl text-white font-black text-sm uppercase shadow-lg active:scale-95 transition-all">Sudah Bayar (Reset)</button>
-                    <button id="nt-btn-no" class="w-full bg-rgans-card2 border border-rgans-border2 py-3 rounded-2xl text-rgans-muted font-bold text-[10px] uppercase active:scale-95 transition-all">Nanti (Hanya Stop)</button>
-                </div>
-                <button onclick="document.getElementById('notif-modal').classList.replace('flex', 'hidden')" class="text-[10px] text-rgans-muted underline mt-2">Batal</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL STRUK SELESAI -->
-    <div id="super-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4 modal-blur">
-        <div class="bg-rgans-card w-full max-w-sm rounded-[30px] border-2 border-rgans-cyan shadow-[0_0_60px_rgba(34,211,238,0.4)] overflow-hidden animate-pop flex flex-col">
-            <div class="bg-rgans-cyan py-4 px-6 text-center shadow-lg relative">
-                <div class="absolute w-8 h-8 bg-white/20 rounded-full top-2 right-2 flex items-center justify-center animate-pulse">🛎️</div>
-                <p class="font-black text-xl tracking-tight text-rgans-bg">SESI SELESAI!</p>
-                <p class="text-xs font-bold text-rgans-bg/80 uppercase tracking-widest mt-1">R-Gans Playstation</p>
-            </div>
-            <div class="p-6 flex-1 flex flex-col gap-4">
-                <div class="bg-rgans-bg rounded-2xl p-4 border border-rgans-border2 shadow-inner">
-                    <div class="flex justify-between items-center mb-2 pb-2 border-b border-dashed border-rgans-border2">
-                        <span class="text-rgans-muted text-xs font-bold uppercase tracking-widest">Unit</span>
-                        <span class="text-white text-sm font-black bg-rgans-card px-2 py-0.5 rounded border border-rgans-border2" id="sm-unit">--</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-rgans-muted text-xs">Customer</span>
-                        <span class="text-white font-mono text-[11px] font-bold bg-rgans-card2 px-1.5 py-0.5 rounded" id="sm-customer">--</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-rgans-muted text-xs">Date</span>
-                        <span class="text-white font-mono text-[11px] font-bold" id="sm-tanggal">--/--/----</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-rgans-muted text-xs">Time Started</span>
-                        <span class="text-white font-mono text-[11px] font-bold" id="sm-mulai">--:--</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-rgans-muted text-xs">Time Ended</span>
-                        <span class="text-white font-mono text-[11px] font-bold" id="sm-selesai">--:--</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-rgans-muted text-xs">Total Duration</span>
-                        <span class="text-rgans-cyan font-bold text-xs bg-rgans-cyan/10 px-1.5 py-0.5 rounded border border-rgans-cyan/30" id="sm-durasi">--:--:--</span>
-                    </div>
-                </div>
-                
-                <div class="bg-rgans-card2/50 rounded-2xl p-4 border border-rgans-border text-center">
-                    <p class="text-[10px] text-rgans-gold font-bold uppercase tracking-widest mb-1">Total Tagihan</p>
-                    <p class="text-3xl font-mono font-black text-white" id="sm-total">Rp 0</p>
-                </div>
-                
-                <button onclick="document.getElementById('super-modal').classList.replace('flex', 'hidden')" class="w-full bg-gradient-to-r from-rgans-cyan to-blue-500 py-4 rounded-2xl text-rgans-bg font-black text-sm shadow-[0_10px_20px_rgba(34,211,238,0.3)] active:scale-95 transition-all mt-2 uppercase tracking-widest">
-                    Tutup Struk
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- SIDEBAR -->
-    <aside class="w-full md:w-[220px] bg-rgans-card border-b md:border-r border-rgans-border flex md:flex-col shrink-0">
-        <div class="h-16 border-b border-rgans-border flex items-center justify-center md:justify-start px-4">
-            <h1 class="text-rgans-gold font-bold text-lg tracking-tighter">R-GANS <span class="text-white text-xs">BOSS</span></h1>
-        </div>
-        <div class="p-4 border-b border-rgans-border flex items-center gap-3 justify-center md:justify-start">
-            <div class="w-10 h-10 rounded-full bg-rgans-card2 flex items-center justify-center text-lg shadow-inner">👤</div>
-            <div class="hidden md:block">
-                <p class="text-xs font-bold text-white uppercase" id="ui-kasir">ADMIN</p>
-                <p class="text-[10px] text-rgans-green font-semibold">Owner Mode</p>
-            </div>
-        </div>
-        <nav class="flex-1 p-2 flex md:flex-col gap-1">
-            <button class="flex items-center justify-center md:justify-start gap-3 p-3 rounded-xl bg-rgans-cyan/10 text-rgans-cyan border border-rgans-cyan/20 font-bold text-xs shrink-0">
-                <span class="text-lg">🎮</span> <span class="hidden md:inline">DASHBOARD</span>
-            </button>
-        </nav>
-        <div class="p-3 border-t border-rgans-border">
-            <div class="bg-rgans-bg px-2 py-1.5 rounded-lg text-center border border-rgans-border shadow-inner">
-                <p class="text-[9px] text-rgans-muted font-bold uppercase tracking-widest">Koneksi Cloud</p>
-                <p class="text-[10px] font-bold text-rgans-green" id="connection-status">● ONLINE</p>
-            </div>
-        </div>
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 flex flex-col min-w-0 bg-rgans-bg relative overflow-y-auto">
-        <header class="border-b border-rgans-border bg-rgans-card/50 backdrop-blur-md sticky top-0 z-10 p-3 shrink-0">
-            <div class="grid grid-cols-3 gap-2 max-w-6xl mx-auto mb-2 text-center">
-                <div class="bg-rgans-bg p-2 rounded-xl border border-rgans-border">
-                    <p class="text-[8px] text-rgans-muted font-bold uppercase">Hari Ini</p>
-                    <p class="text-xs font-bold text-rgans-green leading-none mt-1" id="ui-omset-hari">Rp 0</p>
-                </div>
-                <div class="bg-rgans-bg p-2 rounded-xl border border-rgans-border">
-                    <p class="text-[8px] text-rgans-muted font-bold uppercase">Minggu Ini</p>
-                    <p class="text-xs font-bold text-rgans-gold leading-none mt-1" id="ui-omset-minggu">Rp 0</p>
-                </div>
-                <div class="bg-rgans-bg p-2 rounded-xl border border-rgans-border">
-                    <p class="text-[8px] text-rgans-muted font-bold uppercase">Bulan Ini</p>
-                    <p class="text-xs font-bold text-rgans-cyan leading-none mt-1" id="ui-omset-bulan">Rp 0</p>
+    <!-- Header Glassmorphism -->
+    <header class="border-b border-white/5 bg-[#050b14]/60 backdrop-blur-xl sticky top-0 z-20 p-5 shrink-0 flex justify-between items-center shadow-2xl w-full">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00f0ff] to-[#0066ff] p-[1px] shadow-[0_0_20px_rgba(0,240,255,0.3)]">
+                <div class="w-full h-full bg-[#050b14] rounded-xl flex items-center justify-center relative overflow-hidden">
+                    <div class="absolute inset-0 bg-[#00f0ff] opacity-10"></div>
+                    <span class="text-[#00f0ff] text-2xl font-black relative z-10">R</span>
                 </div>
             </div>
-            <div class="flex justify-between items-center px-1">
-                <p class="text-[9px] text-rgans-green font-bold uppercase" id="ui-status">● LIVE</p>
-                <p class="text-sm font-mono font-bold text-white" id="jam-digital">00:00:00</p>
+            <div>
+                <h1 class="text-white font-black text-xl tracking-tighter leading-none">R-GANS <span class="text-[#00f0ff]">PREMIER</span></h1>
+                <p class="text-[10px] text-rgans-muted font-bold uppercase tracking-[0.2em] mt-1.5">VIP Monitor</p>
             </div>
-        </header>
-
-        <div class="flex-1 overflow-y-auto p-4 hide-scroll pb-24">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="wadah-ps"></div>
         </div>
+        <div class="text-right">
+            <p class="text-[10px] text-[#00ffa3] font-black uppercase mb-1 tracking-widest" id="connection-status">● CONNECTED</p>
+            <p class="text-lg font-mono font-black text-white leading-none drop-shadow-md" id="jam-digital">00:00:00</p>
+        </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 md:p-8 hide-scroll flex flex-col items-center justify-center w-full relative">
+        <div id="alert-no-unit" class="hidden bg-red-900/40 border border-red-500/30 backdrop-blur-md text-white p-5 rounded-2xl text-center mb-6 shadow-2xl absolute top-6 max-w-md w-[90%] z-20">
+            <p class="font-black text-sm tracking-wide">MENAMPILKAN SEMUA UNIT</p>
+            <p class="text-[11px] text-red-200/60 mt-1.5 tracking-wider">Untuk tampilan spesifik, scan QR Code di meja.</p>
+        </div>
+
+        <div id="wadah-ps"></div>
     </main>
 
     <script>
-        // --- 1. KONFIGURASI API KEY FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyDAD47-malAVNF0pvG-zb68VSlPT4KftU4",
             authDomain: "rgans-premier.firebaseapp.com",
@@ -195,493 +222,159 @@
             projectId: "rgans-premier",
             storageBucket: "rgans-premier.firebasestorage.app",
             messagingSenderId: "483724142361",
-            appId: "1:483724142361:web:18517acb9e31a2962e4788",
-            measurementId: "G-R40E2YGERJ"
+            appId: "1:483724142361:web:18517acb9e31a2962e4788"
         };
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
         let activeTimers = {};
-        let localState = {}; 
         let stationsData = {}; 
-        let globalListMember = []; 
-        let strukTimer = null; 
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetUnit = urlParams.get('unit'); 
 
         setInterval(() => { 
             const el = document.getElementById('jam-digital');
             if(el) el.innerText = new Date().toLocaleTimeString('id-ID', { hour12: false }); 
         }, 1000);
 
-        function showToast(msg, isSuccess = true) {
-            const container = document.getElementById('toast-container');
-            if(!container) return;
-            const toast = document.createElement('div');
-            toast.className = `toast-entry pointer-events-auto px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-bold border border-rgans-border2 ${isSuccess ? 'bg-rgans-card text-rgans-cyan' : 'bg-rgans-red_dim text-white'}`;
-            toast.innerHTML = `<span>${isSuccess ? '📡' : '⚠️'}</span> ${msg}`;
-            container.appendChild(toast);
-            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
-        }
-
-        class PSBoxUI {
+        class PSBoxViewer {
             constructor(name) { this.name = name; }
             render() {
                 const kotak = document.createElement('div');
-                kotak.className = `box-ps bg-rgans-card rounded-2xl border border-rgans-border transition-all duration-300 flex flex-col h-full overflow-hidden`;
+                kotak.className = `stn-card st-idle w-full max-w-[420px] mx-auto`;
                 kotak.id = `box-${this.name}`;
                 kotak.innerHTML = `
-                    <div class="status-bar h-1.5 shrink-0 bg-rgans-border2"></div>
-                    <div class="p-3.5 flex flex-col flex-1">
-                        <div class="flex justify-between items-center mb-1 shrink-0">
-                            <div class="flex items-center gap-2">
-                                <span class="status-dot text-[11px] text-rgans-border2">●</span>
-                                <span class="font-bold text-sm text-white tracking-tight">${this.name.toUpperCase()}</span>
+                    <div class="stn-border"></div>
+                    <div class="stn-shimmer"></div>
+
+                        <div class="relative z-[3] px-6 pt-8 pb-2 flex flex-col items-center justify-center">
+                            <h2 class="stn-name uppercase">${this.name}</h2>
+                        </div>
+
+                        <div class="stn-timer-wrap">
+                            <span class="member-label text-[11px] font-black text-white/50 tracking-[0.3em] uppercase truncate px-4 mb-2">MEMBER VIP</span>
+                            <div id="timer-${this.name}" class="stn-timer-digits">00:00:00</div>
+                            <div class="stn-mode-tag mode-label">IDLE</div>
+                        </div>
+
+                        <div class="stn-billing">
+                            <div class="flex flex-col">
+                                <span class="stn-billing-label">Total Tagihan</span>
+                                <span id="harga-${this.name}" class="stn-billing-val">Rp 0</span>
                             </div>
-                            <div class="flex bg-rgans-card2 rounded-lg p-[3px] border border-rgans-border2 shadow-inner">
-                                <button class="btn-on btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md text-rgans-muted transition">ON</button>
-                                <button class="btn-off btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md text-rgans-muted transition">OFF</button>
+                            <div class="flex flex-col items-end">
+                                <span class="stn-billing-label">Mulai: <span class="jam-mulai text-white/80 font-mono text-xs">--:--</span></span>
+                                <span class="lunas-label badge-front badge-idle mt-1.5">STANDBY</span>
                             </div>
                         </div>
-                        <div class="flex-1 flex flex-col items-center justify-center py-4 min-h-[70px]">
-                            <p class="member-label text-[10px] font-bold text-rgans-cyan/80 mb-1 tracking-widest uppercase truncate w-full text-center h-4"></p>
-                            <h2 id="timer-${this.name}" class="font-mono text-4xl sm:text-5xl font-bold text-rgans-muted tracking-tighter">00:00:00</h2>
-                        </div>
-                        <div class="flex justify-between items-center mb-4 shrink-0 px-1 border-b border-rgans-border2/30 pb-2">
-                            <span id="harga-${this.name}" class="font-mono font-bold text-base text-rgans-gold">Rp 0</span>
-                            <span class="mode-label text-[10px] font-extrabold text-rgans-gold/70 bg-rgans-gold/10 px-2 py-0.5 rounded-full border border-rgans-gold/20 uppercase tracking-tighter">IDLE</span>
-                        </div>
-                        <div class="mt-auto shrink-0 flex flex-col gap-2.5">
-                            <div class="flex bg-rgans-bg border border-rgans-border2 rounded-xl p-1 h-[38px] shadow-inner items-center">
-                                <input type="text" placeholder="--:--" class="jam-mulai bg-transparent w-[70%] px-2 text-center font-mono text-xs font-bold text-rgans-muted outline-none" disabled>
-                                <div class="w-[1px] h-4 bg-rgans-border2 mx-1"></div>
-                                <select id="paket-${this.name}" class="bg-transparent w-[30%] px-1 text-rgans-cyan text-[11px] font-bold outline-none cursor-pointer text-center">
-                                    <option value="Bebas">Bebas</option>
-                                    <option value="60">1 Jam</option>
-                                    <option value="120">2 Jam</option>
-                                    <option value="180">3 Jam</option>
-                                    <option value="240">4 Jam</option>
-                                    <option value="300">5 Jam</option>
-                                </select>
-                            </div>
-                            <div class="flex gap-2">
-                                <button class="btn-utama btn-klik flex-1 bg-rgans-green text-white shadow-[0_4px_15px_rgba(16,185,129,0.3)] text-xs font-bold py-3 rounded-xl transition-all">▶ MULAI SESI</button>
-                                <button class="btn-update btn-klik hidden bg-rgans-cyan text-rgans-bg text-[10px] font-extrabold px-3 py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(34,211,238,0.4)]">💾 UPDATE</button>
-                            </div>
-                            <div class="grid grid-cols-4 gap-1.5 h-[36px]">
-                                <button class="btn-move btn-klik bg-rgans-card2 border border-rgans-border2 text-rgans-muted text-[9px] font-bold rounded-lg hover:bg-rgans-border transition flex items-center justify-center">⇄</button>
-                                <button class="btn-lunas btn-klik col-span-2 text-[9px] font-bold rounded-lg transition border">BELUM</button>
-                                <button class="btn-plus30 btn-klik bg-rgans-card2 border border-rgans-border2 text-rgans-muted text-[9px] font-bold rounded-lg hover:bg-rgans-border transition flex items-center justify-center">+30</button>
-                            </div>
-                            <button class="btn-struk btn-klik w-full bg-rgans-cyan/10 border border-rgans-cyan/30 text-rgans-cyan text-[10px] font-bold py-1.5 rounded-lg transition-all">🖨️ CETAK STRUK</button>
-                        </div>
-                    </div>
                 `;
                 return kotak;
             }
         }
 
-        class AppManager {
+        class ViewerManager {
             constructor() {
                 this.wadah = document.getElementById('wadah-ps');
-                this.isFirstLoadStruk = true; 
-                this.lastReceiptTime = null; 
                 this.setupFirebase();
-            }
-
-            saveLocal(n, v) { 
-                localState[n] = v; 
-                this.syncBoxUI(n, stationsData[n], document.getElementById(`box-${n}`));
-            }
-
-            updateSesi(n) {
-                const val = document.getElementById(`paket-${n}`).value;
-                document.getElementById(`box-${n}`).querySelector('.btn-update').innerText = "⏳...";
-                this.kirimPerintah(n, 'UPDATE_SESSION', val); 
-                delete localState[n]; 
+                
+                if(!targetUnit) {
+                    document.getElementById('alert-no-unit').classList.remove('hidden');
+                }
             }
 
             setupFirebase() {
                 db.ref('.info/connected').on('value', s => {
                     const el = document.getElementById('connection-status');
                     if(el) {
-                        el.innerText = s.val() ? '● ONLINE' : '● OFFLINE';
-                        el.className = s.val() ? 'text-[10px] font-bold text-rgans-green' : 'text-[10px] font-bold text-rgans-red';
+                        el.innerText = s.val() ? '● LIVE CONNECTED' : '● OFFLINE';
+                        el.className = s.val() ? 'text-[10px] font-black tracking-widest text-[#00ffa3] uppercase mb-1 drop-shadow-[0_0_8px_rgba(0,255,163,0.5)]' : 'text-[10px] font-black tracking-widest text-[#ff2a2a] uppercase mb-1 drop-shadow-[0_0_8px_rgba(255,42,42,0.5)]';
                     }
-                });
-
-                db.ref('struk_terakhir').on('value', snap => {
-                    const s = snap.val();
-                    if (!s) return;
-                    if (this.isFirstLoadStruk) { 
-                        this.lastReceiptTime = s.waktu_update; 
-                        this.isFirstLoadStruk = false; 
-                        return; 
-                    }
-                    if (s.waktu_update !== this.lastReceiptTime) {
-                        this.showSuperModal(s);
-                        this.lastReceiptTime = s.waktu_update;
-                    }
-                });
-
-                db.ref('statistik_rgans').on('value', snap => {
-                    const stats = snap.val();
-                    if (!stats) return;
-                    try {
-                        document.getElementById('ui-omset-hari').innerText = `Rp ${parseInt(stats.omset_hari_ini || 0).toLocaleString('id-ID')}`;
-                        document.getElementById('ui-omset-minggu').innerText = `Rp ${parseInt(stats.omset_minggu_ini || 0).toLocaleString('id-ID')}`;
-                        document.getElementById('ui-omset-bulan').innerText = `Rp ${parseInt(stats.omset_bulan_ini || 0).toLocaleString('id-ID')}`;
-                        document.getElementById('ui-status').innerText = `● LIVE: ${stats.terakhir_update || '--:--'}`;
-                    } catch(e) {}
                 });
 
                 db.ref('dashboard_rgans').on('value', snap => {
                     stationsData = snap.val(); 
                     if (!stationsData) {
-                        this.wadah.innerHTML = ''; 
+                        this.wadah.innerHTML = '<p class="text-slate-500 font-bold tracking-widest text-sm text-center col-span-full">NO DATA AVAILABLE</p>'; 
                         return;
                     }
                     
-                    // --- MENGEMBALIKAN SORTING YANG BENAR (SUDAH DIKEMBALIKAN SEPERTI REQUEST MAS RON) ---
                     const urutan = Object.keys(stationsData).sort((a, b) => {
                         const isStationA = a.toUpperCase().startsWith('STATION');
                         const isStationB = b.toUpperCase().startsWith('STATION');
-                        
                         if (isStationA && !isStationB) return -1;
                         if (!isStationA && isStationB) return 1;
-                        
                         return a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'});
                     });
 
-                    Array.from(this.wadah.children).forEach(child => {
-                        const idNama = child.id.replace('box-', '');
-                        if (!stationsData[idNama]) {
-                             child.remove();
-                        }
-                    });
-                    
-                    urutan.forEach((n, idx) => {
+                    urutan.forEach((n) => {
+                        if (targetUnit && n.toLowerCase() !== targetUnit.toLowerCase()) return;
+
                         let k = document.getElementById(`box-${n}`);
-                        
                         if (!k) {
-                            k = (new PSBoxUI(n)).render(); 
+                            k = (new PSBoxViewer(n)).render(); 
                             this.wadah.appendChild(k);
                         }
-                        
-                        if (this.wadah.children[idx] !== k) {
-                            this.wadah.insertBefore(k, this.wadah.children[idx]);
-                        }
-                        
                         this.syncBoxUI(n, stationsData[n], k);
                     });
                 });
-
-                db.ref('members_db').on('value', snap => {
-                    const memData = snap.val();
-                    if (!memData) return;
-                    globalListMember = Object.keys(memData).map(key => `${key} - ${memData[key].nama}`);
-                });
-            }
-
-            showSuperModal(s) {
-                const modal = document.getElementById('super-modal');
-                if(!modal) return;
-                
-                document.getElementById('sm-unit').innerText = s.unit || '--';
-                document.getElementById('sm-tanggal').innerText = s.tanggal || '--/--/----';
-                
-                const wMulai = s.mulai || '--:--';
-                const wSelesai = s.selesai || '--:--';
-                document.getElementById('sm-mulai').innerText = wMulai;
-                document.getElementById('sm-selesai').innerText = wSelesai;
-                
-                let textDurasi = s.durasi || '--:--:--';
-                if (wMulai.includes(':') && wSelesai.includes(':')) {
-                    const [h1, m1] = wMulai.split(':').map(Number);
-                    const [h2, m2] = wSelesai.split(':').map(Number);
-                    let minMulai = (h1 * 60) + m1;
-                    let minSelesai = (h2 * 60) + m2;
-                    if (minSelesai < minMulai) minSelesai += 1440; 
-                    let slsh = minSelesai - minMulai;
-                    let jam = Math.floor(slsh / 60);
-                    let menit = slsh % 60;
-                    textDurasi = `${jam} Jam ${menit} Menit`;
-                }
-                document.getElementById('sm-durasi').innerText = textDurasi;
-
-                const totalEl = document.getElementById('sm-total');
-                if (s.customer && s.customer !== "TAMU REGULER") {
-                    document.getElementById('sm-customer').innerText = s.customer;
-                    totalEl.innerText = s.customer.toUpperCase();
-                    totalEl.className = "text-2xl font-mono font-black text-rgans-cyan tracking-tighter uppercase";
-                } else {
-                    document.getElementById('sm-customer').innerText = 'TAMU REGULER';
-                    totalEl.innerText = `Rp ${parseInt(s.total || 0).toLocaleString('id-ID')}`;
-                    totalEl.className = "text-3xl font-mono font-black text-white";
-                }
-
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-
-                if(strukTimer) clearTimeout(strukTimer);
-                strukTimer = setTimeout(() => { modal.classList.replace('flex', 'hidden'); }, 10000); 
-            }
-            
-            showStartModal(n) {
-                const modal = document.getElementById('start-modal');
-                if(!modal) return;
-                document.getElementById('start-unit-name').innerText = n.toUpperCase();
-                
-                const cmb = document.getElementById('cmb-pilih-member');
-                if(cmb) {
-                    cmb.innerHTML = '<option value="">-- Pilih Member --</option>';
-                    globalListMember.forEach(item => {
-                        let opt = document.createElement('option'); opt.value = item; opt.innerText = item;
-                        cmb.appendChild(opt);
-                    });
-                }
-                
-                modal.classList.replace('hidden', 'flex');
-                
-                document.getElementById('btn-start-tamu').onclick = () => {
-                    const paketValue = document.getElementById(`paket-${n}`).value;
-                    // FIX MENGHAPUS STRING "|TAMU" AGAR PYTHON MAU MEMBACA ANGKANYA
-                    let pVal = paketValue === "Bebas" ? "0" : paketValue;
-                    
-                    const kotak = document.getElementById(`box-${n}`);
-                    if(kotak) {
-                        delete localState[n]; 
-                        kotak.querySelector('.btn-update').classList.add('hidden');
-                        kotak.querySelector('.btn-utama').innerText = "⏳ MEMPROSES...";
-                    }
-                    
-                    this.kirimPerintah(n, 'START_SESSION', pVal);
-                    
-                    // --- AUTO-UPDATE SAKTI MENGATASI PYTHON DELAY ---
-                    // Secara diam-diam mengirim sinyal update ke PC 1.5 detik kemudian agar Web dan PC sinkron ke Jam yang dipilih
-                    if (pVal !== "0") {
-                        setTimeout(() => {
-                            this.kirimPerintah(n, 'UPDATE_SESSION', pVal);
-                        }, 1500);
-                    }
-                    
-                    modal.classList.replace('flex', 'hidden');
-                };
-                
-                document.getElementById('btn-start-member').onclick = () => {
-                    if (cmb && cmb.value !== "") {
-                        const memID = cmb.value.split(" - ")[0];
-                        const paketValue = document.getElementById(`paket-${n}`).value;
-                        let pVal = paketValue === "Bebas" ? "0" : paketValue;
-                        
-                        const kotak = document.getElementById(`box-${n}`);
-                        if(kotak) {
-                            delete localState[n]; 
-                            kotak.querySelector('.btn-update').classList.add('hidden');
-                            kotak.querySelector('.btn-utama').innerText = "⏳ MEMPROSES...";
-                        }
-                        
-                        this.kirimPerintah(n, 'START_SESSION', pVal, memID);
-                        
-                        // Auto-Update untuk Member (Jika ada paketnya)
-                        if (pVal !== "0") {
-                            setTimeout(() => {
-                                this.kirimPerintah(n, 'UPDATE_SESSION', pVal, memID);
-                            }, 1500);
-                        }
-                        
-                        modal.classList.replace('flex', 'hidden');
-                    } else {
-                        showToast("Pilih member dulu!", false);
-                    }
-                };
-            }
-
-            showNotifModal(n) {
-                const modal = document.getElementById('notif-modal');
-                if(!modal) return;
-                document.getElementById('nt-unit').innerText = n.toUpperCase();
-                modal.classList.replace('hidden', 'flex');
-                
-                document.getElementById('nt-btn-yes').onclick = () => {
-                    this.kirimPerintah(n, 'STOP_SESSION', 'YES');
-                    modal.classList.replace('flex', 'hidden');
-                };
-                document.getElementById('nt-btn-no').onclick = () => {
-                    this.kirimPerintah(n, 'STOP_SESSION', 'NO');
-                    modal.classList.replace('flex', 'hidden');
-                };
             }
 
             syncBoxUI(n, info, kotak) {
                 if (!kotak || !info) return;
                 
-                const btnU = kotak.querySelector('.btn-utama');
-                const btnUpdate = kotak.querySelector('.btn-update');
-                const btnL = kotak.querySelector('.btn-lunas');
-                const btnOn = kotak.querySelector('.btn-on');
-                const btnOff = kotak.querySelector('.btn-off');
-                const btnMove = kotak.querySelector('.btn-move');
-                const btnPlus30 = kotak.querySelector('.btn-plus30');
-                const btnStruk = kotak.querySelector('.btn-struk');
-                const dot = kotak.querySelector('.status-dot');
-                const bar = kotak.querySelector('.status-bar');
                 const mem = kotak.querySelector('.member-label');
                 const mod = kotak.querySelector('.mode-label');
                 const jam = kotak.querySelector('.jam-mulai');
-                const sel = kotak.querySelector('select');
+                const lunas = kotak.querySelector('.lunas-label');
                 const tim = document.getElementById(`timer-${n}`);
                 const hargaEl = document.getElementById(`harga-${n}`);
 
-                // --- BINDING FUNGSI KLIK PADA SETIAP TOMBOL KOTAK ---
-                btnOn.onclick = () => {
-                    btnOn.className = "btn-on btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md bg-rgans-green/20 text-rgans-green border border-rgans-green/50 shadow-[0_0_5px_rgba(16,185,129,0.3)]";
-                    btnOff.className = "btn-off btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted transition";
-                    this.kirimPerintah(n, 'TOGGLE_WIZ', 'ON');
-                };
-                
-                btnOff.onclick = () => {
-                    btnOff.className = "btn-off btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md bg-rgans-red/20 text-rgans-red border border-rgans-red/50 shadow-[0_0_5px_rgba(239,68,68,0.3)]";
-                    btnOn.className = "btn-on btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted transition";
-                    this.kirimPerintah(n, 'TOGGLE_WIZ', 'OFF');
-                };
-                
-                sel.onchange = () => this.saveLocal(n, sel.value);
-                
-                btnStruk.onclick = () => {
-                    this.kirimPerintah(n, 'PRINT_STRUK');
-                };
-                
-                btnMove.onclick = () => {
-                    const newStation = prompt(`Pindahkan ${n} ke Unit mana?\n(Ketik nama yang kosong, cth: STATION 2)`);
-                    if (newStation) {
-                        btnMove.innerText = "⏳";
-                        this.kirimPerintah(n, 'MOVE_STATION', newStation.toUpperCase());
-                        setTimeout(() => btnMove.innerText = "⇄", 2000);
-                    }
-                };
-                
-                btnPlus30.onclick = () => {
-                    btnPlus30.innerText = "⏳";
-                    this.kirimPerintah(n, 'ADD_TIME', '30');
-                    setTimeout(() => btnPlus30.innerText = "+30", 2000);
-                };
-
-                // VISUAL LAMPU
-                if (info.wiz_status === "ON" || info.wiz_on === true) {
-                    btnOn.className = "btn-on btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md bg-rgans-green/20 text-rgans-green border border-rgans-green/50 shadow-[0_0_5px_rgba(16,185,129,0.3)]";
-                    btnOff.className = "btn-off btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted transition";
-                } else {
-                    btnOff.className = "btn-off btn-klik px-2 py-0.5 text-[10px] font-bold rounded-md bg-rgans-red/20 text-rgans-red border border-rgans-red/50 shadow-[0_0_5px_rgba(239,68,68,0.3)]";
-                    btnOn.className = "btn-on btn-klik px-2 py-0.5 text-[10px] font-bold text-rgans-muted transition";
-                }
+                kotak.classList.remove('st-idle', 'st-running-belum', 'st-running-lunas', 'st-running-bebas', 'st-timeup');
 
                 if (info.running) {
-                    kotak.style.borderColor = "#22d3ee";
-                    kotak.classList.add('shadow-[0_0_15px_rgba(34,211,238,0.2)]');
-                    bar.className = 'status-bar h-1.5 shrink-0 bg-rgans-cyan';
-                    dot.className = 'status-dot text-[11px] text-rgans-green animate-pulse';
+                    const isBebas = info.mode && info.mode.toUpperCase() === 'BEBAS';
+                    
+                    if (info.is_time_up) {
+                        kotak.classList.add('st-timeup');
+                    } else if (isBebas) {
+                        kotak.classList.add('st-running-bebas');
+                    } else if (info.lunas) {
+                        kotak.classList.add('st-running-lunas');
+                    } else {
+                        kotak.classList.add('st-running-belum');
+                    }
+
                     mem.innerText = info.customer || 'TAMU REGULER'; 
                     mod.innerText = info.mode || 'PAKET';
-                    jam.value = info.start_time_iso ? info.start_time_iso.substring(11, 16) : '--:--';
-                    jam.classList.replace('text-rgans-muted', 'text-rgans-cyan');
                     
-                    btnU.innerText = "🛑 STOP SESI";
-                    btnU.className = "btn-utama btn-klik flex-1 bg-rgans-red_dim/50 border border-rgans-red/50 text-rgans-red text-xs font-bold py-3 rounded-xl transition-all mb-2";
-                    
-                    btnU.onclick = () => {
-                        if (info.is_member || info.lunas) {
-                            btnU.innerText = "⏳ MEMPROSES..."; 
-                            this.kirimPerintah(n, 'STOP_SESSION', 'YES');
+                    jam.innerText = info.start_time_iso ? info.start_time_iso.substring(11, 16) : '--:--';
+                    if (hargaEl) hargaEl.innerText = `Rp ${parseInt(info.total_sementara || 0).toLocaleString('id-ID')}`;
+
+                    if(lunas) {
+                        if (isBebas) {
+                            lunas.innerText = "OPEN BILLING";
+                            lunas.className = "lunas-label badge-front badge-bebas mt-1.5";
                         } else {
-                            this.showNotifModal(n);
-                        }
-                    };
-
-                    [btnL, btnMove, btnPlus30, btnStruk].forEach(b => { 
-                        if(b) { b.classList.remove('btn-disabled'); b.disabled = false; }
-                    });
-
-                    if (hargaEl) {
-                        hargaEl.innerText = `Rp ${parseInt(info.total_sementara || 0).toLocaleString('id-ID')}`;
-                    }
-
-                    // --- KALKULASI WAKTU PAKET ---
-                    let valPC = "Bebas";
-                    if (info.mode === "PAKET" && info.start_time_iso && info.end_time_iso) {
-                        const startT = new Date(info.start_time_iso).getTime();
-                        const endT = new Date(info.end_time_iso).getTime();
-                        
-                        const diffMins = Math.round((endT - startT) / 60000);
-                        if (diffMins > 0) {
-                            const nearestHour = Math.round(diffMins / 60) * 60;
-                            if (nearestHour > 0) {
-                                valPC = nearestHour.toString(); 
-                            }
-                        }
-                    }
-
-                    const currentSel = localState[n] || valPC;
-                    sel.value = currentSel;
-                    
-                    if (currentSel !== valPC) { 
-                        btnUpdate.classList.remove('hidden'); 
-                    } else { 
-                        btnUpdate.classList.add('hidden'); 
-                    }
-
-                    if (info.is_time_up) {
-                        if (info.is_member || info.lunas) {
-                            this.kirimPerintah(n, 'STOP_SESSION', 'YES');
-                        } else {
-                            const sessID = info.start_time_iso || 0;
-                            if (window[`notifLock_${n}`] !== sessID) {
-                                window[`notifLock_${n}`] = sessID;
-                                this.showNotifModal(n);
-                            }
+                            lunas.innerText = info.lunas ? "LUNAS" : "BELUM BAYAR";
+                            lunas.className = `lunas-label badge-front mt-1.5 ${info.lunas ? 'badge-lunas' : 'badge-belum'}`;
                         }
                     }
 
                     this.runTimer(n, info);
                 } else {
-                    // KONDISI IDLE
-                    kotak.style.borderColor = "#334155";
-                    kotak.classList.remove('shadow-[0_0_15px_rgba(34,211,238,0.2)]');
-                    bar.className = 'status-bar h-1.5 shrink-0 bg-rgans-border2';
-                    dot.className = 'status-dot text-[11px] text-rgans-border2';
-                    dot.classList.remove('animate-pulse');
-                    mem.innerText = ''; mod.innerText = 'IDLE'; jam.value = '';
-                    jam.classList.replace('text-rgans-cyan', 'text-rgans-muted');
+                    kotak.classList.add('st-idle');
                     
-                    btnU.innerText = "▶ MULAI SESI";
-                    btnU.className = "btn-utama btn-klik flex-1 bg-rgans-green text-white shadow-[0_4px_15px_rgba(16,185,129,0.3)] text-xs font-bold py-3 rounded-xl transition-all mb-2";
+                    mem.innerText = 'UNIT KOSONG'; 
+                    mod.innerText = 'IDLE'; 
+                    jam.innerText = '--:--';
                     
-                    btnU.onclick = () => this.showStartModal(n);
+                    if(lunas) { lunas.innerText = "STANDBY"; lunas.className = "lunas-label badge-front badge-idle mt-1.5"; }
+                    if(hargaEl) hargaEl.innerText = "Rp 0";
                     
-                    btnUpdate.classList.add('hidden');
-                    [btnL, btnMove, btnPlus30, btnStruk].forEach(b => { if(b) { b.classList.add('btn-disabled'); b.disabled = true; } });
-
-                    const modalNotif = document.getElementById('notif-modal');
-                    const ntUnit = document.getElementById('nt-unit');
-                    
-                    if (modalNotif && ntUnit && !modalNotif.classList.contains('hidden')) {
-                        if (ntUnit.innerText === n.toUpperCase()) {
-                            modalNotif.classList.replace('flex', 'hidden');
-                        }
-                    }
-                    window[`notifLock_${n}`] = null;
-
-                    if(localState[n]) sel.value = localState[n];
                     if (activeTimers[n]) { clearInterval(activeTimers[n]); delete activeTimers[n]; }
-                    if(tim) { tim.innerText = "00:00:00"; tim.className = 'font-mono text-4xl sm:text-5xl font-bold text-rgans-muted tracking-tighter'; }
-                    if (hargaEl) hargaEl.innerText = "Rp 0";
-                }
-
-                if(btnL) {
-                    btnL.innerText = info.lunas ? "LUNAS" : "BELUM";
-                    btnL.className = `btn-lunas btn-klik col-span-2 text-[9px] font-bold rounded-lg transition border ${info.lunas ? 'bg-rgans-green/20 border-rgans-green/50 text-rgans-green' : 'bg-rgans-red/20 border-rgans-red/50 text-rgans-red'} ${!info.running ? 'btn-disabled' : ''}`;
-                    btnL.onclick = () => {
-                         showToast('Pilih Lunas / Cetak Struk via Kasir', false);
-                    }
+                    if(tim) { tim.innerText = "00:00:00"; }
                 }
             }
 
@@ -704,38 +397,13 @@
                     const m = Math.floor((absD%3600000)/60000).toString().padStart(2,'0');
                     const s = Math.floor((absD%60000)/1000).toString().padStart(2,'0');
                     el.innerText = `${h}:${m}:${s}`;
-                    
-                    el.className = (info.is_time_up) ? 'font-mono text-4xl sm:text-5xl font-bold text-rgans-red animate-pulse tracking-tighter' : 'font-mono text-4xl sm:text-5xl font-bold text-white tracking-tighter';
                 }, 1000);
-            }
-
-            async kirimPerintah(unit, aksi, val = "", member_id = null) {
-                try {
-                    const url = `https://rgans-premier-default-rtdb.asia-southeast1.firebasedatabase.app/commands/${unit}.json`;
-                    
-                    let payload = { 
-                        aksi: aksi, 
-                        value: val, 
-                        time: new Date().getTime() 
-                    };
-                    
-                    if (member_id) {
-                        payload.member_id = member_id;
-                    }
-                    
-                    await fetch(url, { 
-                        method: 'PUT', 
-                        body: JSON.stringify(payload) 
-                    });
-                    
-                } catch (e) { 
-                    console.error("Error kirim sinyal:", e);
-                    showToast(`Gagal kirim sinyal!`, false); 
-                }
             }
         }
 
-        window.R_GANS = new AppManager();
+        window.onload = () => {
+            window.R_GANS_VIEWER = new ViewerManager();
+        };
     </script>
 </body>
 </html>
