@@ -82,6 +82,7 @@
             position: absolute; top: 0; left: 0; width: 50%; height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
             z-index: 5; pointer-events: none; opacity: 0; animation: glassShimmer 6s infinite ease-in-out;
+            will-change: transform; /* Tambahkan ini */
         }
 
         .stn-border {
@@ -180,13 +181,12 @@
         }
         
         .modal-overlay {
-            position: fixed; inset: 0; z-index: 100; background: rgba(5, 11, 20, 0.85); 
-            backdrop-filter: blur(8px); /* Fix 1: Turunkan blur jadi 8px agar ringan */
-            -webkit-backdrop-filter: blur(8px); /* Support Safari iOS */
+            position: fixed; inset: 0; z-index: 100; 
+            background: rgba(5, 11, 20, 0.95); /* Dibuat lebih pekat agar tetap dramatis tanpa blur */
             display: flex; justify-content: center; align-items: center; padding: 20px;
             opacity: 0; pointer-events: none; 
-            transition: opacity 0.3s ease; /* Percepat jadi 0.3s */
-            will-change: opacity; /* Fix 2: Paksa render pakai GPU */
+            transition: opacity 0.25s ease; /* Transisi dipercepat */
+            will-change: opacity;
         }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         
