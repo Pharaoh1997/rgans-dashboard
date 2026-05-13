@@ -163,14 +163,16 @@
         .badge-bebas { background: rgba(181,42,255,0.1); color: #b52aff; border-color: rgba(181,42,255,0.3); }
         .badge-idle { background: rgba(255,255,255,0.02); color: #64748b; border-color: rgba(255,255,255,0.05); }
 
-        /* PROMO BANNER & MODAL CSS */
+        /* PROMO BANNER & MODAL CSS OPTIMIZED */
         .promo-banner {
             width: 100%; max-width: 420px; margin: 0 auto 10px auto; padding: 16px 20px;
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%);
             border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 20px;
             box-shadow: 0 10px 30px rgba(255, 215, 0, 0.05);
             display: flex; align-items: center; justify-content: space-between;
-            cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px);
+            cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; /* Fix: Hindari 'all' */
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            will-change: transform;
         }
         .promo-banner:hover {
             transform: translateY(-2px); box-shadow: 0 15px 35px rgba(255, 215, 0, 0.15);
@@ -178,9 +180,13 @@
         }
         
         .modal-overlay {
-            position: fixed; inset: 0; z-index: 100; background: rgba(5, 11, 20, 0.85); backdrop-filter: blur(15px);
+            position: fixed; inset: 0; z-index: 100; background: rgba(5, 11, 20, 0.85); 
+            backdrop-filter: blur(8px); /* Fix 1: Turunkan blur jadi 8px agar ringan */
+            -webkit-backdrop-filter: blur(8px); /* Support Safari iOS */
             display: flex; justify-content: center; align-items: center; padding: 20px;
-            opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+            opacity: 0; pointer-events: none; 
+            transition: opacity 0.3s ease; /* Percepat jadi 0.3s */
+            will-change: opacity; /* Fix 2: Paksa render pakai GPU */
         }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         
@@ -188,9 +194,11 @@
             background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
             border: 1px solid rgba(255, 215, 0, 0.4); border-radius: 30px;
             width: 100%; max-width: 450px; padding: 30px; position: relative;
-            transform: translateY(20px) scale(0.95); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(20px) scale(0.95); 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Fix 3: Fokus animasi ke transform saja */
             box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 2px 0 rgba(255,255,255,0.1);
-            max-height: 90vh; overflow-y: auto; /* Agar bisa discroll di HP kecil */
+            max-height: 90vh; overflow-y: auto; 
+            will-change: transform; /* Fix 4: Paksa render pakai GPU */
         }
         .modal-overlay.active .modal-content { transform: translateY(0) scale(1); }
 
