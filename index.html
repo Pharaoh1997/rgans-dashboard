@@ -1,622 +1,463 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>R-GANS PREMIER - Luxury Monitor</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700;800;900&display=swap" rel="stylesheet">
-    
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
-                    colors: {
-                        rgans: {
-                            bg: '#050b14', card: 'rgba(15, 23, 42, 0.4)', border: 'rgba(255, 255, 255, 0.08)',
-                            text: '#f8fafc', muted: '#94a3b8', cyan: '#00f0ff', gold: '#ffd700', green: '#00ffa3', red: '#ff2a2a', purple: '#b52aff'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        :root {
-            --cyan-glow: rgba(0, 240, 255, 0.4);   --cyan-dim: rgba(0, 240, 255, 0.1);
-            --gold-glow: rgba(255, 215, 0, 0.4);   --gold-dim: rgba(255, 215, 0, 0.1);
-            --green-glow: rgba(0, 255, 163, 0.4);  --green-dim: rgba(0, 255, 163, 0.1);
-            --red-glow: rgba(255, 42, 42, 0.4);    --red-dim: rgba(255, 42, 42, 0.1);
-            --purple-glow: rgba(181, 42, 255, 0.4);--purple-dim: rgba(181, 42, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.1);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>R-GANS PREMIER - PS5 Cinematic OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@700;800;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0c10;
+  --surface:#11151e;
+  --surface-inset:#05070a;
+  --border:rgba(255,255,255,0.06);
+  --text:#f8fafc;
+  --muted:#64748b;
+  --muted2:#94a3b8;
+  --font:'Outfit',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  
+  /* PS5 System Colors */
+  --c-idle: #334155;
+  --c-unpaid: #0ea5e9; /* Cyan */
+  --c-paid: #10b981;   /* Emerald */
+  --c-open: #8b5cf6;   /* Amethyst */
+  --c-vip: #facc15;    /* Luxury Gold */
+  --c-timeup: #ef4444; /* Red Alert */
+}
 
-        body { 
-            background: radial-gradient(circle at 50% 0%, #111827 0%, #050b14 70%);
-            color: #f8fafc; overflow-x: hidden; -webkit-tap-highlight-color: transparent; 
-        }
+body {
+    background: var(--bg); color: var(--text); font-family: var(--font);
+    min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
+    /* PS5 Subtle Gradient */
+    background-image: radial-gradient(circle at 50% 0%, #172136 0%, var(--bg) 75%);
+    background-attachment: fixed;
+}
+::-webkit-scrollbar { width: 0px; }
 
-        /* FIX PERFORMA: Saat modal terbuka, pause semua animasi berat di background */
-        body.modal-open .stn-shimmer { animation-play-state: paused !important; }
-        body.modal-open .stn-border { animation-play-state: paused !important; }
-        body.modal-open .stn-timer-digits { animation-play-state: paused !important; }
-        body.modal-open .stn-card::before { animation-play-state: paused !important; }
-        
-        .hide-scroll::-webkit-scrollbar { display: none; }
-        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        #wadah-ps {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            width: 100%; gap: 2rem; position: relative; z-index: 10;
-        }
-        
-        @media (max-width: 768px) {
-            .stn-card { width: 92vw !important; max-width: 400px; margin: 0 auto; }
-            .promo-banner { width: 92vw !important; max-width: 400px; margin: 0 auto; }
-        }
+/* Background Watermark Simbol PS */
+.ps-shapes-bg {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background-image: url('data:image/svg+xml;utf8,<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><path d="M10,25 L20,10 L30,25 Z" fill="none" stroke="rgba(255,255,255,0.01)" stroke-width="2"/><circle cx="80" cy="18" r="8" fill="none" stroke="rgba(255,255,255,0.01)" stroke-width="2"/><path d="M12,72 L28,88 M28,72 L12,88" stroke="rgba(255,255,255,0.01)" stroke-width="2" stroke-linecap="round"/><rect x="72" y="72" width="16" height="16" fill="none" stroke="rgba(255,255,255,0.01)" stroke-width="2"/></svg>');
+    opacity: 0.8;
+}
 
-        @keyframes borderSpin { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        @keyframes timerPulse { 0%,100% { filter: drop-shadow(0 0 15px currentColor) brightness(1); } 50% { filter: drop-shadow(0 0 35px currentColor) brightness(1.3); } }
-        @keyframes glassShimmer { 0% { transform: translate3d(-150%, 0, 0) skewX(-45deg); opacity: 0; } 50% { opacity: 0.1; } 100% { transform: translate3d(150%, 0, 0) skewX(-45deg); opacity: 0; } }
+/* =========================================
+   HEADER
+   ========================================= */
+.hdr {
+    position: sticky; top: 0; z-index: 50; background: rgba(10,12,16,.9);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border); padding: 14px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
+.logo-row { display: flex; align-items: center; gap: 12px; }
+.logo-mark {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #0284c7, #0f172a);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: inset 0 2px 5px rgba(255,255,255,0.1), 0 0 15px rgba(14,165,233,0.2);
+}
+.logo-mark span { font-size: 18px; font-weight: 900; color: #fff; line-height: 1; }
+.logo-title { font-size: 15px; font-weight: 900; letter-spacing: 2px; line-height: 1.1; text-transform: uppercase; color: #fff; }
+.logo-title em { color: #38bdf8; font-style: normal; font-weight: 400; }
+.logo-sub { font-size: 8px; color: var(--muted); letter-spacing: 4px; text-transform: uppercase; margin-top: 2px; font-weight: 600; }
+.hdr-r { text-align: right; }
+#conn { font-size: 8px; font-weight: 900; letter-spacing: 3px; color: #10b981; text-transform: uppercase; margin-bottom: 2px; text-shadow: 0 0 10px rgba(16,185,129,0.5); }
+#clk { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--muted2); }
 
-        /* KARTU STATION — FIX: backdrop-filter dikurangi dari blur(24px) → blur(12px) untuk performa */
-        .stn-card {
-            position: relative; border-radius: 32px; overflow: hidden; display: flex; flex-direction: column;
-            background: linear-gradient(145deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.75) 100%);
-            /* FIX: blur dikurangi, tidak terlihat bedanya tapi performa naik drastis */
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1);
-            transition: box-shadow .5s, border-color .5s;
-            /* FIX: isolate & contain agar browser tidak repaint seluruh halaman */
-            isolation: isolate;
-            contain: layout style paint;
-            /* FIX: paksa layer GPU sendiri */
-            transform: translateZ(0);
-            will-change: transform;
-            margin-bottom: 5px;
-        }
+/* MAIN CONTAINER */
+.main { position: relative; z-index: 1; padding: 20px 16px 50px; display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 480px; margin: 0 auto; width: 100%; }
 
-        .stn-card::before {
-            content: ''; position: absolute; inset: -20px; z-index: -1; border-radius: 40px;
-            filter: blur(40px); opacity: 0.5; transition: background 0.5s; pointer-events: none;
-        }
-        .stn-card.st-idle::before { background: rgba(0,0,0,0.5); }
-        .stn-card.st-running-belum::before { background: var(--cyan-dim); }
-        .stn-card.st-running-lunas::before { background: var(--green-dim); }
-        .stn-card.st-running-bebas::before { background: var(--purple-dim); }
-        .stn-card.st-timeup::before { background: var(--red-dim); animation: timerPulse 1s infinite; }
+/* =========================================
+   VIP PROMO BANNER (Luxury Star)
+   ========================================= */
+.promo-banner {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #0f1219; border: 1px solid rgba(250,204,21,0.2);
+    border-radius: 18px; padding: 14px 18px; width: 100%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6); cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.promo-banner:active { transform: scale(0.97); }
+.pb-left { display: flex; align-items: center; gap: 14px; }
+.pb-icon {
+    width: 42px; height: 42px; background: rgba(250,204,21,0.1);
+    border: 1px solid rgba(250,204,21,0.25); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    color: #facc15; font-size: 22px; box-shadow: 0 0 15px rgba(250,204,21,0.15);
+}
+.pb-title { font-size: 14px; font-weight: 900; color: #fff; letter-spacing: 1.5px; text-transform: uppercase; }
+.pb-sub { font-size: 9px; font-weight: 800; color: #facc15; letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
+.pb-btn {
+    padding: 8px 14px; border: 1px solid rgba(250,204,21,0.5); border-radius: 10px;
+    color: #facc15; font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;
+}
 
-        .stn-shimmer {
-            position: absolute; top: 0; left: 0; width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
-            z-index: 5; pointer-events: none; opacity: 0; animation: glassShimmer 6s infinite ease-in-out;
-            will-change: transform;
-            /* FIX: layer terpisah agar tidak trigger repaint kartu */
-            transform: translateZ(0);
-        }
+/* =========================================
+   STATION CARD (CINEMATIC CENTERED)
+   ========================================= */
+.stn-card {
+    width: 100%; border-radius: 28px; overflow: hidden; border: 1px solid var(--border);
+    background: var(--surface); transform: translateZ(0); contain: layout style paint;
+    transition: border-color 0.4s, box-shadow 0.4s; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    display: flex; flex-direction: column; position: relative; text-align: center;
+}
 
-        .stn-border {
-            position: absolute; inset: 0; border-radius: inherit; padding: 2px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(0,0,0,0));
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); 
-            -webkit-mask-composite: xor; mask-composite: exclude;
-            pointer-events: none; z-index: 2; transition: background 0.5s;
-        }
-        
-        .stn-card.st-running-belum .stn-border { background: linear-gradient(90deg, transparent, #00f0ff, transparent); background-size: 200% 100%; animation: borderSpin 3s linear infinite; }
-        .stn-card.st-running-lunas .stn-border { background: linear-gradient(90deg, transparent, #00ffa3, transparent); background-size: 200% 100%; animation: borderSpin 3s linear infinite; }
-        .stn-card.st-running-bebas .stn-border { background: linear-gradient(90deg, transparent, #b52aff, transparent); background-size: 200% 100%; animation: borderSpin 3s linear infinite; }
-        .stn-card.st-timeup .stn-border { background: linear-gradient(90deg, transparent, #ff2a2a, transparent); background-size: 200% 100%; animation: borderSpin 1.5s linear infinite; }
+/* Dynamic Accent Colors */
+.stn-card { --accent: var(--c-idle); --glow: rgba(51,65,85,0.4); }
+.st-unpaid { --accent: var(--c-unpaid); --glow: rgba(14,165,233,0.4); border-color: rgba(14,165,233,0.3); }
+.st-paid { --accent: var(--c-paid); --glow: rgba(16,185,129,0.4); border-color: rgba(16,185,129,0.3); }
+.st-open { --accent: var(--c-open); --glow: rgba(139,92,246,0.4); border-color: rgba(139,92,246,0.3); }
+.st-vip { --accent: var(--c-vip); --glow: rgba(250,204,21,0.4); border-color: rgba(250,204,21,0.3); }
+.st-timeup { --accent: var(--c-timeup); --glow: rgba(239,68,68,0.4); border-color: rgba(239,68,68,0.5); }
 
-        .stn-name {
-            font-size: clamp(20px, 6vw, 28px); 
-            font-weight: 900; letter-spacing: 4px;
-            background: linear-gradient(to bottom, #ffffff, #94a3b8);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
+/* PS5 Lightbar Indicator */
+.ps-lightbar {
+    position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+    background: var(--accent); box-shadow: 0 0 15px var(--accent);
+    opacity: 0; transition: opacity 0.4s, background 0.4s; z-index: 10;
+}
+.stn-card:not(.st-idle) .ps-lightbar { opacity: 1; }
+.st-timeup .ps-lightbar { animation: blink 1s infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        .stn-timer-wrap {
-            position:relative; z-index:3; flex:1; display:flex; flex-direction:column; justify-content:center; align-items: center;
-            margin: 10px 20px; padding: 30px 10px; border-radius: 20px;
-            background: rgba(0,0,0,0.2); box-shadow: inset 0 2px 15px rgba(0,0,0,0.5);
-            border-top: 1px solid rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
+/* Art Section */
+.art {
+    position: relative; overflow: hidden; padding: 24px 20px 18px;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.art-wm {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-size: 55px; letter-spacing: 15px; font-weight: 300; white-space: nowrap; pointer-events: none;
+    color: var(--accent); opacity: 0.08; transition: color 0.4s; text-shadow: 0 0 20px var(--glow);
+}
+.stn-name { font-size: 30px; font-weight: 900; letter-spacing: 2px; color: #fff; text-transform: uppercase; text-shadow: 0 4px 15px rgba(0,0,0,0.8); position: relative; z-index: 2; }
 
-        .stn-timer-digits {
-            font-family:'JetBrains Mono',monospace; 
-            font-size: clamp(40px, 11.5vw, 58px); 
-            font-weight: 900; letter-spacing: 2px; line-height: 1; font-variant-numeric: tabular-nums; 
-            margin: 15px 0; transition: color .5s;
-            /* FIX: filter animasi pakai will-change agar jalan di compositor thread */
-            will-change: filter;
-        }
-        
-        .stn-card.st-idle .stn-timer-digits { color: #475569; }
-        .stn-card.st-running-belum .stn-timer-digits { color: #00f0ff; filter: drop-shadow(0 0 20px var(--cyan-glow)); animation: timerPulse 3s ease-in-out infinite; }
-        .stn-card.st-running-lunas .stn-timer-digits { color: #00ffa3; filter: drop-shadow(0 0 20px var(--green-glow)); animation: timerPulse 3s ease-in-out infinite; }
-        .stn-card.st-running-bebas .stn-timer-digits { color: #b52aff; filter: drop-shadow(0 0 20px var(--purple-glow)); animation: timerPulse 3s ease-in-out infinite; }
-        .stn-card.st-timeup .stn-timer-digits { color: #ff2a2a; filter: drop-shadow(0 0 20px var(--red-glow)); animation: timerPulse 0.8s ease-in-out infinite; }
+.badge-group { display: flex; justify-content: center; gap: 8px; position: relative; z-index: 2; }
+.badge { display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 10px; font-size: 9px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--accent); color: var(--accent); background: rgba(0,0,0,0.4); box-shadow: 0 0 10px var(--glow); transition: all 0.4s ease; }
+.st-idle .badge { border-color: rgba(255,255,255,0.1); color: var(--muted2); box-shadow: none; }
 
-        .stn-mode-tag {
-            display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:6px 16px; border-radius:12px;
-            font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:2px;
-            /* FIX: backdrop-filter dihapus dari tag kecil, diganti background solid — tidak terlihat bedanya */
-            transition: background 0.5s, color 0.5s, border-color 0.5s;
-        }
-        .stn-card.st-idle .stn-mode-tag { background: rgba(255,255,255,0.06); color: #64748b; border: 1px solid rgba(255,255,255,0.1); }
-        .stn-card.st-running-belum .stn-mode-tag { background: rgba(0,240,255,0.12); color: #00f0ff; border: 1px solid rgba(0,240,255,0.3); }
-        .stn-card.st-running-lunas .stn-mode-tag { background: rgba(0,255,163,0.12); color: #00ffa3; border: 1px solid rgba(0,255,163,0.3); }
-        .stn-card.st-running-bebas .stn-mode-tag { background: rgba(181,42,255,0.12); color: #b52aff; border: 1px solid rgba(181,42,255,0.3); }
-        .stn-card.st-timeup .stn-mode-tag { background: rgba(255,42,42,0.12); color: #ff2a2a; border: 1px solid rgba(255,42,42,0.4); }
+.art-bot { position: relative; z-index: 2; margin-top: 5px; }
+.ps-prompt { display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(0,0,0,0.4); padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+.ps-sym { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 900; color: var(--accent); border: 1.5px solid var(--accent); border-radius: 5px; transition: all 0.4s; }
+.ps-txt { font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); transition: color 0.4s; }
+.st-idle .ps-sym, .st-idle .ps-txt { color: var(--muted); border-color: var(--muted); }
 
-        .stn-billing {
-            position:relative; z-index:3; margin: 5px 20px 20px; padding: 20px; border-radius: 20px;
-            display:flex; align-items:center; justify-content:space-between;
-            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.35);
-        }
+/* CONTENT PANEL */
+.content { width: 100%; background: var(--surface); display: flex; flex-direction: column; align-items: center; }
 
-        .stn-billing-label { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:2.5px; color:#64748b; margin-bottom:4px; display: block;}
-        
-        .stn-billing-val { 
-            font-family:'JetBrains Mono',monospace; 
-            font-size: clamp(20px, 6vw, 26px); 
-            font-weight:900; transition: color .5s; text-shadow: 0 4px 10px rgba(0,0,0,0.5); 
-        }
-        
-        .stn-card.st-idle .stn-billing-val { color: #64748b; }
-        .stn-card.st-running-belum .stn-billing-val { color: #00f0ff; }
-        .stn-card.st-running-lunas .stn-billing-val { color: #00ffa3; }
-        .stn-card.st-running-bebas .stn-billing-val { color: #b52aff; }
-        .stn-card.st-timeup .stn-billing-val { color: #ff2a2a; }
+.idle-body { padding: 40px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
+.idle-ico { font-size: 44px; filter: grayscale(1); opacity: .15; }
+.idle-lbl { font-size: 24px; font-weight: 900; letter-spacing: 6px; color: rgba(255,255,255,.15); text-transform: uppercase; }
+.idle-sub { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; }
 
-        .badge-front { padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; border: 1px solid transparent; display: inline-block;}
-        .badge-lunas { background: rgba(0,255,163,0.1); color: #00ffa3; border-color: rgba(0,255,163,0.3); }
-        .badge-belum { background: rgba(255,42,42,0.1); color: #ff2a2a; border-color: rgba(255,42,42,0.3); }
-        .badge-bebas { background: rgba(181,42,255,0.1); color: #b52aff; border-color: rgba(181,42,255,0.3); }
-        .badge-idle { background: rgba(255,255,255,0.02); color: #64748b; border-color: rgba(255,255,255,0.05); }
+.run-body { display: none; flex-direction: column; width: 100%; align-items: center; }
 
-        /* PROMO BANNER */
-        .promo-banner {
-            width: 100%; max-width: 420px; margin: 0 auto 10px auto; padding: 16px 20px;
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%);
-            border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 20px;
-            display: flex; align-items: center; justify-content: space-between;
-            cursor: pointer;
-            /* FIX: hanya transition property yang berubah, bukan 'all' */
-            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-            /* FIX: backdrop-filter dihapus dari banner — tidak perlu */
-            transform: translateZ(0);
-            will-change: transform;
-        }
-        .promo-banner:hover {
-            transform: translate3d(0, -2px, 0);
-            box-shadow: 0 15px 35px rgba(255, 215, 0, 0.15);
-            border-color: rgba(255, 215, 0, 0.6);
-        }
-        .promo-banner:active {
-            transform: translate3d(0, 0, 0) scale(0.98);
-        }
-        
-        /* =============================================
-           MODAL — DIOPTIMASI PENUH
-           FIX utama:
-           1. Overlay TIDAK pakai backdrop-filter sama sekali
-           2. Animasi hanya opacity (overlay) + transform (content)
-           3. contain: layout style paint pada .modal-content
-           4. Semua animasi di background di-pause saat modal aktif
-           ============================================= */
-        .modal-overlay {
-            position: fixed; inset: 0; z-index: 100; 
-            /* FIX: background semi-opaque sudah cukup dramatis tanpa blur berat */
-            background: rgba(5, 11, 20, 0.93);
-            display: flex; justify-content: center; align-items: center; padding: 20px;
-            opacity: 0; pointer-events: none; 
-            /* FIX: hanya opacity, TIDAK ada blur/filter */
-            transition: opacity 0.2s ease;
-            will-change: opacity;
-        }
-        .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        
-        .modal-content {
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-            border: 1px solid rgba(255, 215, 0, 0.4); border-radius: 30px;
-            width: 100%; max-width: 450px; padding: 30px; position: relative;
-            /* FIX: hanya transform — compositor-only, tidak trigger layout/paint */
-            transform: translate3d(0, 24px, 0) scale(0.96);
-            transition: transform 0.25s cubic-bezier(0.34, 1.2, 0.64, 1);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 2px 0 rgba(255,255,255,0.1);
-            max-height: 90vh; overflow-y: auto;
-            /* FIX: contain agar repaint terbatas di dalam modal saja */
-            contain: layout style paint;
-            will-change: transform;
-        }
-        .modal-overlay.active .modal-content { transform: translate3d(0, 0, 0) scale(1); }
+/* INSET HUD DISPLAY */
+.timer-wrap { 
+    width: calc(100% - 32px); margin: 16px 16px 0; padding: 24px 16px; text-align: center; 
+    background: var(--surface-inset); border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.8);
+    box-shadow: inset 0 15px 35px rgba(0,0,0,1), 0 2px 0 rgba(255,255,255,0.05);
+    display: flex; flex-direction: column; align-items: center; position: relative; overflow: hidden;
+}
+.hud-scanline { position: absolute; top: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.03)); animation: scanline 4s linear infinite; pointer-events: none; }
+@keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(200%); } }
 
-        .benefit-item {
-            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 16px; padding: 15px; margin-bottom: 12px;
-            display: flex; gap: 15px; align-items: flex-start;
-        }
-        .benefit-icon {
-            width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), transparent);
-            color: #ffd700; font-size: 20px; flex-shrink: 0;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-        }
-    </style>
+.timer-lbl { font-size: 10px; font-weight: 800; letter-spacing: 4px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+.timer-dg { 
+    font-family: var(--mono); font-size: clamp(48px, 12vw, 64px); 
+    font-weight: 900; letter-spacing: 1px; line-height: 1; font-variant-numeric: tabular-nums; 
+    color: var(--accent); text-shadow: 0 0 25px var(--glow); transition: all 0.4s ease;
+}
+.st-timeup .timer-dg { animation: blink 0.8s step-end infinite; }
+
+.paket-chip { display: inline-flex; align-items: center; padding: 6px 18px; border-radius: 12px; font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-top: 16px; background: rgba(0,0,0,0.4); color: var(--accent); border: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 2; }
+
+.time-meta { display: flex; justify-content: center; gap: 30px; margin-top: 20px; width: 100%; border-top: 1px solid rgba(255,255,255,0.03); padding-top: 16px; }
+.tmi { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.tmi-lbl { font-size: 8px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+.tmi-val { font-family: var(--mono); font-size: 14px; font-weight: 800; color: var(--muted2); }
+
+/* BILLING FOOTER */
+.bill-row { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px 20px; width: 100%; }
+.bill-lbl { font-size: 10px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); text-align: center; }
+.bill-amt { font-family: var(--mono); font-size: 30px; font-weight: 900; color: var(--accent); text-shadow: 0 0 15px var(--glow); transition: all 0.4s ease; text-align: center; line-height: 1; }
+
+.pay-chip { display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; border-radius: 16px; font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; border: 1.5px solid var(--accent); color: var(--accent); background: rgba(0,0,0,0.4); box-shadow: 0 5px 20px var(--glow); width: 100%; max-width: 260px; transition: all 0.4s ease; }
+.st-idle .pay-chip { color: var(--muted); border-color: var(--border); box-shadow: none; background: rgba(255,255,255,0.05); }
+
+.timeup-bar { width: 100%; background: #2a0808; border-top: 1px solid #ef4444; padding: 14px 16px; text-align: center; font-size: 10px; font-weight: 900; letter-spacing: 3px; color: #ef4444; text-transform: uppercase; margin-top: 16px; animation: blink 1.2s ease-in-out infinite; box-shadow: 0 0 20px rgba(239,68,68,0.2); }
+
+/* =========================================
+   FOOTER WHATSAPP
+   ========================================= */
+.footer-wa { 
+    width: 100%; padding: 20px; border-radius: 20px; text-decoration: none; 
+    display: flex; flex-direction: column; align-items: center; 
+    background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5); transition: transform 0.2s, border-color 0.2s; 
+}
+.footer-wa:active { transform: scale(0.97); border-color: #10b981; }
+.footer-wa p { font-size: 10px; font-weight: 800; color: var(--muted2); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 6px; }
+.footer-wa strong { font-size: 16px; font-weight: 900; color: #fff; letter-spacing: 1.5px; }
+.footer-wa em { color: #10b981; font-style: normal; text-shadow: 0 0 10px rgba(16,185,129,0.4); }
+
+/* =========================================
+   MODAL VIP
+   ========================================= */
+.modal-bg { position: fixed; inset: 0; z-index: 200; background: rgba(3,5,9,.96); display: flex; justify-content: center; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity .3s ease; padding: 20px; }
+.modal-bg.open { opacity: 1; pointer-events: auto; }
+.modal-box { 
+    background: linear-gradient(180deg, #151926 0%, #0b0e14 100%); 
+    border: 1px solid rgba(250,204,21,.3); border-radius: 32px; width: 100%; max-width: 480px; 
+    padding: 30px 24px; overflow-y: auto; max-height: 90vh; 
+    transform: translateY(100%); transition: transform .4s cubic-bezier(.2,1,.4,1); 
+    box-shadow: 0 -20px 60px rgba(0,0,0,0.9), inset 0 2px 0 rgba(255,255,255,0.1); 
+    display: flex; flex-direction: column; align-items: center; 
+}
+.modal-bg.open .modal-box { transform: translateY(0); }
+.modal-handle { width: 40px; height: 5px; background: rgba(255,255,255,.1); border-radius: 3px; margin: 0 auto 20px; }
+.modal-title { font-size: 32px; font-weight: 900; color: #fff; letter-spacing: 1px; margin-bottom: 24px; text-align: center; }
+
+.brow { display: flex; gap: 16px; align-items: center; padding: 16px; border-radius: 20px; background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.05); margin-bottom: 12px; width: 100%; }
+.brow-ico { width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0; background: linear-gradient(135deg, rgba(250,204,21,.15), transparent); border: 1px solid rgba(250,204,21,.3); display: flex; align-items: center; justify-content: center; font-size: 22px; color: #facc15; }
+.brow-text h4 { font-size: 14px; font-weight: 800; color: #fff; text-transform: uppercase; margin-bottom: 2px; }
+.brow-text p { font-size: 11px; color: var(--muted2); line-height: 1.5; }
+
+.modal-close-btn { width: 100%; margin-top: 20px; padding: 18px; border-radius: 16px; border: none; cursor: pointer; background: linear-gradient(135deg, #facc15, #a16207); color: #000; font-family: var(--font); font-size: 13px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; box-shadow: 0 10px 25px rgba(234,179,8,0.3); }
+</style>
 </head>
-<body class="h-screen w-screen flex flex-col font-sans">
+<body>
 
-    <!-- Header Glassmorphism -->
-    <header class="border-b border-white/5 bg-[#050b14]/60 backdrop-blur-xl sticky top-0 z-20 p-5 shrink-0 flex justify-between items-center shadow-2xl w-full">
-        <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00f0ff] to-[#0066ff] p-[1px] shadow-[0_0_20px_rgba(0,240,255,0.3)]">
-                <div class="w-full h-full bg-[#050b14] rounded-xl flex items-center justify-center relative overflow-hidden">
-                    <div class="absolute inset-0 bg-[#00f0ff] opacity-10"></div>
-                    <span class="text-[#00f0ff] text-2xl font-black relative z-10">R</span>
-                </div>
-            </div>
-            <div>
-                <h1 class="text-white font-black text-xl tracking-tighter leading-none">R-GANS <span class="text-[#00f0ff]">PREMIER</span></h1>
-                <p class="text-[10px] text-rgans-muted font-bold uppercase tracking-[0.2em] mt-1.5">VIP Monitor</p>
-            </div>
-        </div>
-        <div class="text-right">
-            <p class="text-[10px] text-[#00ffa3] font-black uppercase mb-1 tracking-widest" id="connection-status">● CONNECTED</p>
-            <p class="text-lg font-mono font-black text-white leading-none drop-shadow-md" id="jam-digital">00:00:00</p>
-        </div>
-    </header>
+<div class="ps-shapes-bg"></div>
 
-    <main class="flex-1 overflow-y-auto p-4 md:p-8 hide-scroll flex flex-col items-center w-full relative">
-        <div id="alert-no-unit" class="hidden bg-red-900/40 border border-red-500/30 backdrop-blur-md text-white p-5 rounded-2xl text-center mb-6 shadow-2xl absolute top-6 max-w-md w-[90%] z-20">
-            <p class="font-black text-sm tracking-wide">MENAMPILKAN SEMUA UNIT</p>
-            <p class="text-[11px] text-red-200/60 mt-1.5 tracking-wider">Untuk tampilan spesifik, scan QR Code di meja.</p>
-        </div>
+<header class="hdr">
+  <div class="logo-row">
+    <div class="logo-mark"><span>R</span></div>
+    <div>
+      <div class="logo-title">R-GANS <em>PREMIER</em></div>
+      <div class="logo-sub">OS Monitor Center</div>
+    </div>
+  </div>
+  <div class="hdr-r">
+    <div id="conn">● LIVE</div>
+    <div id="clk">--:--:--</div>
+  </div>
+</header>
 
-        <!-- BANNER PROMOSI VIP -->
-        <div class="promo-banner mt-2" onclick="openPromoModal()">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-full bg-yellow-500/20 border border-yellow-500/50 flex items-center justify-center animate-pulse">
-                    <span class="text-yellow-400 text-lg">👑</span>
-                </div>
-                <div>
-                    <h3 class="text-white font-black text-sm tracking-wider">JADI VIP MEMBER</h3>
-                    <p class="text-yellow-400/80 text-[10px] font-bold tracking-widest mt-0.5 uppercase">Lebih Murah • Anti Hangus</p>
-                </div>
-            </div>
-            <div class="bg-yellow-500 text-[#050b14] px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest">
-                INFO
-            </div>
-        </div>
+<main class="main">
+  <div id="alert-box" class="hidden w-full p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-center mb-4"><p class="text-xs text-red-500 font-bold tracking-widest uppercase">Semua Unit Ditampilkan</p></div>
 
-        <!-- Wadah Station -->
-        <div id="wadah-ps" class="w-full flex flex-col items-center"></div>
-
-        <div class="mt-4 mb-8 text-center w-full max-w-[420px]">
-            <a href="https://wa.me/6282221586680" target="_blank" class="block px-4 py-3 bg-[#0f172a]/80 border border-slate-700/50 rounded-xl hover:border-[#00ffa3]/50 transition-colors">
-                <p class="text-[9px] text-slate-400 font-bold tracking-widest uppercase mb-1">Ada Kendala / Masalah?</p>
-                <p class="text-xs text-white font-black tracking-widest">HUB WA: <span class="text-[#00ffa3]">082221586680</span></p>
-            </a>
-        </div>
-    </main>
-
-    <!-- POP-UP MODAL BENEFIT MEMBER -->
-    <div id="modal-vip" class="modal-overlay" onclick="closePromoModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            
-            <button onclick="closePromoModal(event)" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-800 border border-slate-600 text-slate-400 flex items-center justify-center hover:bg-red-500/20 hover:text-red-400 hover:border-red-500 transition-colors">
-                ✕
-            </button>
-
-            <div class="text-center mb-6 pt-2">
-                <div class="inline-block px-4 py-1.5 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 text-[10px] font-black tracking-[0.2em] uppercase mb-3">
-                    Keuntungan Gabung
-                </div>
-                <h2 class="text-2xl font-black text-white tracking-wide">R-GANS <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200">VIP</span></h2>
-            </div>
-
-            <div class="benefit-item">
-                <div class="benefit-icon">💸</div>
-                <div>
-                    <h4 class="text-white font-bold text-sm tracking-wide">Harga Jauh Lebih Murah</h4>
-                    <p class="text-slate-400 text-[11px] mt-1 leading-relaxed">Top-up <b>Rp 50.000</b> langsung dapat <span class="text-yellow-400 font-bold">12 JAM</span>. (Normalnya Rp 5.000 per jam, sangat hemat!)</p>
-                </div>
-            </div>
-
-            <div class="benefit-item">
-                <div class="benefit-icon">⏳</div>
-                <div>
-                    <h4 class="text-white font-bold text-sm tracking-wide">Bebas Top-up Berapa Saja</h4>
-                    <p class="text-slate-400 text-[11px] mt-1 leading-relaxed">Top-up di bawah 50rb (misal 5rb) dapat <span class="text-yellow-400 font-bold">66 Menit</span>. (Normal hanya 60 menit).</p>
-                </div>
-            </div>
-
-            <div class="benefit-item">
-                <div class="benefit-icon">💾</div>
-                <div>
-                    <h4 class="text-white font-bold text-sm tracking-wide">Saldo & Waktu Anti Hangus</h4>
-                    <p class="text-slate-400 text-[11px] mt-1 leading-relaxed">Sisa waktu otomatis tersimpan di sistem. Bebas lanjut main kapan saja tanpa takut rugi.</p>
-                </div>
-            </div>
-
-            <div class="benefit-item">
-                <div class="benefit-icon">📱</div>
-                <div>
-                    <h4 class="text-white font-bold text-sm tracking-wide">Daftar Super Instan</h4>
-                    <p class="text-slate-400 text-[11px] mt-1 leading-relaxed">Tidak perlu KTP/Formulir. Cukup berikan <span class="text-green-400 font-bold">Nomor WhatsApp</span> ke Kasir, langsung jadi VIP!</p>
-                </div>
-            </div>
-
-            <button onclick="closePromoModal(event)" class="w-full mt-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-[#050b14] py-3.5 rounded-xl font-black text-xs tracking-[0.2em] uppercase hover:shadow-[0_0_20px_rgba(255,215,0,0.4)] transition-shadow">
-                TUTUP INFO
-            </button>
+  <!-- PROMO BANNER -->
+  <div class="promo-banner" onclick="openModal()">
+    <div class="pb-left">
+        <div class="pb-icon">★</div>
+        <div class="pb-text">
+            <div class="pb-title">UPGRADE KE VIP</div>
+            <div class="pb-sub">HARGA KHUSUS · SMART WA</div>
         </div>
     </div>
+    <div class="pb-btn">INFO</div>
+  </div>
 
-    <script>
-        // --- LOGIKA BUKA TUTUP MODAL ---
-        // FIX: Tambah/hapus class 'modal-open' di body agar animasi kartu bisa di-pause via CSS
-        function openPromoModal() {
-            document.body.classList.add('modal-open');
-            document.getElementById('modal-vip').classList.add('active');
-        }
-        function closePromoModal(e) {
-            if(e) e.preventDefault();
-            document.body.classList.remove('modal-open');
-            document.getElementById('modal-vip').classList.remove('active');
-        }
+  <div id="wadah-ps" style="width:100%;display:flex;flex-direction:column;gap:24px;align-items:center"></div>
 
-        // --- FIREBASE SETUP ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyDAD47-malAVNF0pvG-zb68VSlPT4KftU4",
-            authDomain: "rgans-premier.firebaseapp.com",
-            databaseURL: "https://rgans-premier-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "rgans-premier",
-            storageBucket: "rgans-premier.firebasestorage.app",
-            messagingSenderId: "483724142361",
-            appId: "1:483724142361:web:18517acb9e31a2962e4788"
-        };
+  <!-- FOOTER WA -->
+  <a href="https://wa.me/6282221586680" target="_blank" class="footer-wa">
+    <p>Ada Masalah / Kendala?</p>
+    <strong>HUBUNGI WHATSAPP: <em>0822 2158 6680</em></strong>
+  </a>
+</main>
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+<!-- MODAL VIP -->
+<div id="modal-vip" class="modal-bg" onclick="closeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div style="font-size:10px; font-weight:900; letter-spacing:4px; text-transform:uppercase; color:#facc15; margin-bottom:8px;">EXCLUSIVE PRIVILEGES</div>
+    <div class="modal-title">R-GANS VIP</div>
+    <div class="brow"><div class="brow-ico">💸</div><div class="brow-text"><h4>Tarif Flat Eksklusif</h4><p>Top-up <b>Rp 50.000</b> langsung dapat <b>12 JAM</b>. Bebas main sepuasnya dengan harga terbaik.</p></div></div>
+    <div class="brow"><div class="brow-ico">⏳</div><div class="brow-text"><h4>Bebas Nominal Top-up</h4><p>Isi saldo berapapun bisa. Pecahan di bawah 50rb akan dikonversi menjadi <b>66 Menit</b> per 5rb.</p></div></div>
+    <div class="brow"><div class="brow-ico">💾</div><div class="brow-text"><h4>Waktu Aman Tersimpan</h4><p>Sisa waktu otomatis tersimpan di ID kamu. <b>Anti hangus</b>, bisa dilanjut kapan saja.</p></div></div>
+    <div class="brow"><div class="brow-ico">📱</div><div class="brow-text"><h4>Sistem Smart WA</h4><p>Pendaftaran cukup dengan No WhatsApp. Menerima struk top-up & sisa waktu secara otomatis.</p></div></div>
+    <p style="font-size:10px; color:var(--muted); text-align:center; margin-top:16px; font-weight:600;">Untuk informasi lebih lanjut, silakan hubungi WhatsApp kami.</p>
+    <button class="modal-close-btn" onclick="closeModal(event)">TUTUP MENU</button>
+  </div>
+</div>
 
-        let activeTimers = {};
-        let stationsData = {}; 
+<script>
+function openModal(){document.getElementById('modal-vip').classList.add('open'); document.body.classList.add('modal-open');}
+function closeModal(e){if(e)e.preventDefault();document.getElementById('modal-vip').classList.remove('open'); document.body.classList.remove('modal-open');}
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const targetUnit = urlParams.get('unit'); 
+const firebaseConfig={
+  apiKey:"AIzaSyDAD47-malAVNF0pvG-zb68VSlPT4KftU4",
+  authDomain:"rgans-premier.firebaseapp.com",
+  databaseURL:"https://rgans-premier-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"rgans-premier",
+  storageBucket:"rgans-premier.firebasestorage.app",
+  messagingSenderId:"483724142361",
+  appId:"1:483724142361:web:18517acb9e31a2962e4788"
+};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+let timers={};
+const uP=new URLSearchParams(window.location.search);
+const tU=uP.get('unit');
 
-        setInterval(() => { 
-            const el = document.getElementById('jam-digital');
-            if(el) el.innerText = new Date().toLocaleTimeString('id-ID', { hour12: false }); 
-        }, 1000);
+setInterval(()=>{const e=document.getElementById('clk');if(e)e.textContent=new Date().toLocaleTimeString('id-ID',{hour12:false})},1000);
+function fRp(n){return'Rp '+parseInt(n||0).toLocaleString('id-ID')}
+function fT(iso){return iso?iso.substring(11,16):'--:--'}
+function fMs(ms){const a=Math.abs(ms);return[Math.floor(a/3600000),Math.floor((a%3600000)/60000),Math.floor((a%60000)/1000)].map(v=>v.toString().padStart(2,'0')).join(':')}
 
-        class PSBoxViewer {
-            constructor(name) { this.name = name; }
-            render() {
-                const kotak = document.createElement('div');
-                kotak.className = `stn-card st-idle w-full max-w-[420px] mx-auto`;
-                kotak.id = `box-${this.name}`;
-                kotak.innerHTML = `
-                    <div class="stn-border"></div>
-                    <div class="stn-shimmer"></div>
-
-                    <div class="relative z-[3] px-6 pt-8 pb-2 flex flex-col items-center justify-center">
-                        <h2 class="stn-name uppercase">${this.name}</h2>
+class StationConsoleUI {
+    constructor(name) { this.name = name; }
+    render() {
+        const div = document.createElement('div');
+        div.id = `box-${this.name}`;
+        div.className = `stn-card st-idle w-full`;
+        div.innerHTML = `
+            <div class="ps-lightbar"></div>
+            <div class="art">
+                <div class="art-wm">△ ○ □ ✕</div>
+                <div class="art-top">
+                    <h2 class="stn-name">${this.name}</h2>
+                    <div class="badge-group">
+                        <span class="badge b-vip vip-el" style="display:none">★ VIP ACTIVE</span>
+                        <span class="badge st-badge">— STANDBY</span>
                     </div>
-
-                    <div class="stn-timer-wrap">
-                        <span class="member-label text-[11px] font-black text-white/50 tracking-[0.3em] uppercase truncate px-4 mb-2">MEMBER VIP</span>
-                        <div id="timer-${this.name}" class="stn-timer-digits">00:00:00</div>
-                        
-                        <div class="flex flex-col items-center gap-2">
-                            <div class="stn-mode-tag mode-label">IDLE</div>
-                            <div class="text-[9px] font-bold text-white/50 tracking-widest uppercase mt-1">
-                                Mulai: <span class="jam-mulai text-white/80 font-mono">--:--</span>
-                                <span class="est-wrap hidden"> | EST: <span class="jam-selesai text-white/80 font-mono">--:--</span></span>
-                            </div>
+                </div>
+                <div class="art-bot">
+                    <div class="ps-prompt">
+                        <span class="ps-sym ps-sym-el">□</span>
+                        <span class="ps-txt ps-txt-el">STANDBY</span>
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="idle-body">
+                    <div class="idle-ico">🎮</div>
+                    <div class="idle-lbl">STANDBY</div>
+                    <div class="idle-sub">Unit Siap Digunakan</div>
+                </div>
+                <div class="run-body">
+                    <div class="timer-wrap">
+                        <div class="hud-scanline"></div>
+                        <div class="timer-lbl">SISA WAKTU BERMAIN</div>
+                        <div id="timer-${this.name}" class="timer-dg">00:00:00</div>
+                        <div class="mt-1"><span class="paket-chip paket-el">—</span></div>
+                        <div class="time-meta">
+                            <div class="tmi"><span class="tmi-lbl">MULAI</span><span class="tmi-val jam-mulai">--:--</span></div>
+                            <div class="tmi est-wrap" style="display:none"><span class="tmi-lbl">EST SELESAI</span><span class="tmi-val jam-est">--:--</span></div>
                         </div>
                     </div>
-
-                    <div class="stn-billing">
-                        <div class="flex flex-col">
-                            <span class="stn-billing-label">Total Tagihan</span>
-                            <span id="harga-${this.name}" class="stn-billing-val">Rp 0</span>
-                        </div>
-                        <div class="flex flex-col items-end justify-center">
-                            <span class="lunas-label badge-front badge-idle">STANDBY</span>
-                        </div>
+                    <div class="bill-row">
+                        <div class="bill-lbl bill-lbl-el">TOTAL BIAYA</div>
+                        <div class="bill-amt bill-el">Rp 0</div>
+                        <div class="pay-chip pay-el"><span class="pay-txt-el">STANDBY</span></div>
                     </div>
-                `;
-                return kotak;
-            }
+                    <div class="timeup-bar timeup-el" style="display:none">⚠ WAKTU HABIS — SEGERA PERPANJANG ⚠</div>
+                </div>
+            </div>`;
+        return div;
+    }
+}
+
+function sync(name,info,card){
+    if(!card||!info)return;
+    const q=s=>card.querySelector(s);
+    card.classList.remove('st-idle','st-unpaid','st-paid','st-open','st-vip','st-timeup');
+    
+    const vipEl=q('.vip-el'), stBadge=q('.st-badge'), psSym=q('.ps-sym-el'), psTxt=q('.ps-txt-el');
+    const timerEl=document.getElementById('timer-'+name);
+    const paketEl=q('.paket-el'), jamM=q('.jam-mulai'), estW=q('.est-wrap'), jamE=q('.jam-est');
+    const billLbl=q('.bill-lbl-el'), billEl=q('.bill-el'), payEl=q('.pay-el'), payTxt=q('.pay-txt-el');
+    const idleB=q('.idle-body'), runB=q('.run-body'), tuBar=q('.timeup-el');
+
+    if(!info.running){
+        card.classList.add('st-idle'); idleB.style.display='flex'; runB.style.display='none';
+        stBadge.textContent='— STANDBY'; psSym.textContent='□'; psTxt.textContent='STANDBY';
+        if(timers[name]){clearInterval(timers[name]);delete timers[name]} return;
+    }
+
+    idleB.style.display='none'; runB.style.display='flex';
+    const isBebas=(info.mode||'').toUpperCase()==='BEBAS';
+    const isLunas=info.status_bayar==='LUNAS';
+    const isTimeup=!!info.is_time_up;
+    const isMember=info.is_member===true;
+
+    let sc='st-unpaid';
+    if(isTimeup) sc='st-timeup'; else if(isMember) sc='st-vip'; else if(isBebas) sc='st-open'; else if(isLunas) sc='st-paid';
+    card.classList.add(sc);
+
+    vipEl.style.display=isMember?'inline-flex':'none';
+
+    if(isTimeup){ stBadge.textContent='✕ WAKTU HABIS'; psSym.textContent='✕'; psTxt.textContent='SESI BERAKHIR'; }
+    else if(isMember){ stBadge.textContent='★ VIP ACTIVE'; psSym.textContent='★'; psTxt.textContent='VIP ACCESS'; }
+    else if(isBebas){ stBadge.textContent='△ OPEN BILLING'; psSym.textContent='△'; psTxt.textContent='OPEN BILLING AKTIF'; }
+    else if(isLunas){ stBadge.textContent='○ LUNAS'; psSym.textContent='○'; psTxt.textContent='SESI AKTIF'; }
+    else{ stBadge.textContent='□ BELUM BAYAR'; psSym.textContent='□'; psTxt.textContent='MENUNGGU PEMBAYARAN'; }
+
+    let paket=info.mode||'PAKET', harga=parseInt(info.total_sementara||0);
+    if(info.end_time_iso&&info.start_time_iso){
+        const diff=new Date(info.end_time_iso)-new Date(info.start_time_iso);
+        if(diff>0){
+            const jD=diff/3600000, jP=Math.floor(jD), sM=Math.round((jD-jP)*60);
+            if(jP>0&&sM>=25) paket=jP+' JAM 30 MNT'; else if(jP>0) paket=jP+' JAM'; else if(sM>=25) paket='30 MNT';
+            harga=(jP*5000)+(sM>=25?3000:0);
         }
+        estW.style.display='flex'; jamE.textContent=info.end_time_iso.substring(11,16);
+    } else estW.style.display='none';
 
-        class ViewerManager {
-            constructor() {
-                this.wadah = document.getElementById('wadah-ps');
-                this.setupFirebase();
-                
-                if(!targetUnit) {
-                    document.getElementById('alert-no-unit').classList.remove('hidden');
-                }
-            }
+    paketEl.textContent=paket; jamM.textContent=info.start_time_iso?info.start_time_iso.substring(11,16):'--:--';
 
-            setupFirebase() {
-                db.ref('.info/connected').on('value', s => {
-                    const el = document.getElementById('connection-status');
-                    if(el) {
-                        el.innerText = s.val() ? '● LIVE CONNECTED' : '● OFFLINE';
-                        el.className = s.val() ? 'text-[10px] font-black tracking-widest text-[#00ffa3] uppercase mb-1 drop-shadow-[0_0_8px_rgba(0,255,163,0.5)]' : 'text-[10px] font-black tracking-widest text-[#ff2a2a] uppercase mb-1 drop-shadow-[0_0_8px_rgba(255,42,42,0.5)]';
-                    }
-                });
+    if(isMember) {
+        billLbl.innerHTML = '<span style="color:var(--accent); letter-spacing:4px;">★ VIP MEMBER ★</span>';
+        billEl.textContent = info.customer ? info.customer.toUpperCase() : 'VIP GUEST';
+    } else {
+        billLbl.textContent = 'TOTAL BIAYA'; billEl.textContent = fRp(harga);
+    }
 
-                db.ref('dashboard_rgans').on('value', snap => {
-                    stationsData = snap.val(); 
-                    if (!stationsData) {
-                        this.wadah.innerHTML = '<p class="text-slate-500 font-bold tracking-widest text-sm text-center col-span-full">NO DATA AVAILABLE</p>'; 
-                        return;
-                    }
-                    
-                    const urutan = Object.keys(stationsData).sort((a, b) => {
-                        const isStationA = a.toUpperCase().startsWith('STATION');
-                        const isStationB = b.toUpperCase().startsWith('STATION');
-                        if (isStationA && !isStationB) return -1;
-                        if (!isStationA && isStationB) return 1;
-                        return a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'});
-                    });
+    if(isTimeup){ payTxt.textContent='WAKTU HABIS'; tuBar.style.display='block'; }
+    else {
+        tuBar.style.display='none';
+        if(isMember) payTxt.textContent='VIP ACCESS'; else if(isBebas) payTxt.textContent='OPEN BILLING';
+        else if(isLunas) payTxt.textContent='LUNAS'; else payTxt.textContent='BELUM BAYAR';
+    }
 
-                    urutan.forEach((n) => {
-                        if (targetUnit && n.toLowerCase() !== targetUnit.toLowerCase()) return;
+    if(timers[name])clearInterval(timers[name]);
+    if(!timerEl||!info.start_time_iso)return;
+    timers[name]=setInterval(()=>{
+        const now=Date.now(),end=info.end_time_iso?new Date(info.end_time_iso).getTime():0,start=new Date(info.start_time_iso).getTime();
+        const diff=end>0?end-now:now-start;
+        timerEl.textContent=fMs(diff<=0&&end>0?0:diff);
+    },1000);
+}
 
-                        let k = document.getElementById(`box-${n}`);
-                        if (!k) {
-                            k = (new PSBoxViewer(n)).render(); 
-                            this.wadah.appendChild(k);
-                        }
-                        this.syncBoxUI(n, stationsData[n], k);
-                    });
-                });
-            }
+db.ref('.info/connected').on('value',s=>{
+    const e=document.getElementById('conn'); if(!e)return;
+    e.textContent=s.val()?'● LIVE':'● OFFLINE'; e.style.color=s.val()?'#10b981':'#ef4444';
+});
 
-            syncBoxUI(n, info, kotak) {
-                if (!kotak || !info) return;
-                
-                const mem = kotak.querySelector('.member-label');
-                const mod = kotak.querySelector('.mode-label');
-                const jam = kotak.querySelector('.jam-mulai');
-                const estWrap = kotak.querySelector('.est-wrap');
-                const jamSelesai = kotak.querySelector('.jam-selesai');
-                const lunas = kotak.querySelector('.lunas-label');
-                const tim = document.getElementById(`timer-${n}`);
-                const hargaEl = document.getElementById(`harga-${n}`);
-
-                kotak.classList.remove('st-idle', 'st-running-belum', 'st-running-lunas', 'st-running-bebas', 'st-timeup');
-
-                if (info.running) {
-                    const isBebas = info.mode && info.mode.toUpperCase() === 'BEBAS';
-                    const isLunas = info.status_bayar === 'LUNAS'; 
-                    const isMember = info.is_member === true;
-
-                    let teksPaket = info.mode || 'PAKET';
-                    let totalHarga = parseInt(info.total_sementara || 0);
-
-                    if (info.end_time_iso && info.start_time_iso) {
-                        const start = new Date(info.start_time_iso).getTime();
-                        const end = new Date(info.end_time_iso).getTime();
-                        const diffMs = end - start;
-                        
-                        if (diffMs > 0) {
-                            const jamDesimal = diffMs / (1000 * 60 * 60);
-                            const jamPenuh = Math.floor(jamDesimal); 
-                            const sisaMenit = Math.round((jamDesimal - jamPenuh) * 60); 
-
-                            if (jamPenuh > 0 && sisaMenit >= 25) {
-                                teksPaket = `${jamPenuh} JAM 30 MENIT`;
-                            } else if (jamPenuh > 0) {
-                                teksPaket = `${jamPenuh} JAM`;
-                            } else if (sisaMenit >= 25) {
-                                teksPaket = `30 MENIT`;
-                            }
-
-                            const TARIF_1_JAM = 5000;
-                            const TARIF_30_MENIT = 3000;
-                            let tambahanSetengah = sisaMenit >= 25 ? TARIF_30_MENIT : 0;
-                            totalHarga = (jamPenuh * TARIF_1_JAM) + tambahanSetengah;
-                        }
-                        
-                        if (estWrap) estWrap.classList.remove('hidden');
-                        if (jamSelesai) jamSelesai.innerText = info.end_time_iso.substring(11, 16);
-                    } else {
-                        if (estWrap) estWrap.classList.add('hidden');
-                    }
-
-                    if (info.is_time_up) {
-                        kotak.classList.add('st-timeup');
-                    } else if (isBebas) {
-                        kotak.classList.add('st-running-bebas');
-                    } else if (isLunas) {
-                        kotak.classList.add('st-running-lunas');
-                    } else {
-                        kotak.classList.add('st-running-belum');
-                    }
-
-                    if (isMember && info.customer) {
-                        mem.innerText = `[VIP] ${info.customer.toUpperCase()}`;
-                    } else if (info.customer) {
-                        mem.innerText = info.customer.toUpperCase();
-                    } else {
-                        mem.innerText = 'TAMU REGULER';
-                    }
-
-                    mod.innerText = teksPaket;
-                    jam.innerText = info.start_time_iso ? info.start_time_iso.substring(11, 16) : '--:--';
-                    
-                    if (hargaEl) {
-                        hargaEl.innerText = `Rp ${totalHarga.toLocaleString('id-ID')}`;
-                    }
-
-                    if(lunas) {
-                        if (isBebas) {
-                            lunas.innerText = "OPEN BILLING";
-                            lunas.className = "lunas-label badge-front badge-bebas";
-                        } else {
-                            lunas.innerText = isLunas ? "LUNAS" : "BELUM BAYAR";
-                            lunas.className = `lunas-label badge-front ${isLunas ? 'badge-lunas' : 'badge-belum'}`;
-                        }
-                    }
-
-                    this.runTimer(n, info);
-                } else {
-                    kotak.classList.add('st-idle');
-                    
-                    mem.innerText = 'UNIT KOSONG'; 
-                    mod.innerText = 'IDLE'; 
-                    jam.innerText = '--:--';
-                    
-                    if (estWrap) estWrap.classList.add('hidden');
-                    
-                    if(lunas) { lunas.innerText = "STANDBY"; lunas.className = "lunas-label badge-front badge-idle"; }
-                    if(hargaEl) hargaEl.innerText = "Rp 0";
-                    
-                    if (activeTimers[n]) { clearInterval(activeTimers[n]); delete activeTimers[n]; }
-                    if(tim) { tim.innerText = "00:00:00"; }
-                }
-            }
-
-            runTimer(n, info) {
-                if (activeTimers[n]) clearInterval(activeTimers[n]);
-                const el = document.getElementById(`timer-${n}`);
-                if(!el || !info.start_time_iso) return;
-                
-                activeTimers[n] = setInterval(() => {
-                    const now = new Date().getTime();
-                    const start = new Date(info.start_time_iso).getTime();
-                    const end = info.end_time_iso ? new Date(info.end_time_iso).getTime() : 0; 
-                    
-                    let diff = (end > 0) ? end - now : now - start;
-
-                    if (diff <= 0 && end > 0) { el.innerText = "00:00:00"; return; }
-                    
-                    const absD = Math.abs(diff);
-                    const h = Math.floor(absD/3600000).toString().padStart(2,'0');
-                    const m = Math.floor((absD%3600000)/60000).toString().padStart(2,'0');
-                    const s = Math.floor((absD%60000)/1000).toString().padStart(2,'0');
-                    el.innerText = `${h}:${m}:${s}`;
-                }, 1000);
-            }
-        }
-
-        window.onload = () => {
-            window.R_GANS_VIEWER = new ViewerManager();
-        };
-    </script>
+const wadah=document.getElementById('wadah-ps');
+db.ref('dashboard_rgans').on('value',snap=>{
+    const data=snap.val(); if(!data){wadah.innerHTML='<p style="color:var(--muted);text-align:center;padding:40px;font-size:12px;letter-spacing:4px;font-weight:800;">NO DATA FOUND</p>';return}
+    if(!tU)document.getElementById('alert-box').classList.remove('hidden');
+    const order=Object.keys(data).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));
+    order.forEach(n=>{
+        if(tU&&n.toLowerCase()!==tU.toLowerCase())return;
+        let card=document.getElementById('box-'+n);
+        if(!card){card=(new StationConsoleUI(n)).render(); wadah.appendChild(card)}
+        sync(n,data[n],card);
+    });
+});
+</script>
 </body>
 </html>
