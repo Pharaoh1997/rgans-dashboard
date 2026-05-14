@@ -2,376 +2,629 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>R-GANS PREMIER - PS5 Cinematic OS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>R-GANS PREMIER — Live Monitor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@700;800;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#030509;
-  --surface:#0b101a;
-  --surface2:#121927;
-  --border:rgba(255,255,255,0.06);
-  --text:#f8fafc;
-  --muted:#64748b;
-  --muted2:#94a3b8;
-  --font:'Outfit',sans-serif;
-  --mono:'JetBrains Mono',monospace;
-  
-  /* PS5 System Colors */
-  --c-idle: #334155;
-  --c-unpaid: #0ea5e9; /* Cyan Blue */
-  --c-paid: #10b981;   /* Emerald Green */
-  --c-open: #8b5cf6;   /* Purple/Amethyst */
-  --c-vip: #facc15;    /* Luxury Gold */
-  --c-timeup: #ef4444; /* Alert Red */
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DESIGN TOKENS — PS5 PEARL WHITE HD (COMPACT)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+:root {
+  --bg:      #F4F7FB; 
+  --surf:    #FFFFFF; 
+  --surf2:   #F8FAFC;
+  --surf3:   #020617; 
+  --border:  rgba(15, 23, 42, 0.08);
+  --text:    #0F172A; 
+  --muted:   #64748B;
+  --muted2:  #94A3B8;
+  --font:    'Plus Jakarta Sans', sans-serif;
+  --mono:    'JetBrains Mono', monospace;
+
+  /* PlayStation Button Colors */
+  --tri: #10B981;   
+  --cir: #EF4444;   
+  --sqr: #EC4899;   
+  --xbt: #3B82F6;   
+
+  /* State Accent Colors */
+  --a-idle:   #94A3B8;
+  --a-unpaid: #0284C7; 
+  --a-paid:   #059669; 
+  --a-open:   #7C3AED; 
+  --a-timeup: #DC2626; 
+  --a-member: #D97706; 
+  --a-memberl:#FDE047;
 }
 
+html { scroll-behavior: smooth; }
 body {
-    background: var(--bg); color: var(--text); font-family: var(--font);
-    min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
-    background-image: 
-        radial-gradient(circle at 50% 0%, #10182b 0%, transparent 80%),
-        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-    background-size: 100% 100%, 24px 24px, 24px 24px;
-    background-attachment: fixed;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  background-image: radial-gradient(ellipse 100% 60% at 50% 0%, #FFFFFF 0%, transparent 80%);
+  background-attachment: fixed;
 }
-::-webkit-scrollbar { width: 0px; }
+::-webkit-scrollbar { display: none; }
 
-/* =========================================
-   HEADER
-   ========================================= */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MASTER ANIMATIONS (GPU ACCELERATED & ANTI-LAG)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.ambient-gradient {
+  position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; z-index: -3;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(2, 132, 199, 0.06) 0%, transparent 30%),
+    radial-gradient(circle at 80% 40%, rgba(124, 58, 237, 0.05) 0%, transparent 30%),
+    radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 30%);
+  animation: driftAmbient 20s linear infinite alternate;
+  pointer-events: none;
+  will-change: transform;
+}
+/* Pakai translate3d agar diproses langsung oleh GPU HP */
+@keyframes driftAmbient {
+  0% { transform: translate3d(0,0,0) scale(1); }
+  100% { transform: translate3d(3%, 3%, 0) scale(1.05); }
+}
+
+@keyframes floatShapes {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -10px, 0) rotate(3deg); }
+  100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+}
+
+/* Animasi geser cahaya menggunakan transform GPU */
+@keyframes sweepLight { 0% { transform: translate3d(-150%, 0, 0) skewX(-20deg); opacity: 0; } 30% { opacity: 1; } 100% { transform: translate3d(250%, 0, 0) skewX(-20deg); opacity: 0; } }
+@keyframes pulseWA { 0% { box-shadow: 0 8px 25px rgba(15,23,42,0.08), 0 0 0 0 rgba(16, 185, 129, 0.25); } 70% { box-shadow: 0 8px 25px rgba(15,23,42,0.08), 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 8px 25px rgba(15,23,42,0.08), 0 0 0 0 rgba(16, 185, 129, 0); } }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   GIANT BACKGROUND SHAPES & PATTERNS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+body::after {
+  content: ''; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background-image: url('data:image/svg+xml;utf8,<svg width="150" height="150" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg"><g stroke="rgba(15,23,42,0.035)" stroke-width="2" fill="none"><path d="M25,35 L35,20 L45,35 Z"/><path d="M100,110 L110,95 L120,110 Z"/><circle cx="110" cy="35" r="9"/><circle cx="35" cy="110" r="7"/><rect x="75" y="65" width="14" height="14"/><rect x="15" y="70" width="10" height="10"/><path d="M75,25 L89,39 M89,25 L75,39"/><path d="M125,65 L137,77 M137,65 L125,77"/></g></svg>');
+  opacity: 0.8;
+}
+
+.g-shape { position: fixed; z-index: -1; font-weight: 300; pointer-events: none; opacity: 0.03; line-height: 1; will-change: transform; }
+.g-shape.t1 { top: 10%; left: -5%; font-size: 35vh; color: var(--tri); animation: floatShapes 20s infinite alternate; }
+.g-shape.c1 { top: 40%; right: -10%; font-size: 45vh; color: var(--cir); animation: floatShapes 25s infinite alternate-reverse; }
+.g-shape.x1 { bottom: -5%; left: 15%; font-size: 40vh; color: var(--xbt); animation: floatShapes 22s infinite alternate; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   HEADER (Diperkecil & Presisi)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .hdr {
-    position: sticky; top: 0; z-index: 50; background: rgba(3,5,9,.9);
-    border-bottom: 1px solid rgba(255,255,255,0.03); padding: 14px 20px;
-    display: flex; align-items: center; justify-content: space-between;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border); height: 56px;
+  display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04); transform: translateZ(0);
 }
-.logo-row { display: flex; align-items: center; gap: 12px; }
+.hdr-syms { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); display: flex; align-items: center; gap: 10px; pointer-events: none; opacity: 0.12; }
+.hs { font-size: 16px; font-weight: 900; line-height: 1; }
+.hs-tri { color: var(--tri); } .hs-cir { color: var(--cir); } .hs-sqr { color: var(--sqr); } .hs-x { color: var(--xbt); }
+
+.logo-area { display: flex; align-items: center; gap: 10px; position: relative; z-index: 2; }
 .logo-mark {
-    width: 36px; height: 36px; border-radius: 10px;
-    background: linear-gradient(135deg, #0284c7, #0f172a);
-    border: 1px solid rgba(255,255,255,0.1);
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: inset 0 2px 5px rgba(255,255,255,0.1), 0 0 15px rgba(14,165,233,0.2);
+  width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+  background: linear-gradient(135deg, #0284C7, #1E3A8A); border: 1px solid rgba(2, 132, 199, 0.2);
+  display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(2,132,199,0.3);
 }
-.logo-mark span { font-size: 18px; font-weight: 900; color: #fff; line-height: 1; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
-.logo-title { font-size: 15px; font-weight: 900; letter-spacing: 2px; line-height: 1.1; text-transform: uppercase; color: #fff; }
-.logo-title em { color: #38bdf8; font-style: normal; font-weight: 400; }
-.logo-sub { font-size: 8px; color: var(--muted); letter-spacing: 4px; text-transform: uppercase; margin-top: 2px; font-weight: 600; }
-.hdr-r { text-align: right; }
-#conn { font-size: 8px; font-weight: 900; letter-spacing: 3px; color: #10b981; text-transform: uppercase; margin-bottom: 2px; text-shadow: 0 0 10px rgba(16,185,129,0.5); }
-#clk { font-family: var(--mono); font-size: 14px; font-weight: 700; letter-spacing: 1px; color: var(--muted2); }
+.logo-mark span { font-size: 18px; font-weight: 900; color: #fff; line-height: 1; }
+.logo-nm { font-size: 15px; font-weight: 900; letter-spacing: 1px; color: var(--text); line-height: 1.1; }
+.logo-nm em { color: #0284C7; font-style: normal; font-weight: 800; }
+.logo-sb { font-size: 8px; font-weight: 800; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 1px; }
 
-/* MAIN CONTAINER */
-.main { position: relative; z-index: 1; padding: 20px 16px 50px; display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 480px; margin: 0 auto; width: 100%; }
+.hdr-right { text-align: right; position: relative; z-index: 2; }
+#conn { font-size: 8px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; color: #059669; margin-bottom: 2px; }
+#clk { font-family: var(--mono); font-size: 14px; font-weight: 800; color: var(--text); letter-spacing: 0.5px; }
 
-/* =========================================
-   VIP PROMO BANNER (Sesuai Screenshot User)
-   ========================================= */
-.promo-banner {
-    display: flex; justify-content: space-between; align-items: center;
-    background: #0f1219; border: 1px solid rgba(250,204,21,0.2);
-    border-radius: 18px; padding: 14px 18px; width: 100%;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.6); cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-}
-.promo-banner:active { transform: scale(0.97); border-color: rgba(250,204,21,0.5); }
-.pb-left { display: flex; align-items: center; gap: 14px; }
-.pb-icon {
-    width: 42px; height: 42px; background: rgba(250,204,21,0.1);
-    border: 1px solid rgba(250,204,21,0.25); border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    color: #facc15; font-size: 22px; box-shadow: 0 0 15px rgba(250,204,21,0.15);
-}
-.pb-text { display: flex; flex-direction: column; }
-.pb-title { font-size: 14px; font-weight: 900; color: #fff; letter-spacing: 1.5px; line-height: 1.2; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-.pb-sub { font-size: 9px; font-weight: 800; color: #facc15; letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
-.pb-btn {
-    padding: 8px 14px; border: 1px solid rgba(250,204,21,0.5); border-radius: 10px;
-    color: #facc15; font-size: 10px; font-weight: 900; letter-spacing: 2px; 
-    background: rgba(250,204,21,0.05); text-transform: uppercase;
-}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MAIN LAYOUT (Lebih Compact)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.main { position: relative; z-index: 1; padding: 16px 12px 50px; display: flex; flex-direction: column; align-items: center; gap: 16px; max-width: 480px; margin: 0 auto; width: 100%; }
 
-/* =========================================
-   STATION CARD
-   ========================================= */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MEMBER BANNER (Diperkecil & Rapi)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.member-banner {
+  width: 100%; border-radius: 18px; overflow: hidden;
+  border: 1px solid rgba(234, 179, 8, 0.4);
+  background: linear-gradient(135deg, #FEF9C3 0%, #FFFFFF 60%);
+  cursor: pointer; transform: translateZ(0); position: relative;
+  transition: all .2s; box-shadow: 0 6px 20px rgba(217, 119, 6, 0.08);
+}
+.member-banner::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent); animation: shineLight 4s ease-in-out infinite; z-index: 1; pointer-events: none; will-change: transform; }
+.member-banner:active { transform: scale(0.97); }
+
+.mb-top { padding: 12px 14px 10px; position: relative; z-index: 2; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(234, 179, 8, 0.1); }
+.mb-ico { width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0; background: linear-gradient(145deg, #FDE047, #F59E0B); border: 1.5px solid #FFF; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 2px 10px rgba(217,119,6,0.15); color: #fff; }
+.mb-txt { flex: 1; min-width: 0; }
+.mb-title { font-size: 13px; font-weight: 900; letter-spacing: 0.5px; color: #451A03; line-height: 1.1; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mb-sub { margin-top: 3px; }
+.mb-sub-txt { font-size: 8px; font-weight: 800; color: #B45309; letter-spacing: 1px; text-transform: uppercase; }
+.mb-btn { display: flex; align-items: center; gap: 4px; flex-shrink: 0; padding: 6px 10px; border-radius: 8px; background: #FEF3C7; border: 1px solid #FCD34D; color: #B45309; font-size: 8.5px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
+.mb-btn-sym { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #B45309; display: inline-flex; align-items: center; justify-content: center; font-size: 6px; font-weight: 900; color: #B45309; }
+
+.mb-bot { 
+  padding: 8px 14px; position: relative; z-index: 2; display: flex; align-items: center; gap: 6px; background: #fff;
+  flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; /* Aman di layar kecil */
+}
+.mb-bot::-webkit-scrollbar { display: none; }
+.mb-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; border: 1px solid; font-size: 8px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
+.mb-pill-sym { width: 10px; height: 10px; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; font-size: 6px; font-weight: 900; border: 1.5px solid currentColor; }
+.mb-pill-sym.rnd { border-radius: 50%; }
+.pill-gold  { border-color: #FCD34D; color: #B45309; background: #FFFBEB; }
+.pill-green { border-color: #A7F3D0; color: #047857; background: #ECFDF5; }
+.pill-blue  { border-color: #BAE6FD; color: #0369A1; background: #F0F9FF; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STATION CARD (Lebih Proporsional)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .stn-card {
-    width: 100%; border-radius: 28px; overflow: hidden; border: 1px solid var(--border);
-    background: var(--surface); transform: translateZ(0); contain: layout style paint;
-    transition: border-color 0.4s, box-shadow 0.4s; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-    display: flex; flex-direction: column; position: relative;
+  width: 100%; border-radius: 22px; overflow: hidden;
+  background: var(--surf); border: 2px solid #E2E8F0;
+  transform: translateZ(0); contain: layout style paint;
+  transition: all .3s ease;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  position: relative;
+  --accent: var(--a-idle);
 }
 
-/* Dynamic State CSS Variables */
-.stn-card { --accent: var(--c-idle); --glow: rgba(51,65,85,0.4); }
-.st-unpaid { --accent: var(--c-unpaid); --glow: rgba(14,165,233,0.4); border-color: rgba(14,165,233,0.3); }
-.st-paid { --accent: var(--c-paid); --glow: rgba(16,185,129,0.4); border-color: rgba(16,185,129,0.3); }
-.st-open { --accent: var(--c-open); --glow: rgba(139,92,246,0.4); border-color: rgba(139,92,246,0.3); }
-.st-vip { --accent: var(--c-vip); --glow: rgba(250,204,21,0.4); border-color: rgba(250,204,21,0.3); }
-.st-timeup { --accent: var(--c-timeup); --glow: rgba(239,68,68,0.4); border-color: rgba(239,68,68,0.5); }
-
-/* Ambient Light dalam kartu */
-.stn-card::before {
-    content: ''; position: absolute; top: -50px; left: 50%; transform: translateX(-50%);
-    width: 200px; height: 100px; border-radius: 50%;
-    background: var(--accent); opacity: 0.15; filter: blur(40px); pointer-events: none; transition: background 0.4s ease;
+.stn-card:not(.st-idle) {
+  box-shadow: 0 15px 35px rgba(15,23,42,0.06), 
+              0 0 0 1px rgba(var(--ac-r), var(--ac-g), var(--ac-b), 0.2) inset, 
+              0 6px 20px rgba(var(--ac-r), var(--ac-g), var(--ac-b), 0.1);
+  border-color: rgba(var(--ac-r), var(--ac-g), var(--ac-b), 0.25);
 }
 
+.st-unpaid { --accent: var(--a-unpaid); --ac-r: 2; --ac-g: 132; --ac-b: 199; }
+.st-paid   { --accent: var(--a-paid);   --ac-r: 5; --ac-g: 150; --ac-b: 105; }
+.st-open   { --accent: var(--a-open);   --ac-r: 124; --ac-g: 58; --ac-b: 237; }
+.st-timeup { --accent: var(--a-timeup); --ac-r: 220; --ac-g: 38; --ac-b: 38; }
+.st-timeup:not(.st-idle) { box-shadow: 0 15px 35px rgba(15,23,42,0.06), inset 0 0 0 2px rgba(220,38,38,0.3), 0 6px 20px rgba(220,38,38,0.15); animation: blink 1s infinite; }
+
+.ps-lightbar {
+  position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+  background: var(--accent); box-shadow: 0 0 15px 3px var(--accent);
+  opacity: 0; transition: opacity .3s; z-index: 10;
+}
+.stn-card:not(.st-idle) .ps-lightbar { opacity: 1; }
+
+/* ── ART PANEL ── */
 .art {
-    position: relative; overflow: hidden; padding: 24px 20px;
-    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
+  width: 100%; position: relative; overflow: hidden; padding: 22px 14px 16px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  border-bottom: 2px solid rgba(15,23,42,0.02);
+  background: #FFFFFF; transition: background .4s;
 }
+
+/* Fallback/Idle background */
+.st-idle .art { background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(241,245,249,1) 100%); }
+
+/* Dynamic Background by State - CSS Transition on gradients */
+.art::after {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; transition: opacity 0.5s ease;
+  background-size: 200% 200%; animation: liquidGradient 6s ease infinite;
+}
+.st-unpaid .art::after { background: linear-gradient(135deg, rgba(2,132,199,0.1) 0%, rgba(255,255,255,0) 50%, rgba(56,189,248,0.1) 100%); opacity: 1; }
+.st-paid .art::after { background: linear-gradient(135deg, rgba(5,150,105,0.1) 0%, rgba(255,255,255,0) 50%, rgba(52,211,153,0.1) 100%); opacity: 1; }
+.st-open .art::after { background: linear-gradient(135deg, rgba(124,58,237,0.1) 0%, rgba(255,255,255,0) 50%, rgba(167,139,250,0.1) 100%); opacity: 1; }
+.st-timeup .art::after { background: linear-gradient(135deg, rgba(220,38,38,0.1) 0%, rgba(255,255,255,0) 50%, rgba(248,113,113,0.1) 100%); opacity: 1; animation-duration: 3s; }
 
 .art-wm {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    font-size: 55px; letter-spacing: 12px; font-weight: 300; white-space: nowrap; pointer-events: none;
-    color: var(--accent); opacity: 0.05; text-shadow: 0 0 20px var(--glow); transition: color 0.4s;
+  position: absolute; top: 40%; left: 50%; transform: translate(-50%,-50%);
+  font-size: clamp(45px, 12vw, 65px); letter-spacing: 8px; font-weight: 900; white-space: nowrap;
+  pointer-events: none; user-select: none; line-height: 1;
+  color: var(--accent); opacity: 0.04; transition: color .4s;
 }
+.st-idle .art-wm { opacity: 0.02; }
 
-@keyframes sweep { 0% { transform: translateX(-150%) skewX(-20deg); opacity: 0;} 40% { opacity: 0.15; } 100% { transform: translateX(250%) skewX(-20deg); opacity: 0;} }
-.art-shim { position: absolute; top: 0; left: 0; width: 40%; height: 100%; background: linear-gradient(90deg, transparent, #fff, transparent); pointer-events: none; animation: sweep 6s infinite; }
+.art-shim {
+  position: absolute; top: 0; left: -100%; width: 50%; height: 100%; z-index: 2;
+  background: linear-gradient(90deg, transparent, rgba(var(--ac-r), var(--ac-g), var(--ac-b), 0.05), transparent);
+  pointer-events: none; animation: shineLight 5s ease-in-out infinite;
+  will-change: transform; transform: translateZ(0);
+}
 .st-idle .art-shim { display: none; }
 
-.art-top { display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; z-index: 2; width: 100%; }
-.stn-name { font-size: 32px; font-weight: 900; letter-spacing: 2px; color: #fff; line-height: 1; text-transform: uppercase; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }
+.art-top { display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; z-index: 3; width: 100%; }
+.stn-name { font-size: clamp(22px, 6vw, 28px); font-weight: 900; letter-spacing: 1.5px; color: var(--text); line-height: 1; text-transform: uppercase; }
 
-.badge { display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 10px; font-size: 9px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--accent); color: var(--accent); background: rgba(0,0,0,0.4); box-shadow: 0 0 10px var(--glow); transition: all 0.4s ease; }
-.st-idle .badge { border-color: rgba(255,255,255,0.1); color: var(--muted2); box-shadow: none; }
+.badge-grp { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; width: 100%; }
+.mem-badge { display: none; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 8px; background: #FEF3C7; border: 1px solid #FCD34D; font-size: 8px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; color: #B45309; }
+.mem-badge.show { display: inline-flex; }
+.st-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: 8px; font-size: 8.5px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; border: 1.5px solid var(--accent); color: var(--accent); background: rgba(255,255,255,0.9); box-shadow: 0 2px 10px rgba(0,0,0,0.03); transition: all .3s; flex-shrink: 0; }
+.st-idle .st-badge { border-color: #E2E8F0; color: var(--muted); box-shadow: none; }
+.stb-sym { display: none; } /* Tetap di DOM agar JS utuh */
 
-.art-bot { position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 10px; }
-.cust-row { display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.4); padding: 8px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
-.ps-prompt { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 6px 14px; }
-.ps-sym { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 900; color: var(--accent); border: 1.5px solid var(--accent); border-radius: 5px; transition: all 0.4s ease; }
-.ps-txt { font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); transition: color 0.4s; }
-.st-idle .ps-sym, .st-idle .ps-txt { color: var(--muted); border-color: var(--muted); }
+.art-bot { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; margin-top: 4px; }
+.cust-pill { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 18px; border-radius: 16px; background: #FFFFFF; border: 1.5px solid #E2E8F0; box-shadow: 0 2px 6px rgba(15,23,42,0.02); max-width: 95%; overflow: hidden; }
+.cust-ico-el { font-size: 14px; flex-shrink: 0; }
+.cust-nm-el { font-size: clamp(10px, 3.5vw, 12px); font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; transition: color .3s; }
+.cust-nm-el.mem-name { color: #D97706; font-weight: 900; }
+.st-idle .cust-nm-el { color: var(--muted); }
+
+.ps-prompt { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 6px 16px; background: #FFFFFF; border-radius: 12px; border: 1.5px solid #E2E8F0; box-shadow: 0 2px 10px rgba(15,23,42,0.03); margin: 0 auto; max-width: 90%;}
+.ps-sym-el { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--accent); display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 900; color: #fff; background: var(--accent); flex-shrink: 0; transition: all .3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.ps-sym-el.rnd { border-radius: 50%; }
+.ps-txt-el { font-size: 9px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); transition: color .3s; white-space: nowrap; }
+.st-idle .ps-sym-el { background: transparent; border-color: var(--muted2); color: var(--muted); box-shadow: none; }
+.st-idle .ps-txt-el { color: var(--muted); }
 
 /* CONTENT PANEL */
-.content { background: var(--surface); display: flex; flex-direction: column; align-items: center; }
+.content { background: var(--surf); display: flex; flex-direction: column; align-items: center; width: 100%; border-top: 1px solid rgba(15,23,42,0.03); }
 
-/* IDLE screen */
-.idle-body { padding: 40px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
-.idle-ico { font-size: 40px; filter: grayscale(1); opacity: .15; }
-.idle-lbl { font-size: 24px; font-weight: 900; letter-spacing: 4px; color: rgba(255,255,255,.15); text-transform: uppercase; }
-.idle-sub { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+/* ── IDLE SCREEN ── */
+.idle-body { padding: 32px 16px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+.idle-ico { font-size: 38px; opacity: 0.15; filter: grayscale(1); margin-bottom: 2px; }
+.idle-lbl { font-size: 18px; font-weight: 900; letter-spacing: 5px; color: var(--muted2); text-transform: uppercase; }
+.idle-sub { font-size: 10px; font-weight: 800; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
 
-/* RUNNING screen */
-.run-body { display: none; flex-direction: column; width: 100%; align-items: center; }
+.idle-ps { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 8px; flex-wrap: wrap;}
+.idle-ps-btn { width: 28px; height: 28px; border-radius: 6px; border: 2px solid; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; opacity: 0.2; }
+.idle-ps-btn.tri { border-color: var(--tri); color: var(--tri); }
+.idle-ps-btn.cir { border-color: var(--cir); color: var(--cir); border-radius: 50%; }
+.idle-ps-btn.sqr { border-color: var(--sqr); color: var(--sqr); }
+.idle-ps-btn.xbt { border-color: var(--xbt); color: var(--xbt); }
 
-/* INSET HUD TIMER */
-.timer-wrap { 
-    width: calc(100% - 32px); margin: 16px 16px 0; padding: 24px 16px; text-align: center; 
-    background: #020408; border-radius: 20px; border: 1px solid rgba(255,255,255,0.03);
-    box-shadow: inset 0 15px 30px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.3);
-    display: flex; flex-direction: column; align-items: center; position: relative; overflow: hidden;
+/* ── RUNNING SCREEN ── */
+.run-body { display: none; flex-direction: column; align-items: center; width: 100%; padding-bottom: 20px; }
+
+/* TIMER HUD */
+.timer-wrap {
+  width: calc(100% - 28px); margin: 20px 14px 0; border-radius: 20px; 
+  background: var(--surf3); 
+  padding: 22px 14px 20px; text-align: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  box-shadow: inset 0 8px 25px rgba(0,0,0,0.8), inset 0 -1px 4px rgba(255,255,255,0.8);
+  border: 1px solid #E2E8F0; position: relative; overflow: hidden;
 }
-.timer-lbl { font-size: 10px; font-weight: 800; letter-spacing: 4px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
-.timer-dg { 
-    font-family: var(--mono); font-size: clamp(48px, 12vw, 64px); 
-    font-weight: 900; letter-spacing: 1px; line-height: 1; font-variant-numeric: tabular-nums; 
-    color: #fff; transition: color .4s, text-shadow .4s; position: relative; z-index: 2;
+
+/* Fake Holographic Backing */
+.timer-wrap::after {
+  content: ''; position: absolute; inset: 0;
+  background-image: url('data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><g stroke="rgba(255,255,255,0.7)" stroke-width="1.5" fill="none"><path d="M10,13 L13.3,7 L16.6,13 Z"/><circle cx="30" cy="10" r="3.5"/><rect x="10" y="27" width="6.6" height="6.6"/><path d="M28,28 L33.3,33.3 M33.3,28 L28,33.3"/></g></svg>');
+  opacity: 0.08; pointer-events: none; z-index: 1;
 }
 
-.stn-card:not(.st-idle):not(.st-timeup) .timer-dg { color: var(--accent); text-shadow: 0 0 20px var(--glow); animation: breathe 3s ease-in-out infinite; }
-.stn-card.st-timeup .timer-dg { color: var(--accent); text-shadow: 0 0 25px var(--glow); animation: blink .8s step-end infinite; }
-@keyframes breathe { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
-@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
-
-.paket-chip { display: inline-flex; align-items: center; padding: 6px 16px; border-radius: 12px; font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-top: 16px; background: rgba(0,0,0,0.4); color: var(--accent); border: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 2; }
-
-.time-meta { display: flex; justify-content: center; gap: 30px; margin-top: 20px; width: 100%; border-top: 1px solid rgba(255,255,255,0.03); padding-top: 16px; position: relative; z-index: 2; }
-.tmi { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.tmi-lbl { font-size: 8px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
-.tmi-val { font-family: var(--mono); font-size: 14px; font-weight: 800; color: var(--muted2); }
-
-/* BILLING FOOTER - (Pintar Menyesuaikan Mode VIP) */
-.bill-row { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px 20px; width: 100%; }
-.bill-lbl { font-size: 9px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; text-align: center; }
-.bill-amt { font-family: var(--mono); font-size: 28px; font-weight: 900; color: var(--text); transition: color .4s, text-shadow .4s; text-align: center; line-height: 1; }
-
-.stn-card:not(.st-idle) .bill-amt { color: var(--accent); text-shadow: 0 0 15px var(--glow); }
-
-/* Tombol Status Bawah */
-.pay-chip { 
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; 
-    border-radius: 14px; font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; 
-    width: 100%; max-width: 250px; background: rgba(0,0,0,0.3); color: var(--accent); border: 1px solid var(--accent);
-    box-shadow: 0 5px 20px var(--glow); transition: all 0.4s ease;
+.timer-lbl { font-size: 8.5px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: #64748B; margin-bottom: 10px; position: relative; z-index: 2; }
+.timer-dg {
+  font-family: var(--mono); font-size: clamp(38px, 11vw, 56px);
+  font-weight: 900; letter-spacing: 0px; line-height: 1; font-variant-numeric: tabular-nums;
+  color: var(--accent); transition: color .3s, text-shadow .3s; position: relative; z-index: 2;
 }
-.st-idle .pay-chip { color: var(--muted); border-color: var(--border); box-shadow: none; background: rgba(255,255,255,0.05); }
+.stn-card:not(.st-idle):not(.st-timeup) .timer-dg { text-shadow: 0 2px 15px rgba(var(--ac-r), var(--ac-g), var(--ac-b), 0.4); }
+.st-timeup .timer-dg { color: var(--a-timeup); text-shadow: 0 2px 15px rgba(220,38,38,0.5); animation: blink 0.8s step-end infinite; }
 
-/* TIME UP ALERT */
-.timeup-bar { width: 100%; background: #2a0808; border-top: 1px solid #ef4444; padding: 14px 16px; text-align: center; font-size: 10px; font-weight: 900; letter-spacing: 3px; color: #ef4444; text-transform: uppercase; margin-top: 16px; animation: blink 1.2s ease-in-out infinite; box-shadow: 0 0 20px rgba(239,68,68,0.2); }
-
-/* =========================================
-   FOOTER WHATSAPP
-   ========================================= */
-.footer-wa { 
-    width: 100%; padding: 18px; border-radius: 20px; text-decoration: none; 
-    display: flex; flex-direction: column; align-items: center; 
-    background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: transform 0.2s, border-color 0.2s, background 0.2s; 
+.paket-chip {
+  display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px; border-radius: 8px; margin-top: 14px;
+  background: #FFFFFF; border: 1px solid rgba(15,23,42,0.05); box-shadow: 0 2px 10px rgba(15,23,42,0.03);
+  font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); position: relative; z-index: 2;
 }
-.footer-wa:hover { border-color: var(--c-paid); background: rgba(16,185,129,0.05); }
-.footer-wa:active { transform: scale(0.97); }
-.footer-wa p { font-size: 10px; font-weight: 800; color: var(--muted2); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
-.footer-wa strong { font-size: 14px; font-weight: 900; color: #fff; letter-spacing: 1px; }
-.footer-wa em { color: var(--c-paid); font-style: normal; text-shadow: 0 0 10px rgba(16,185,129,0.4); }
 
-/* =========================================
-   MODAL VIP
-   ========================================= */
-.modal-bg { position: fixed; inset: 0; z-index: 200; background: rgba(3,5,9,.95); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity .3s ease; padding: 20px; }
+.time-meta { display: flex; justify-content: center; flex-wrap: wrap; gap: 24px; width: 100%; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 14px; margin-top: 18px; position: relative; z-index: 2; }
+.tmi { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; flex: 1; min-width: 40%;}
+.tmi-lbl { font-size: 8px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+.tmi-val { font-family: var(--mono); font-size: 12px; font-weight: 800; color: #fff; }
+
+/* billing */
+.bill-sec { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 20px 16px 0; width: 100%; text-align: center; position: relative;}
+.bill-left { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; }
+.bill-lbl-el { font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+
+.bill-amt { 
+  font-family: var(--mono); font-size: clamp(24px, 7vw, 30px); font-weight: 900; line-height: 1; text-align: center; white-space: nowrap;
+  color: var(--text); transition: color .3s;
+}
+.stn-card:not(.st-idle) .bill-amt { color: var(--accent); }
+
+.pay-chip {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0; padding: 12px 20px; border-radius: 12px;
+  font-size: 10px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; width: 100%; max-width: 85%;
+  border: 1.5px solid var(--accent); color: #fff; background: var(--accent);
+  box-shadow: 0 4px 15px rgba(var(--ac-r),var(--ac-g),var(--ac-b),0.3); transition: all .3s;
+}
+.st-idle .pay-chip { border-color: #CBD5E1; color: var(--muted); background: #F1F5F9; box-shadow: none; animation: none; }
+.pay-dot { display: none; } 
+
+/* timeup alert */
+.timeup-bar { width: calc(100% - 32px); background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 12px; padding: 12px 14px; text-align: center; font-size: 9px; font-weight: 900; letter-spacing: 2px; color: var(--a-timeup); text-transform: uppercase; margin: 18px 16px 0; animation: blink 1.2s ease-in-out infinite; box-shadow: 0 2px 15px rgba(220,38,38,0.1); }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   WHATSAPP FOOTER CARD (Compact Animated)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.footer-wa {
+  width: 100%; border-radius: 20px; text-decoration: none; display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+  background: var(--surf); border: 1.5px solid #E2E8F0;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05); transition: transform 0.2s; transform: translateZ(0);
+  animation: pulseWA 3s infinite;
+}
+.footer-wa:hover { border-color: #10B981; }
+.footer-wa:active { transform: scale(0.98); }
+.wa-ico { width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0; background: linear-gradient(145deg, #10B981, #047857); display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 12px rgba(16,185,129,0.25); color: #fff; }
+.wa-info { flex: 1; min-width: 0;}
+.wa-lbl { font-size: 9px; font-weight: 800; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+.wa-num { font-size: 15px; font-weight: 900; color: var(--text); letter-spacing: 0.5px; white-space: nowrap;}
+.wa-num em { color: #10B981; font-style: normal; }
+.wa-chevron { color: var(--muted2); font-size: 20px; flex-shrink: 0; font-weight: 400; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MODAL — PS5 System Menu
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.modal-bg { position: fixed; inset: 0; z-index: 200; background: rgba(15, 23, 42, 0.85); display: flex; justify-content: center; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity .25s ease; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
 .modal-bg.open { opacity: 1; pointer-events: auto; }
-.modal-box { 
-    background: linear-gradient(180deg, #151926 0%, #0b0e14 100%); 
-    border: 1px solid rgba(250,204,21,.3); border-radius: 28px; width: 100%; max-width: 440px; 
-    padding: 30px 24px; overflow-y: auto; max-height: 90vh; 
-    transform: scale(0.95) translateY(20px); transition: transform .4s cubic-bezier(.2,1,.4,1); 
-    box-shadow: 0 20px 50px rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; 
-}
-.modal-bg.open .modal-box { transform: scale(1) translateY(0); }
-.modal-handle { width: 40px; height: 4px; background: rgba(255,255,255,.1); border-radius: 2px; margin: 0 auto 20px; }
-.modal-eyebrow { font-size: 10px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; color: var(--c-vip); margin-bottom: 8px; text-align: center; text-shadow: 0 0 10px rgba(250,204,21,0.4); }
-.modal-title { font-size: 28px; font-weight: 900; color: #fff; letter-spacing: 1px; margin-bottom: 24px; text-align: center; line-height: 1; }
+.modal-box { background: #FFFFFF; border: 1px solid #E2E8F0; border-bottom: none; border-radius: 28px 28px 0 0; width: 100%; max-width: 480px; padding: 20px 20px 32px; overflow-y: auto; max-height: 92vh; transform: translateY(100%); transition: transform .3s cubic-bezier(0.32,1.08,0.64,1); will-change: transform; box-shadow: 0 -8px 40px rgba(15, 23, 42, 0.15); }
+.modal-bg.open .modal-box { transform: translateY(0); }
+.modal-handle { width: 40px; height: 5px; background: #CBD5E1; border-radius: 3px; margin: 0 auto 20px; }
 
-.brow { display: flex; gap: 16px; align-items: flex-start; padding: 16px; border-radius: 16px; background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.05); margin-bottom: 12px; width: 100%; }
-.brow-ico { width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0; background: linear-gradient(135deg, rgba(250,204,21,.15), transparent); border: 1px solid rgba(250,204,21,.3); display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--c-vip); }
-.brow-text { display: flex; flex-direction: column; gap: 4px; }
-.brow-text h4 { font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
-.brow-text p { font-size: 11px; font-weight: 400; color: var(--muted2); line-height: 1.5; }
-.brow-text b { color: var(--c-vip); font-weight: 800; }
+.modal-hdr { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #F1F5F9; }
+.modal-ico { width: 50px; height: 50px; border-radius: 14px; flex-shrink: 0; background: linear-gradient(145deg, #FDE047, #F59E0B); display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 4px 15px rgba(217,119,6,0.2); }
+.modal-eyebrow { font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #D97706; margin-bottom: 4px; }
+.modal-title { font-size: 22px; font-weight: 900; color: var(--text); letter-spacing: 0.5px; line-height: 1; }
+.modal-title em { color: #D97706; font-style: normal; }
 
-.modal-footer-txt { font-size: 10px; color: var(--muted); text-align: center; margin-top: 16px; line-height: 1.5; font-weight: 600; padding: 0 10px; }
-.modal-close-btn { width: 100%; margin-top: 16px; padding: 16px; border-radius: 14px; border: none; cursor: pointer; background: linear-gradient(135deg, #facc15, #a16207); color: #000; font-family: var(--font); font-size: 12px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; box-shadow: 0 10px 20px rgba(234,179,8,0.2); }
-.modal-close-btn:active { transform: scale(.98); }
+.brow { display: flex; gap: 14px; align-items: flex-start; padding: 14px; border-radius: 16px; background: #F8FAFC; border: 1px solid #F1F5F9; margin-bottom: 10px; }
+.brow-ico { width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0; background: #FEF3C7; border: 1px solid #FDE047; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.brow-txt h4 { font-size: 13px; font-weight: 800; color: var(--text); letter-spacing: 0.5px; margin-bottom: 4px; }
+.brow-txt p  { font-size: 11px; color: var(--muted); line-height: 1.5; font-weight: 500; }
+.brow-txt b  { color: #D97706; font-weight: 800; }
+.brow-txt em { color: #0284C7; font-style: normal; font-weight: 700; }
 
-/* ALERT */
-.alert-box { width: 100%; padding: 12px 16px; background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); border-radius: 16px; text-align: center; margin-bottom: 16px; }
-.alert-box p:first-child { font-size: 11px; font-weight: 900; color: var(--c-timeup); letter-spacing: 2px; text-transform: uppercase; }
-.alert-box p:last-child { font-size: 10px; font-weight: 600; color: var(--muted2); margin-top: 4px; }
+.modal-note { font-size: 10px; color: var(--muted); text-align: center; margin-top: 14px; line-height: 1.5; font-weight: 600; }
+.modal-close { width: 100%; margin-top: 18px; padding: 14px; border-radius: 14px; border: none; cursor: pointer; background: linear-gradient(135deg, #FDE047, #F59E0B); color: #451A03; font-family: var(--font); font-size: 12px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; box-shadow: 0 6px 18px rgba(217,119,6,0.2); transition: transform 0.2s; }
+.modal-close:active { transform: scale(0.98); }
 
-@media(min-width:900px){
-  #wadah-ps { display: grid !important; grid-template-columns: repeat(2,1fr) !important; gap: 20px !important; align-items: start !important; }
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ALERT BOX
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.alert-box { width: 100%; padding: 14px; border-radius: 16px; text-align: center; background: #FEF2F2; border: 1px solid #FECACA; }
+.alert-box p:first-child { font-size: 10px; font-weight: 900; color: var(--a-timeup); letter-spacing: 2px; text-transform: uppercase; }
+.alert-box p:last-child  { font-size: 10px; color: var(--text); margin-top: 3px; font-weight: 600; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   RESPONSIVE GRID
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media (min-width: 900px) {
+  #wadah-ps { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 20px !important; align-items: start !important; }
   .main { max-width: 960px; }
 }
 </style>
 </head>
 <body>
 
+<!-- Giant Float Shapes Background -->
+<div class="ambient-gradient"></div>
+<div class="g-shape t1">△</div>
+<div class="g-shape c1">○</div>
+<div class="g-shape x1">✕</div>
+<div class="ps-shapes-bg"></div>
+
+<!-- ═══════════════════════════════════════
+     HEADER
+═══════════════════════════════════════ -->
 <header class="hdr">
-  <div class="logo-row">
+  <div class="hdr-syms">
+    <span class="hs hs-tri">△</span>
+    <span class="hs hs-cir">○</span>
+    <span class="hs hs-sqr">□</span>
+    <span class="hs hs-x">✕</span>
+  </div>
+  <div class="logo-area">
     <div class="logo-mark"><span>R</span></div>
     <div>
-      <div class="logo-title">R-GANS <em>PREMIER</em></div>
-      <div class="logo-sub">OS Monitor Center</div>
+      <div class="logo-nm">R-GANS <em>PREMIER</em></div>
+      <div class="logo-sb">Live Monitor Center</div>
     </div>
   </div>
-  <div class="hdr-r">
-    <div id="conn">● LIVE</div>
+  <div class="hdr-right">
+    <div id="conn">● CONNECTING</div>
     <div id="clk">--:--:--</div>
   </div>
 </header>
 
 <main class="main">
+
+  <!-- ALERT: semua unit -->
   <div id="alert-box" class="alert-box" style="display:none">
     <p>MENAMPILKAN SEMUA STASIUN</p>
-    <p>Scan QR di meja untuk memfilter stasiun spesifik.</p>
+    <p>Scan QR di meja untuk filter stasiun spesifik</p>
   </div>
 
-  <!-- PROMO BANNER (BINTANG/TROPHY) -->
-  <div class="promo-banner" onclick="openModal()">
-    <div class="pb-left">
-        <div class="pb-icon">★</div>
-        <div class="pb-text">
-            <div class="pb-title">UPGRADE KE VIP</div>
-            <div class="pb-sub">HARGA KHUSUS · SMART WA</div>
+  <!-- MEMBER BANNER -->
+  <div class="member-banner" onclick="openModal()">
+    <div class="mb-top">
+      <div class="mb-ico">🏆</div>
+      <div class="mb-txt">
+        <div class="mb-title">Jadi Member R-GANS</div>
+        <div class="mb-sub">
+          <span class="mb-sub-txt">Harga Spesial · Anti Hangus · Instan</span>
         </div>
+      </div>
+      <div class="mb-btn">
+        <span class="mb-btn-sym">○</span>
+        INFO
+      </div>
     </div>
-    <div class="pb-btn">INFO</div>
+    <div class="mb-bot">
+      <div class="mb-pill pill-gold">
+        <span class="mb-pill-sym rnd" style="font-size:9px">★</span>
+        12 Jam / 50rb
+      </div>
+      <div class="mb-sep"></div>
+      <div class="mb-pill pill-green">
+        <span class="mb-pill-sym">△</span>
+        Anti Hangus
+      </div>
+      <div class="mb-sep"></div>
+      <div class="mb-pill pill-blue">
+        <span class="mb-pill-sym rnd" style="font-size:9px">✕</span>
+        Daftar Gratis
+      </div>
+    </div>
   </div>
 
-  <div id="wadah-ps" style="width:100%;display:flex;flex-direction:column;gap:24px;align-items:center"></div>
+  <!-- STATION CARDS -->
+  <div id="wadah-ps" style="width:100%;display:flex;flex-direction:column;gap:20px;align-items:center"></div>
 
-  <!-- FOOTER -->
-  <a href="https://wa.me/6282221586680" target="_blank" class="footer-wa">
-    <p>Ada Masalah / Kendala?</p>
-    <strong>HUBUNGI WHATSAPP: <em>0822 2158 6680</em></strong>
+  <!-- WHATSAPP FOOTER -->
+  <a href="https://wa.me/6282221586680" target="_blank" class="footer-wa mt-2">
+    <div class="wa-ico">💬</div>
+    <div class="wa-info">
+      <div class="wa-lbl">Ada Kendala / Masalah?</div>
+      <div class="wa-num">WA: <em>0822 2158 6680</em></div>
+    </div>
+    <div class="wa-chevron">›</div>
   </a>
+
 </main>
 
-<!-- MODAL VIP -->
+<!-- ═══════════════════════════════════════
+     MODAL MEMBER
+═══════════════════════════════════════ -->
 <div id="modal-vip" class="modal-bg" onclick="closeModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
-    <div class="modal-eyebrow">EXCLUSIVE PRIVILEGES</div>
-    <div class="modal-title">R-GANS VIP</div>
-    
-    <div class="brow"><div class="brow-ico">★</div><div class="brow-text"><h4>Tarif Flat Eksklusif</h4><p>Top-up <b>Rp 50.000</b> langsung dapat <b>12 JAM</b>. Bebas main sepuasnya dengan harga terbaik.</p></div></div>
-    <div class="brow"><div class="brow-ico">⏳</div><div class="brow-text"><h4>Bebas Nominal Top-up</h4><p>Isi saldo berapapun bisa. Pecahan di bawah 50rb akan dikonversi menjadi <b>66 Menit</b> per 5rb.</p></div></div>
-    <div class="brow"><div class="brow-ico">💾</div><div class="brow-text"><h4>Waktu Aman Tersimpan</h4><p>Sisa waktu otomatis tersimpan di ID kamu. <b>Anti hangus</b>, bisa dilanjut kapan saja.</p></div></div>
-    <div class="brow"><div class="brow-ico">📱</div><div class="brow-text"><h4>Sistem Smart WA</h4><p>Pendaftaran cukup dengan No WhatsApp. Menerima struk top-up & sisa waktu secara otomatis.</p></div></div>
-    
-    <p class="modal-footer-txt">Untuk informasi pendaftaran lebih lanjut, silakan hubungi WhatsApp kami atau langsung ke Kasir.</p>
-    <button class="modal-close-btn" onclick="closeModal(event)">TUTUP MENU</button>
+
+    <div class="modal-hdr">
+      <div class="modal-ico">🏆</div>
+      <div class="modal-hdrtxt">
+        <div class="modal-eyebrow">Exclusive Member Privileges</div>
+        <div class="modal-title">R-GANS <em>MEMBER</em></div>
+      </div>
+    </div>
+
+    <!-- Note: Modal legend sudah dihapus sesuai instruksi -->
+
+    <div class="brow">
+      <div class="brow-ico">💸</div>
+      <div class="brow-txt">
+        <h4>Tarif Flat Super Hemat</h4>
+        <p>Top-up <b>Rp 50.000</b> langsung dapat <b>12 JAM</b> penuh. Jauh lebih hemat dari tarif normal Rp 5.000/jam.</p>
+      </div>
+    </div>
+    <div class="brow">
+      <div class="brow-ico">⏱</div>
+      <div class="brow-txt">
+        <h4>Top-up Bebas Nominal</h4>
+        <p>Isi saldo berapapun bisa. Pecahan di bawah 50rb dikonversi <b>66 Menit</b> per Rp 5.000 — 6 menit bonus!</p>
+      </div>
+    </div>
+    <div class="brow">
+      <div class="brow-ico">💾</div>
+      <div class="brow-txt">
+        <h4>Waktu & Saldo Anti Hangus</h4>
+        <p>Sisa waktu tersimpan otomatis di ID kamu. <b>Lanjut kapan saja</b> tanpa takut rugi sepeser pun.</p>
+      </div>
+    </div>
+    <div class="brow">
+      <div class="brow-ico">📱</div>
+      <div class="brow-txt">
+        <h4>Daftar & Smart Notif</h4>
+        <p>Pendaftaran instan tanpa ribet. Dapatkan notifikasi struk dan sisa waktu bermain langsung ke <em>WhatsApp</em> kamu!</p>
+      </div>
+    </div>
+
+    <p class="modal-note">Informasi lebih lanjut, hubungi WhatsApp atau langsung ke Kasir kami.</p>
+    <button class="modal-close" onclick="closeModal(event)">○ &nbsp;TUTUP MENU</button>
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════
+     JAVASCRIPT (TIDAK ADA PENGURANGAN)
+═══════════════════════════════════════ -->
 <script>
-function openModal(){document.getElementById('modal-vip').classList.add('open'); document.body.classList.add('modal-open');}
-function closeModal(e){if(e)e.preventDefault();document.getElementById('modal-vip').classList.remove('open'); document.body.classList.remove('modal-open');}
+/* ── Modal ── */
+function openModal()  { document.getElementById('modal-vip').classList.add('open'); }
+function closeModal(e){ if(e) e.preventDefault(); document.getElementById('modal-vip').classList.remove('open'); }
 
-const firebaseConfig={
-  apiKey:"AIzaSyDAD47-malAVNF0pvG-zb68VSlPT4KftU4",
-  authDomain:"rgans-premier.firebaseapp.com",
-  databaseURL:"https://rgans-premier-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId:"rgans-premier",
-  storageBucket:"rgans-premier.firebasestorage.app",
-  messagingSenderId:"483724142361",
-  appId:"1:483724142361:web:18517acb9e31a2962e4788"
+/* ── Firebase ── */
+const firebaseConfig = {
+  apiKey: "AIzaSyDAD47-malAVNF0pvG-zb68VSlPT4KftU4",
+  authDomain: "rgans-premier.firebaseapp.com",
+  databaseURL: "https://rgans-premier-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "rgans-premier",
+  storageBucket: "rgans-premier.firebasestorage.app",
+  messagingSenderId: "483724142361",
+  appId: "1:483724142361:web:18517acb9e31a2962e4788"
 };
 firebase.initializeApp(firebaseConfig);
-const db=firebase.database();
-let timers={};
-const uP=new URLSearchParams(window.location.search);
-const tU=uP.get('unit');
+const db = firebase.database();
 
-setInterval(()=>{const e=document.getElementById('clk');if(e)e.textContent=new Date().toLocaleTimeString('id-ID',{hour12:false})},1000);
-function fRp(n){return'Rp '+parseInt(n||0).toLocaleString('id-ID')}
-function fT(iso){return iso?iso.substring(11,16):'--:--'}
-function fMs(ms){const a=Math.abs(ms);return[Math.floor(a/3600000),Math.floor((a%3600000)/60000),Math.floor((a%60000)/1000)].map(v=>v.toString().padStart(2,'0')).join(':')}
+let timers = {};
+const tU = new URLSearchParams(window.location.search).get('unit');
 
-function buildCard(name){
-  const el=document.createElement('div');
-  el.className='stn-card st-idle';el.id='box-'+name;
-  el.innerHTML=`
+/* ── Clock ── */
+setInterval(() => {
+  const e = document.getElementById('clk');
+  if(e) e.textContent = new Date().toLocaleTimeString('id-ID', {hour12:false});
+}, 1000);
+
+/* ── Helpers ── */
+function fRp(n) { return 'Rp ' + parseInt(n||0).toLocaleString('id-ID'); }
+function fT(iso){ return iso ? iso.substring(11,16) : '--:--'; }
+function fMs(ms){
+  const a = Math.abs(ms);
+  return [Math.floor(a/3600000), Math.floor((a%3600000)/60000), Math.floor((a%60000)/1000)]
+    .map(v => v.toString().padStart(2,'0')).join(':');
+}
+
+/* ── Build Card DOM ── */
+function buildCard(name) {
+  const el = document.createElement('div');
+  el.className = 'stn-card st-idle';
+  el.id = 'box-' + name;
+  el.innerHTML = `
+<div class="ps-lightbar"></div>
 <div class="art">
   <div class="art-shim"></div>
   <div class="art-wm">△ ○ □ ✕</div>
+
   <div class="art-top">
-    <div class="badge-group">
-      <span class="badge st-badge">— STANDBY</span>
-    </div>
     <div class="stn-name">${name}</div>
+    <div class="badge-grp">
+      <span class="mem-badge mem-el">★ MEMBER</span>
+      <span class="st-badge">
+        <span class="stb-sym stb-el">—</span>
+        <span class="stb-txt-el">STANDBY</span>
+      </span>
+    </div>
   </div>
+
   <div class="art-bot">
+    <div class="cust-pill">
+      <span class="cust-ico-el">🎮</span>
+      <span class="cust-nm-el">Unit Kosong</span>
+    </div>
     <div class="ps-prompt">
-      <span class="ps-sym ps-sym-el">□</span>
-      <span class="ps-txt ps-txt-el">STANDBY</span>
+      <span class="ps-sym-el">—</span>
+      <span class="ps-txt-el">STANDBY</span>
     </div>
   </div>
 </div>
+
 <div class="content">
   <div class="idle-body">
     <div class="idle-ico">🎮</div>
     <div class="idle-lbl">STANDBY</div>
     <div class="idle-sub">Unit Siap Digunakan</div>
+    <div class="idle-ps">
+      <div class="idle-ps-btn tri">△</div>
+      <div class="idle-ps-btn cir">○</div>
+      <div class="idle-ps-btn sqr">□</div>
+      <div class="idle-ps-btn xbt">✕</div>
+    </div>
   </div>
   <div class="run-body">
     <div class="timer-wrap">
@@ -379,140 +632,233 @@ function buildCard(name){
       <div class="timer-dg" id="timer-${name}">00:00:00</div>
       <div><span class="paket-chip paket-el">—</span></div>
       <div class="time-meta">
-        <div class="tmi"><span class="tmi-lbl">MULAI</span><span class="tmi-val jam-mulai">--:--</span></div>
-        <div class="tmi est-wrap" style="display:none"><span class="tmi-lbl">EST SELESAI</span><span class="tmi-val jam-est">--:--</span></div>
+        <div class="tmi">
+          <span class="tmi-lbl">MULAI</span>
+          <span class="tmi-val jam-mulai">--:--</span>
+        </div>
+        <div class="tmi est-wrap" style="display:none">
+          <span class="tmi-lbl">EST SELESAI</span>
+          <span class="tmi-val jam-est">--:--</span>
+        </div>
       </div>
     </div>
-    <div class="bill-row">
-      <div style="display:flex; flex-direction:column; align-items:center;">
-          <div class="bill-lbl bill-lbl-el">TOTAL BIAYA</div>
-          <div class="bill-amt bill-el">Rp 0</div>
+    <div class="bill-sec">
+      <div class="bill-left">
+        <div class="bill-lbl-el">TOTAL TAGIHAN</div>
+        <div class="bill-amt bill-amt-el">Rp 0</div>
       </div>
-      <div class="pay-chip pc-idle pay-el">
-          <span class="pay-txt-el">STANDBY</span>
+      <div class="pay-chip pay-el">
+        <span class="pay-dot"></span>
+        <span class="pay-txt-el">STANDBY</span>
       </div>
     </div>
-    <div class="timeup-bar timeup-el" style="display:none">⚠ WAKTU HABIS — SEGERA PERPANJANG ⚠</div>
+    <div class="timeup-bar timeup-el" style="display:none">
+      ✕ &nbsp;WAKTU HABIS — SEGERA PERPANJANG &nbsp;✕
+    </div>
   </div>
 </div>`;
   return el;
 }
 
-function sync(name,info,card){
-  if(!card||!info)return;
-  const q=s=>card.querySelector(s);
-  
-  card.classList.remove('st-idle','st-unpaid','st-paid','st-open','st-vip','st-timeup');
-  
-  const stBadge=q('.st-badge');
-  const psSym=q('.ps-sym-el'),psTxt=q('.ps-txt-el'),timerEl=document.getElementById('timer-'+name);
-  const paketEl=q('.paket-el'),jamM=q('.jam-mulai'),estW=q('.est-wrap'),jamE=q('.jam-est');
-  const billLbl=q('.bill-lbl-el'), billEl=q('.bill-el'), payEl=q('.pay-el'), payTxt=q('.pay-txt-el');
-  const idleB=q('.idle-body'),runB=q('.run-body'),tuBar=q('.timeup-el');
+/* ── Sync Card State ── */
+function sync(name, info, card) {
+  if (!card || !info) return;
+  const q = s => card.querySelector(s);
 
-  if(!info.running){
+  ['st-idle','st-unpaid','st-paid','st-open','st-timeup'].forEach(c => card.classList.remove(c));
+
+  /* DOM refs */
+  const memEl    = q('.mem-el');
+  const stbSym   = q('.stb-el');
+  const stbTxt   = q('.stb-txt-el');
+  const custIco  = q('.cust-ico-el');
+  const custNm   = q('.cust-nm-el');
+  const psSym    = q('.ps-sym-el');
+  const psTxt    = q('.ps-txt-el');
+  const timerEl  = document.getElementById('timer-' + name);
+  const paketEl  = q('.paket-el');
+  const jamM     = q('.jam-mulai');
+  const estW     = q('.est-wrap');
+  const jamE     = q('.jam-est');
+  const billLbl  = q('.bill-lbl-el');
+  const billAmt  = q('.bill-amt-el');
+  const payEl    = q('.pay-el');
+  const payTxt   = q('.pay-txt-el');
+  const idleB    = q('.idle-body');
+  const runB     = q('.run-body');
+  const tuBar    = q('.timeup-el');
+
+  /* ── IDLE ── */
+  if (!info.running) {
     card.classList.add('st-idle');
-    idleB.style.display='flex';runB.style.display='none';
-    stBadge.textContent='— STANDBY';
-    psSym.textContent='□';psTxt.textContent='STANDBY';
-    if(timers[name]){clearInterval(timers[name]);delete timers[name]}
+    idleB.style.display = 'flex'; runB.style.display = 'none';
+    memEl.classList.remove('show');
+    stbSym.textContent = '—'; stbSym.className = 'stb-sym stb-el';
+    stbTxt.textContent = 'STANDBY';
+    custIco.textContent = '🎮';
+    custNm.textContent = 'Unit Kosong'; custNm.className = 'cust-nm-el';
+    psSym.textContent = '—'; psSym.className = 'ps-sym-el';
+    psTxt.textContent = 'STANDBY';
+    if (timers[name]) { clearInterval(timers[name]); delete timers[name]; }
     return;
   }
 
-  idleB.style.display='none';runB.style.display='flex';
-  
-  const isBebas=(info.mode||'').toUpperCase()==='BEBAS';
-  const isLunas=info.status_bayar==='LUNAS';
-  const isTimeup=!!info.is_time_up;
-  const isMember=info.is_member===true;
+  /* ── RUNNING ── */
+  idleB.style.display = 'none'; runB.style.display = 'flex';
 
-  // Menentukan Theme Prioritas
-  let sc='st-unpaid';
-  if(isTimeup) sc='st-timeup';
-  else if(isMember) sc='st-vip';
-  else if(isBebas) sc='st-open';
-  else if(isLunas) sc='st-paid';
-  
+  const isBebas  = (info.mode || '').toUpperCase() === 'BEBAS';
+  const isLunas  = info.status_bayar === 'LUNAS';
+  const isTimeup = !!info.is_time_up;
+  const isMember = info.is_member === true;
+
+  /* Card state class (payment determines color, member is a badge) */
+  let sc = 'st-unpaid';
+  if (isTimeup)      sc = 'st-timeup';
+  else if (isBebas)  sc = 'st-open';
+  else if (isLunas)  sc = 'st-paid';
   card.classList.add(sc);
 
-  // Status Badge Atas
-  if(isTimeup){stBadge.textContent='✕ WAKTU HABIS';}
-  else if(isMember){stBadge.textContent='★ VIP ACTIVE';}
-  else if(isBebas){stBadge.textContent='△ OPEN BILLING';}
-  else if(isLunas){stBadge.textContent='○ LUNAS';}
-  else{stBadge.textContent='□ BELUM BAYAR';}
+  /* MEMBER badge */
+  if (isMember) memEl.classList.add('show');
+  else          memEl.classList.remove('show');
 
-  // PS Action Prompt
-  if(isTimeup){psSym.textContent='✕';psTxt.textContent='SESI BERAKHIR'}
-  else if(isBebas){psSym.style.borderRadius='5px'; psSym.textContent='△';psTxt.textContent='OPEN BILLING AKTIF'}
-  else if(isLunas){psSym.style.borderRadius='50%'; psSym.textContent='○';psTxt.textContent='SESI AKTIF'}
-  else{psSym.style.borderRadius='5px'; psSym.textContent='□';psTxt.textContent='MENUNGGU PEMBAYARAN'}
-
-  // Kalkulasi Harga & Sisa Waktu
-  let paket=info.mode||'PAKET', harga=parseInt(info.total_sementara||0);
-  if(info.end_time_iso&&info.start_time_iso){
-    const diff=new Date(info.end_time_iso)-new Date(info.start_time_iso);
-    if(diff>0){const jD=diff/3600000,jP=Math.floor(jD),sM=Math.round((jD-jP)*60);
-      if(jP>0&&sM>=25)paket=jP+' JAM 30 MENIT';else if(jP>0)paket=jP+' JAM';else if(sM>=25)paket='30 MENIT';
-      harga=(jP*5000)+(sM>=25?3000:0);}
-    estW.style.display='flex';jamE.textContent=fT(info.end_time_iso);
-  }else estW.style.display='none';
-
-  paketEl.textContent=paket; jamM.textContent=fT(info.start_time_iso);
-
-  // FOOTER LOGIC - JIKA VIP, TAMPILKAN NAMA BUKAN TAGIHAN
-  if(isMember) {
-      billLbl.innerHTML = '<span style="color:var(--accent); letter-spacing:4px;">★ VIP MEMBER ★</span>';
-      billEl.textContent = info.customer ? info.customer.toUpperCase() : 'VIP GUEST';
+  /* Status badge (top-right) — use PS button symbol */
+  if (isTimeup) {
+    stbSym.textContent = '✕'; stbSym.className = 'stb-sym stb-el rnd';
+    stbTxt.textContent = 'WAKTU HABIS';
+    tuBar.style.display = 'block';
   } else {
-      billLbl.textContent = 'TOTAL BIAYA';
-      billEl.textContent = fRp(harga);
+    tuBar.style.display = 'none';
+    if (isBebas) {
+      stbSym.textContent = '△'; stbSym.className = 'stb-sym stb-el tri-shape';
+      stbTxt.textContent = 'OPEN BILLING';
+    } else if (isLunas) {
+      stbSym.textContent = '○'; stbSym.className = 'stb-sym stb-el rnd';
+      stbTxt.textContent = 'LUNAS';
+    } else {
+      stbSym.textContent = '□'; stbSym.className = 'stb-sym stb-el';
+      stbTxt.textContent = 'BELUM BAYAR';
+    }
   }
 
-  // Tombol Pay Chip
-  payEl.className = 'pay-chip';
-  if(isTimeup){payEl.classList.add('pc-timeup');payTxt.textContent='WAKTU HABIS'; tuBar.style.display='block';}
-  else {
-      tuBar.style.display='none';
-      if(isMember) { payEl.classList.add('pc-open'); payEl.style.borderColor='var(--accent)'; payEl.style.color='var(--accent)'; payTxt.textContent='VIP ACCESS'; }
-      else if(isBebas) { payEl.classList.add('pc-open'); payTxt.textContent='OPEN BILLING'; }
-      else if(isLunas) { payEl.classList.add('pc-paid'); payTxt.textContent='LUNAS'; }
-      else { payEl.classList.add('pc-unpaid'); payTxt.textContent='BELUM BAYAR'; }
+  /* PS action prompt (bottom of art panel) */
+  if (isTimeup) {
+    psSym.textContent = '✕'; psSym.className = 'ps-sym-el rnd';
+    psTxt.textContent = 'SESI BERAKHIR';
+  } else if (isBebas) {
+    psSym.textContent = '△'; psSym.className = 'ps-sym-el';
+    psTxt.textContent = 'OPEN BILLING AKTIF';
+  } else if (isLunas) {
+    psSym.textContent = '○'; psSym.className = 'ps-sym-el rnd';
+    psTxt.textContent = 'SESI AKTIF — SUDAH BAYAR';
+  } else {
+    psSym.textContent = '□'; psSym.className = 'ps-sym-el';
+    psTxt.textContent = 'MENUNGGU PEMBAYARAN';
   }
 
-  // Timer Engine
-  if(timers[name])clearInterval(timers[name]);
-  if(!timerEl||!info.start_time_iso)return;
-  timers[name]=setInterval(()=>{
-    const now=Date.now(),end=info.end_time_iso?new Date(info.end_time_iso).getTime():0,start=new Date(info.start_time_iso).getTime();
-    const diff=end>0?end-now:now-start;
-    if(diff<=0&&end>0){timerEl.textContent='00:00:00';return}
-    timerEl.textContent=fMs(diff);
-  },1000);
+  /* Customer display */
+  let ico = isTimeup ? '⏰' : isMember ? '🏆' : '🎮';
+  custIco.textContent = ico;
+  if (isMember && info.customer) {
+    custNm.textContent = '★ ' + info.customer.toUpperCase();
+    custNm.className = 'cust-nm-el mem-name';
+  } else if (info.customer) {
+    custNm.textContent = info.customer.toUpperCase();
+    custNm.className = 'cust-nm-el';
+  } else {
+    custNm.textContent = 'TAMU REGULER';
+    custNm.className = 'cust-nm-el';
+  }
+
+  /* Paket & billing calc */
+  let paket = info.mode || 'PAKET';
+  let harga = parseInt(info.total_sementara || 0);
+  if (info.end_time_iso && info.start_time_iso) {
+    const diff = new Date(info.end_time_iso) - new Date(info.start_time_iso);
+    if (diff > 0) {
+      const jD = diff / 3600000, jP = Math.floor(jD), sM = Math.round((jD - jP) * 60);
+      if (jP > 0 && sM >= 25)   paket = jP + ' JAM 30 MENIT';
+      else if (jP > 0)          paket = jP + ' JAM';
+      else if (sM >= 25)        paket = '30 MENIT';
+      harga = (jP * 5000) + (sM >= 25 ? 3000 : 0);
+    }
+    estW.style.display = 'flex'; jamE.textContent = fT(info.end_time_iso);
+  } else {
+    estW.style.display = 'none';
+  }
+
+  paketEl.textContent = paket;
+  jamM.textContent    = fT(info.start_time_iso);
+
+  /* Billing display — if member, show name+member info */
+  if (isMember && info.customer) {
+    billLbl.innerHTML = '<span style="color:var(--a-memberl);letter-spacing:2px">★ MEMBER — ' + info.customer.toUpperCase() + '</span>';
+    billAmt.textContent = fRp(harga);
+  } else {
+    billLbl.textContent = 'TOTAL TAGIHAN';
+    billAmt.textContent = fRp(harga);
+  }
+
+  /* Pay chip */
+  payEl.className = 'pay-chip pay-el';
+  if (isTimeup) {
+    payTxt.textContent = 'WAKTU HABIS';
+  } else if (isBebas) {
+    payTxt.textContent = 'OPEN BILLING';
+  } else if (isLunas) {
+    payTxt.textContent = '○ LUNAS';
+  } else {
+    payTxt.textContent = '□ BELUM BAYAR';
+  }
+
+  /* Timer countdown */
+  if (timers[name]) clearInterval(timers[name]);
+  if (!timerEl || !info.start_time_iso) return;
+  timers[name] = setInterval(() => {
+    const now   = Date.now();
+    const end   = info.end_time_iso ? new Date(info.end_time_iso).getTime() : 0;
+    const start = new Date(info.start_time_iso).getTime();
+    const diff  = end > 0 ? end - now : now - start;
+    if (diff <= 0 && end > 0) { timerEl.textContent = '00:00:00'; return; }
+    timerEl.textContent = fMs(diff);
+  }, 1000);
 }
 
-db.ref('.info/connected').on('value',s=>{
-  const e=document.getElementById('conn');if(!e)return;
-  e.textContent=s.val()?'● LIVE CONNECTED':'● OFFLINE';
-  e.style.color=s.val()?'var(--c-paid)':'var(--c-timeup)';
-  e.style.textShadow=s.val()?'0 0 10px rgba(16,185,129,0.5)':'0 0 10px rgba(239,68,68,0.5)';
+/* ── Firebase Connection Status ── */
+db.ref('.info/connected').on('value', s => {
+  const e = document.getElementById('conn');
+  if (!e) return;
+  if (s.val()) {
+    e.textContent = '● LIVE CONNECTED';
+    e.style.color = '#10B981';
+  } else {
+    e.textContent = '● OFFLINE';
+    e.style.color = '#DC2626';
+  }
 });
 
-const wadah=document.getElementById('wadah-ps');
-db.ref('dashboard_rgans').on('value',snap=>{
-  const data=snap.val();
-  if(!data){wadah.innerHTML='<p style="color:var(--muted);text-align:center;padding:40px;font-size:12px;letter-spacing:4px;font-weight:800;">NO DATA FOUND</p>';return}
-  if(!tU)document.getElementById('alert-box').style.display='block';
-  const order=Object.keys(data).sort((a,b)=>{
-    const aS=a.toUpperCase().startsWith('STATION'),bS=b.toUpperCase().startsWith('STATION');
-    if(aS&&!bS)return -1;if(!aS&&bS)return 1;
-    return a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'});
+/* ── Firebase Data ── */
+const wadah = document.getElementById('wadah-ps');
+db.ref('dashboard_rgans').on('value', snap => {
+  const data = snap.val();
+  if (!data) {
+    wadah.innerHTML = '<p style="color:var(--muted);text-align:center;padding:40px;font-size:14px;letter-spacing:4px;font-weight:800;">NO DATA FOUND</p>';
+    return;
+  }
+  if (!tU) document.getElementById('alert-box').style.display = 'block';
+
+  const order = Object.keys(data).sort((a, b) => {
+    const aS = a.toUpperCase().startsWith('STATION');
+    const bS = b.toUpperCase().startsWith('STATION');
+    if (aS && !bS) return -1; if (!aS && bS) return 1;
+    return a.localeCompare(b, undefined, {numeric:true, sensitivity:'base'});
   });
-  order.forEach(n=>{
-    if(tU&&n.toLowerCase()!==tU.toLowerCase())return;
-    let card=document.getElementById('box-'+n);
-    if(!card){card=buildCard(n);wadah.appendChild(card)}
-    sync(n,data[n],card);
+
+  order.forEach(n => {
+    if (tU && n.toLowerCase() !== tU.toLowerCase()) return;
+    let card = document.getElementById('box-' + n);
+    if (!card) { card = buildCard(n); wadah.appendChild(card); }
+    sync(n, data[n], card);
   });
 });
 </script>
