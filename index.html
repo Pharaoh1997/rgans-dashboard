@@ -788,14 +788,21 @@ function sync(name, info, card) {
     tarifRow.style.display = 'none';
   }
 
-  // Billing — gunakan total_sementara dari Firebase (sudah termasuk diskon/paket)
-  const totalFb = parseInt(info.total_sementara||0);
+  // Billing — prioritas:
+  // 1. paket_harga (harga TETAP paket) jika ada → tampilkan fixed, tidak naik
+  // 2. total_sementara (live dari Python) untuk billing biasa / open billing
+  // Sebelumnya hanya pakai total_sementara yang ikut naik walau sesi paket
+  const paketHarga = parseInt(info.paket_harga||0);
+  const totalFb    = parseInt(info.total_sementara||0);
+  const biayaTampil = paketHarga > 0 ? paketHarga : totalFb;
   if (isMember && info.customer) {
     billLbl.innerHTML = '<span style="color:var(--a-member);letter-spacing:2px">★ MEMBER — '+info.customer.toUpperCase()+'</span>';
+  } else if (paketHarga > 0) {
+    billLbl.innerHTML = 'HARGA PAKET <span style="font-size:8px;color:var(--a-paid);letter-spacing:1px;margin-left:4px;">✓ TETAP</span>';
   } else {
     billLbl.textContent = 'TOTAL TAGIHAN';
   }
-  billAmt.textContent = isMember ? 'Saldo Member' : fRp(totalFb);
+  billAmt.textContent = isMember ? 'Saldo Member' : fRp(biayaTampil);
 
   payEl.className = 'pay-chip pay-el';
   if (isTimeup) payTxt.textContent = 'WAKTU HABIS';
