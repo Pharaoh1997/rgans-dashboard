@@ -1201,20 +1201,18 @@ body {
   justify-content: center;
   background: #ffffff;
   border-radius: 8px;
-  width: 210px;
-  height: 210px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 240px;
+  min-height: 210px;
+  margin: 6px auto;
   position: relative;
-  overflow: hidden;
 }
-.qris-canvas-target canvas {
-  display: none !important;
-}
+.qris-canvas-target canvas,
 .qris-canvas-target img {
-  display: block !important;
-  width: 210px !important;
-  height: 210px !important;
   max-width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  margin: 0 auto !important;
   border-radius: 6px;
   object-fit: contain;
 }
@@ -1377,6 +1375,12 @@ body {
       <!-- Pilihan Durasi -->
       <div class="sm-section-label">PILIH DURASI / PAKET BERMAIN</div>
       <div class="sm-options-grid" id="sm-options-wadah"></div>
+
+      <!-- Banner Bonus Persiapan 5 Menit -->
+      <div id="sm-prep-banner" class="sm-event-banner" style="display:flex;background:rgba(0,240,255,0.08);border-color:rgba(0,240,255,0.3);margin-bottom:8px;">
+        <span class="seb-ico">⏱️</span>
+        <span class="seb-txt" style="color:#00f0ff;"><strong>BONUS +5 MENIT PERSIAPAN:</strong> Waktu ekstra gratis untuk menyalakan stik & pilih game!</span>
+      </div>
 
       <!-- Banner Event Promo jika ada -->
       <div id="sm-event-banner" class="sm-event-banner" style="display:none;">
@@ -2067,17 +2071,21 @@ function openSelfService(stnName, isExtending = false) {
   const stnData = (allStations && allStations[stnName]) ? allStations[stnName] : {};
   const t60 = parseInt(stnData.tarif_60 || 5000);
 
+  const prepBanner = document.getElementById('sm-prep-banner');
+  if (prepBanner) prepBanner.style.display = isExtending ? 'none' : 'flex';
+
+  const prepSuffix = isExtending ? '' : ' (+5m Persiapan)';
   const options = [
-    { label: '1 Jam', dur: 60, hrg: t60, pktId: '' },
-    { label: '2 Jam', dur: 120, hrg: t60 * 2, pktId: '' },
-    { label: '3 Jam', dur: 180, hrg: t60 * 3, pktId: '' }
+    { label: '1 Jam' + prepSuffix, dur: 60, hrg: t60, pktId: '' },
+    { label: '2 Jam' + prepSuffix, dur: 120, hrg: t60 * 2, pktId: '' },
+    { label: '3 Jam' + prepSuffix, dur: 180, hrg: t60 * 3, pktId: '' }
   ];
 
   if (lastPaket && typeof lastPaket === 'object') {
     Object.entries(lastPaket).forEach(([pid, p]) => {
       if (p.aktif !== false && p.harga > 0) {
         options.push({
-          label: p.nama || 'Paket Promo',
+          label: (p.nama || 'Paket Promo') + prepSuffix,
           dur: p.durasi_menit || 60,
           hrg: p.harga,
           pktId: pid,
@@ -2194,12 +2202,24 @@ function listenForActiveQris(stn) {
       qrTarget.innerHTML = '';
       new QRCode(qrTarget, {
         text: data.qr_string,
-        width: 210,
-        height: 210,
+        width: 220,
+        height: 220,
         colorDark: "#000000",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M
       });
+      // Pastikan QR code selalu tampil di semua tipe browser HP (baik canvas maupun img)
+      setTimeout(() => {
+        const c = qrTarget.querySelector('canvas');
+        const m = qrTarget.querySelector('img');
+        if (m && m.src && m.src.length > 50) {
+          m.style.display = 'block';
+          if (c) c.style.display = 'none';
+        } else if (c) {
+          c.style.display = 'block';
+          if (m) m.style.display = 'none';
+        }
+      }, 60);
     }
   });
 }
@@ -2208,10 +2228,12 @@ function saveQrisImage() {
   const canvas = document.querySelector('#qris-qrcode-target canvas');
   const img    = document.querySelector('#qris-qrcode-target img');
   let dataUrl = '';
-  if (canvas) {
-    dataUrl = canvas.toDataURL('image/png');
-  } else if (img && img.src) {
+  if (img && img.src && img.src.startsWith('data:image')) {
     dataUrl = img.src;
+  } else if (canvas) {
+    try {
+      dataUrl = canvas.toDataURL('image/png');
+    } catch(e) {}
   }
 
   if (!dataUrl) {
