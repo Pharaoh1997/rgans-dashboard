@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@700;800;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
@@ -1095,6 +1096,173 @@ body {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   AUTO-QRIS DISPLAY STYLING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.qris-card-container {
+  background: var(--surf2);
+  border: 1px solid rgba(0, 209, 255, 0.3);
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+.qris-badge-top {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: var(--muted2);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.qbt-left { color: #ef4444; font-weight: 900; }
+.qbt-right { color: var(--muted); }
+
+.qris-loading-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 35px 20px;
+  width: 100%;
+}
+.qris-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(0, 209, 255, 0.2);
+  border-top-color: var(--a-unpaid);
+  border-radius: 50%;
+  animation: spinQris 0.8s linear infinite;
+}
+@keyframes spinQris {
+  to { transform: rotate(360deg); }
+}
+.qlb-txt { font-size: 13px; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
+.qlb-sub { font-size: 10px; color: var(--muted); }
+
+.qris-display-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  animation: fadeIn 0.3s ease;
+}
+.qris-white-canvas {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 16px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 270px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+.qris-logo-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 8px;
+  width: 100%;
+}
+.qlh-qris {
+  font-family: var(--font);
+  font-size: 26px;
+  font-weight: 900;
+  color: #c92a2a;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+.qlh-desc {
+  font-size: 7px;
+  font-weight: 800;
+  color: #495057;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.qris-canvas-target {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border-radius: 8px;
+  width: 210px;
+  height: 210px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+.qris-canvas-target canvas {
+  display: none !important;
+}
+.qris-canvas-target img {
+  display: block !important;
+  width: 210px !important;
+  height: 210px !important;
+  max-width: 100% !important;
+  border-radius: 6px;
+  object-fit: contain;
+}
+.qris-logo-footer {
+  font-size: 7.5px;
+  font-weight: 800;
+  color: #868e96;
+  margin-top: 10px;
+  text-align: center;
+  letter-spacing: 0.5px;
+  width: 100%;
+}
+
+.qris-save-action {
+  width: 100%;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.qris-save-btn {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(0, 209, 255, 0.2), rgba(0, 255, 102, 0.15));
+  border: 1px solid rgba(0, 209, 255, 0.4);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 10px;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+.qris-save-btn:hover {
+  background: linear-gradient(135deg, rgba(0, 209, 255, 0.3), rgba(0, 255, 102, 0.25));
+  border-color: var(--a-unpaid);
+}
+.qris-save-tip {
+  font-size: 9px;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.4;
+}
 </style>
 
 <svg style="display:none;">
@@ -1227,28 +1395,36 @@ body {
         </div>
       </div>
 
-      <!-- Step Instruksi Saweria -->
-      <div class="sm-saweria-guide">
-        <div class="ssg-step">
-          <span class="ssg-num">1</span>
-          <div class="ssg-content">
-            <span class="ssg-label">Salin Format Pesan:</span>
-            <div class="ssg-copy-box">
-              <input type="text" id="sm-msg-input" readonly value="Station 1">
-              <button onclick="copyMsg()">📋 Salin</button>
-            </div>
-          </div>
+      <!-- AUTO-QRIS SECTION (OTOMATIS TANPA FORM) -->
+      <div class="qris-card-container">
+        <div class="qris-badge-top">
+          <span class="qbt-left">⚡ QRIS STANDAR NASIONAL</span>
+          <span class="qbt-right">R-GANS PREMIER</span>
+        </div>
+        
+        <div id="qris-loading" class="qris-loading-box">
+          <div class="qris-spinner"></div>
+          <span class="qlb-txt">Menyiapkan QRIS Otomatis...</span>
+          <span class="qlb-sub">Nominal Pas Terkunci Tanpa Perlu Ketik</span>
         </div>
 
-        <div class="ssg-step">
-          <span class="ssg-num">2</span>
-          <div class="ssg-content">
-            <span class="ssg-label">Buka & Bayar di Saweria (QRIS):</span>
-            <a id="sm-saweria-link" href="https://saweria.co/ronaldbe" target="_blank" class="ssg-pay-btn">
-              <span>💳 Buka Pembayaran Saweria (ronaldbe)</span>
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-            </a>
-            <p class="ssg-tip">💡 Masukkan nominal yang pas di Saweria, lalu scan QRIS dengan GoPay/OVO/DANA/BCA/m-Banking.</p>
+        <div id="qris-display-box" class="qris-display-box" style="display:none;">
+          <div class="qris-white-canvas">
+            <div class="qris-logo-header">
+              <span class="qlh-qris">QRIS</span>
+              <span class="qlh-desc">PEMBAYARAN DIGITAL INDONESIA</span>
+            </div>
+            <div id="qris-qrcode-target" class="qris-canvas-target"></div>
+            <div class="qris-logo-footer">
+              <span>BCA · GoPay · DANA · OVO · ShopeePay · Livin</span>
+            </div>
+          </div>
+          
+          <div class="qris-save-action">
+            <button class="qris-save-btn" onclick="saveQrisImage()">
+              <span>📸 Simpan / Download Gambar QRIS</span>
+            </button>
+            <p class="qris-save-tip">💡 Bayar pakai 1 HP? Simpan QR ini ➔ Buka GoPay/DANA/BCA ➔ Scan ➔ Pilih dari Galeri.</p>
           </div>
         </div>
       </div>
@@ -1265,7 +1441,11 @@ body {
       <!-- Live Waiting Pulse -->
       <div class="sm-waiting-box">
         <div class="sm-pulse-dot"></div>
-        <span>Menunggu pembayaran... TV & Unit akan otomatis MENYALA begitu dibayar!</span>
+        <span id="sm-waiting-txt">Menunggu pembayaran... TV & Unit akan otomatis MENYALA begitu dibayar!</span>
+      </div>
+
+      <div style="text-align:center;margin-top:10px;">
+        <a id="sm-saweria-link" href="https://saweria.co/ronaldbe" target="_blank" style="font-size:10px;color:var(--muted);text-decoration:underline;">Bermasalah dengan QR? Buka form Saweria manual</a>
       </div>
     </div>
   </div>
@@ -1790,21 +1970,56 @@ function sync(name, info, card) {
     tarifRow.style.display = 'none';
   }
 
-  // Billing — prioritas:
-  // 1. paket_harga (harga TETAP paket) jika ada → tampilkan fixed, tidak naik
-  // 2. total_sementara (live dari Python) untuk billing biasa / open billing
-  // Sebelumnya hanya pakai total_sementara yang ikut naik walau sesi paket
-  const paketHarga = parseInt(info.paket_harga||0);
-  const totalFb    = parseInt(info.total_sementara||0);
-  const biayaTampil = paketHarga > 0 ? paketHarga : totalFb;
+  // Billing:
+  // JIKA OPEN BILLING (isBebas):
+  //   Harga SELALU FLUKTUATIF / BERJALAN realtime sesuai durasi bermain!
+  // JIKA PAKET (!isBebas):
+  //   Harga TETAP sesuai paket durasi yang dipilih!
+  let biayaTampil = 0;
+  if (isBebas) {
+    billLbl.textContent = 'TOTAL TAGIHAN';
+    // Hitung realtime secara presisi dari jam mulai
+    const startMs = info.start_time_iso ? new Date(info.start_time_iso).getTime() : Date.now();
+    const elapsedSec = Math.max(0, (Date.now() - startMs) / 1000);
+    const t30Val = parseInt(info.tarif_30 || 3000);
+    const t60Val = parseInt(info.tarif_60 || 5000);
+    const tm = elapsedSec / 60;
+    let bLive = 0;
+    if (tm >= 1) {
+      const jam = Math.floor(tm / 60);
+      const sisa = tm % 60;
+      let b = jam * t60Val;
+      const ra = t30Val / 30, rb = (t60Val - t30Val) / 30;
+      b += (sisa <= 30) ? (sisa * ra) : (t30Val + (sisa - 30) * rb);
+      bLive = Math.floor(b / 500) * 500;
+    }
+    biayaTampil = Math.max(bLive, parseInt(info.total_sementara || info.biaya_asli || 0));
+  } else {
+    // Sesi PAKET (durasi terkunci):
+    billLbl.innerHTML = 'HARGA PAKET <span style="font-size:8px;color:var(--a-paid);letter-spacing:1px;margin-left:4px;">✓ TETAP</span>';
+    let paketHarga = parseInt(info.paket_harga || 0);
+    if (paketHarga <= 0 && info.end_time_iso && info.start_time_iso) {
+      const durMnt = Math.round((new Date(info.end_time_iso) - new Date(info.start_time_iso)) / 60000);
+      const t30Val = parseInt(info.tarif_30 || 3000);
+      const t60Val = parseInt(info.tarif_60 || 5000);
+      if (durMnt > 0) {
+        const jam = Math.floor(durMnt / 60);
+        const sisa = durMnt % 60;
+        let b = jam * t60Val;
+        const ra = t30Val / 30, rb = (t60Val - t30Val) / 30;
+        b += (sisa <= 30) ? (sisa * ra) : (t30Val + (sisa - 30) * rb);
+        paketHarga = Math.floor(b / 500) * 500;
+      }
+    }
+    biayaTampil = paketHarga > 0 ? paketHarga : parseInt(info.total_sementara || 5000);
+  }
+
   if (isMember && info.customer) {
     billLbl.innerHTML = '<span style="color:var(--a-member);letter-spacing:2px">★ MEMBER — '+info.customer.toUpperCase()+'</span>';
-  } else if (paketHarga > 0) {
-    billLbl.innerHTML = 'HARGA PAKET <span style="font-size:8px;color:var(--a-paid);letter-spacing:1px;margin-left:4px;">✓ TETAP</span>';
+    billAmt.textContent = 'Saldo Member';
   } else {
-    billLbl.textContent = 'TOTAL TAGIHAN';
+    billAmt.textContent = fRp(biayaTampil);
   }
-  billAmt.textContent = isMember ? 'Saldo Member' : fRp(biayaTampil);
 
   payEl.className = 'pay-chip pay-el';
   if (isTimeup) payTxt.textContent = 'WAKTU HABIS';
@@ -1823,8 +2038,8 @@ function sync(name, info, card) {
     if (diff <= 0 && end > 0) { timerEl.textContent = '00:00:00'; return; }
     timerEl.textContent = fMs(diff);
   }, 1000);
-  // Auto close modal jika pembayaran diterima & unit aktif
-  if (currentSelfStn === name && info.running && document.getElementById('self-modal').style.display !== 'none') {
+  // Auto close modal jika pembayaran diterima & unit baru aktif (bukan saat perpanjang)
+  if (!currentIsExtending && currentSelfStn === name && info.running && document.getElementById('self-modal').style.display !== 'none') {
     closeSelfService();
     proToast('🎉 PEMBAYARAN DITERIMA! UNIT ' + name + ' SUDAH MENYALA!');
   }
@@ -1838,6 +2053,8 @@ let selectedHrg = 5000;
 let selectedPktId = '';
 let selectedLabel = '1 Jam';
 const SAWERIA_USER = 'ronaldbe';
+let currentQrisListener = null;
+let allStations = {};
 
 function openSelfService(stnName, isExtending = false) {
   currentSelfStn = stnName;
@@ -1847,10 +2064,13 @@ function openSelfService(stnName, isExtending = false) {
   const wadahOpt = document.getElementById('sm-options-wadah');
   wadahOpt.innerHTML = '';
 
+  const stnData = (allStations && allStations[stnName]) ? allStations[stnName] : {};
+  const t60 = parseInt(stnData.tarif_60 || 5000);
+
   const options = [
-    { label: '1 Jam', dur: 60, hrg: 5000, pktId: '' },
-    { label: '2 Jam', dur: 120, hrg: 10000, pktId: '' },
-    { label: '3 Jam', dur: 180, hrg: 15000, pktId: '' }
+    { label: '1 Jam', dur: 60, hrg: t60, pktId: '' },
+    { label: '2 Jam', dur: 120, hrg: t60 * 2, pktId: '' },
+    { label: '3 Jam', dur: 180, hrg: t60 * 3, pktId: '' }
   ];
 
   if (lastPaket && typeof lastPaket === 'object') {
@@ -1896,12 +2116,19 @@ function openSelfService(stnName, isExtending = false) {
   }
   if (!hasEvent) evBanner.style.display = 'none';
 
+  // Mulai dengarkan QRIS aktif untuk stasiun ini
+  listenForActiveQris(stnName);
+
   selectDuration(options[0].dur, options[0].hrg, options[0].label, options[0].pktId);
   document.getElementById('self-modal').style.display = 'flex';
 }
 
 function closeSelfService() {
   document.getElementById('self-modal').style.display = 'none';
+  if (currentQrisListener) {
+    currentQrisListener.off();
+    currentQrisListener = null;
+  }
 }
 
 function selectDuration(durMin, hrg, label, pktId, btnEl) {
@@ -1913,24 +2140,92 @@ function selectDuration(durMin, hrg, label, pktId, btnEl) {
   document.getElementById('sm-total-display').textContent = fRp(hrg);
   document.getElementById('sm-durasi-display').textContent = label;
 
-  const msgInput = document.getElementById('sm-msg-input');
-  msgInput.value = currentSelfStn + (pktId ? ' ' + pktId : ' ' + fDur(durMin));
-
   if (btnEl) {
     document.querySelectorAll('.sm-opt-btn').forEach(b => b.classList.remove('active'));
     btnEl.classList.add('active');
   }
+
+  // Minta sistem PC Kasir generate dynamic QRIS Saweria resmi
+  requestQrisAuto(currentSelfStn, hrg, label, pktId);
 }
 
-function copyMsg() {
-  const inp = document.getElementById('sm-msg-input');
-  inp.select();
-  navigator.clipboard.writeText(inp.value).then(() => {
-    proToast('Pesan berhasil disalin: ' + inp.value);
-  }).catch(() => {
-    document.execCommand('copy');
-    proToast('Pesan disalin!');
+function requestQrisAuto(stn, hrg, label, pktId) {
+  const qrisLoad = document.getElementById('qris-loading');
+  const qrisBox  = document.getElementById('qris-display-box');
+  const qrTarget = document.getElementById('qris-qrcode-target');
+
+  if (qrisLoad) qrisLoad.style.display = 'flex';
+  if (qrisBox)  qrisBox.style.display = 'none';
+  if (qrTarget) qrTarget.innerHTML = '';
+
+  const cleanStn = stn.replace(/\s+/g, '_');
+  // Simpan request ke Firebase
+  db.ref('qris_requests/' + cleanStn).set({
+    station: stn,
+    amount: hrg,
+    label: label,
+    paket_id: pktId || '',
+    time: Date.now()
   });
+}
+
+function listenForActiveQris(stn) {
+  if (currentQrisListener) currentQrisListener.off();
+  const cleanStn = stn.replace(/\s+/g, '_');
+  currentQrisListener = db.ref('qris_active/' + cleanStn);
+  currentQrisListener.on('value', snap => {
+    const data = snap.val();
+    if (!data || !data.qr_string) return;
+
+    if (data.status === 'PAID') {
+      closeSelfService();
+      proToast('🎉 PEMBAYARAN DITERIMA! UNIT ' + stn + ' MENYALA!');
+      return;
+    }
+
+    const qrisLoad = document.getElementById('qris-loading');
+    const qrisBox  = document.getElementById('qris-display-box');
+    const qrTarget = document.getElementById('qris-qrcode-target');
+
+    if (qrisLoad) qrisLoad.style.display = 'none';
+    if (qrisBox)  qrisBox.style.display = 'flex';
+
+    if (qrTarget && typeof QRCode !== 'undefined') {
+      qrTarget.innerHTML = '';
+      new QRCode(qrTarget, {
+        text: data.qr_string,
+        width: 210,
+        height: 210,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    }
+  });
+}
+
+function saveQrisImage() {
+  const canvas = document.querySelector('#qris-qrcode-target canvas');
+  const img    = document.querySelector('#qris-qrcode-target img');
+  let dataUrl = '';
+  if (canvas) {
+    dataUrl = canvas.toDataURL('image/png');
+  } else if (img && img.src) {
+    dataUrl = img.src;
+  }
+
+  if (!dataUrl) {
+    proToast('QRIS belum siap, tunggu sebentar...');
+    return;
+  }
+
+  const a = document.createElement('a');
+  a.href = dataUrl;
+  a.download = `QRIS-${currentSelfStn}-${selectedHrg}.png`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  proToast('QRIS tersimpan! Buka DANA/GoPay ➔ Scan ➔ Galeri.');
 }
 
 function proToast(msg) {
@@ -1965,6 +2260,7 @@ db.ref('events_db').on('value', s => { lastEvent = s.val()||{}; renderPromo(last
 // Listen station dashboard
 db.ref('dashboard_rgans').on('value', snap => {
   const data = snap.val();
+  allStations = data || {};
   if (!data) {
     wadah.innerHTML = '<p style="color:var(--muted);text-align:center;padding:40px;font-size:14px;letter-spacing:4px;font-weight:800;">NO DATA FOUND</p>';
     return;
