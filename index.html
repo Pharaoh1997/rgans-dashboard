@@ -1950,7 +1950,7 @@ function proToast(msg) {
 /* ── Firebase Listeners ── */
 db.ref('.info/connected').on('value', s => {
   const e = document.getElementById('conn');
-  if (!e) return;
+  if (!e) return; 
   if (s.val()) { e.textContent='● LIVE CONNECTED'; e.style.color='var(--a-paid)'; }
   else          { e.textContent='● OFFLINE'; e.style.color='var(--a-timeup)'; }
 });
