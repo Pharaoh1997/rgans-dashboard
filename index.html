@@ -2302,6 +2302,19 @@ db.ref('dashboard_rgans').on('value', snap => {
     if (!card) { card = buildCard(n); wadah.appendChild(card); }
     sync(n, data[n], card);
   });
+
+  // Auto-open modal jika discan dari kartu akrilik meja (?unit=Station 1&auto=1)
+  const autoParam = new URLSearchParams(window.location.search).get('auto');
+  if (tU && (autoParam === '1' || autoParam === 'true') && !window._autoOpened) {
+    window._autoOpened = true;
+    setTimeout(() => {
+      const matched = Object.keys(data).find(k => k.toLowerCase() === tU.toLowerCase());
+      if (matched && typeof openSelfService === 'function') {
+        const isExtending = data[matched] && data[matched].running;
+        openSelfService(matched, isExtending);
+      }
+    }, 450);
+  }
 });
 </script>
 </body>
